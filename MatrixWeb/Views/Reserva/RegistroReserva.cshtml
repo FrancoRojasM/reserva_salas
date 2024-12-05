@@ -1,0 +1,201 @@
+﻿@model Reservas.Reserva
+@{
+	ViewBag.Title = "Registro Reserva";
+	Layout = null;
+}
+<form id="frmRegistroReserva" name="frmRegistroReserva" method="POST">
+	<div class="row">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-header"><h4 class="my-0">Registro de Reserva</h4></div>
+				<div class="card-body">
+					<input type="hidden" id="txtRegIdReserva" name="txtRegIdReserva" value="@Model.IdReserva" />
+					<div class="row">
+						<div class="col-md-2">
+							<div class="mb-1">
+								<div class="form-group">
+									<label class="form-label" for="cmbSolicitud">Solicitud</label>
+									<select class="form-control" id="cmbSolicitud" name="cmbSolicitud" data-toggle="select2" data-width="100%" data-validation="[V>0]" data-validation-message="Seleccione Solicitud"></select>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2">
+							<div class="mb-1">
+								<div class="form-group">
+									<label class="form-label" for="cmbSala">Sala</label>
+									<select class="form-control" id="cmbSala" name="cmbSala" data-toggle="select2" data-width="100%" data-validation="[V>0]" data-validation-message="Seleccione Sala"></select>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2">
+							<div class="mb-1">
+								<div class="form-group" id="divtxtFechaDesdeReserva">
+									<label class="form-label" for="txtFechaDesdeReserva">FechaDesdeReserva</label>
+									<input type="date" autocomplete="off" class="form-control" name="txtFechaDesdeReserva" id="txtFechaDesdeReserva" value="@String.Format("{0:yyyy-MM-dd}",Model.FechaDesdeReserva)">
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2">
+							<div class="mb-1">
+								<div class="form-group" id="divtxtFechaHastaReserva">
+									<label class="form-label" for="txtFechaHastaReserva">FechaHastaReserva</label>
+									<input type="date" autocomplete="off" class="form-control" name="txtFechaHastaReserva" id="txtFechaHastaReserva" value="@String.Format("{0:yyyy-MM-dd}",Model.FechaHastaReserva)">
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2">
+							<div class="mb-1">
+								<div class="form-group">
+									<label class="form-label" for="txtHoraInicio">HoraInicio</label>
+									<input type="text" class="form-control" name="txtHoraInicio" id="txtHoraInicio" value="@Model.HoraInicio">
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2">
+							<div class="mb-1">
+								<div class="form-group">
+									<label class="form-label" for="txtHoraFin">HoraFin</label>
+									<input type="text" class="form-control" name="txtHoraFin" id="txtHoraFin" value="@Model.HoraFin">
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2">
+							<div class="mb-1">
+								<div class="form-group">
+									<label class="form-label" for="txtObservaciones">Observaciones</label>
+									<input type="text" class="form-control" name="txtObservaciones" id="txtObservaciones" value="@Model.Observaciones">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card-footer" style="text-align:end;">
+					<button type="button" class="btn btn-primary waves-effect waves-light" title="Nuevo registro" onclick="VerEditarReserva(0)">Nuevo<span id="spNuevaReserva" class="mdi mdi-file" role="status" aria-hidden="true"></span></button>
+					<button type="submit" id="btnGuardarReserva" class="btn btn-success waves-effect waves-light" title="Grabar registro">Guardar<span id="spGuardarReserva" class="mdi mdi-content-save" role="status" aria-hidden="true"></span></button>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>
+<script>
+
+
+											  function ListarComboSolicitud() {
+												  $.ajax({
+													   url: "@Url.Action("ListarComboSolicitud", "Solicitud")",
+													  method: 'POST',
+													  success: function (lista) {
+														  if (lista.mensaje.CodigoMensaje == 0) {
+															  $("#cmbSolicitud").empty();
+															  $("#cmbSolicitud").append("<option value=0>Seleccione</option>");
+															  $.each(lista.lista, function (i, item) {
+																  if (item.IdSolicitud == "@Model.solicitud.IdSolicitud") {
+																	  $("#cmbSolicitud").append("<option value=" + item.IdSolicitud + " selected='selected'>" + item.NombreSolicitud + "</option>");
+																  }
+																  else {
+																	  $("#cmbSolicitud").append("<option value=" + item.IdSolicitud + ">" + item.NombreSolicitud + "</option>");
+																  }
+															  });
+														  }
+														   else
+														  {
+															  console.log(lista.mensaje.DescripcionMensajeSistema);
+															  toastr.error(lista.mensaje.DescripcionMensaje);
+														  }
+													  },
+													   error: function (mensaje) {
+															  console.log(mensaje);
+															  toastr.error('Sucedió un error en la llamada ListarComboSolicitud, verifique consola');
+														  }
+												  });
+											  }
+
+						  function ListarComboSala() {
+							  $.ajax({
+								   url: "@Url.Action("ListarComboSala", "Sala")",
+								  method: 'POST',
+								  success: function (lista) {
+									  if (lista.mensaje.CodigoMensaje == 0) {
+										  $("#cmbSala").empty();
+										  $("#cmbSala").append("<option value=0>Seleccione</option>");
+										  $.each(lista.lista, function (i, item) {
+											  if (item.IdSala == "@Model.sala.IdSala") {
+												  $("#cmbSala").append("<option value=" + item.IdSala + " selected='selected'>" + item.NombreSala + "</option>");
+											  }
+											  else {
+												  $("#cmbSala").append("<option value=" + item.IdSala + ">" + item.NombreSala + "</option>");
+											  }
+										  });
+									  }
+									   else
+									  {
+										  console.log(lista.mensaje.DescripcionMensajeSistema);
+										  toastr.error(lista.mensaje.DescripcionMensaje);
+									  }
+								  },
+								   error: function (mensaje) {
+										  console.log(mensaje);
+										  toastr.error('Sucedió un error en la interface [ListarComboSala], verifique consola');
+									  }
+							  });
+						  }
+
+	$(function () {
+
+		  // $("#nombreCombo").select2({ theme: 'bootstrap', dropdownParent: $('#NombreModal') });
+			  $("#frmRegistroReserva").validate({
+		  submit: {
+			  settings: {
+				  inputContainer: '.field',
+				  errorClass: 'LabelError', errorListClass: 'ListaError'
+			  },
+			  callback: {
+				  onBeforeSubmit: function (node) {
+					  $("#btnGuardarReserva").addClass("disabled");
+					  $("#spGuardarReserva").removeClass("mdi mdi-content-save");
+					  $("#spGuardarReserva").addClass("spinner-grow spinner-grow-sm me-1");
+				  },
+				  onSubmit: function (node, formData) {
+			  var fileData = new FormData();
+					  for (var control in formData) {
+						  var valor = $("#" + control).val();
+						  fileData.append(control, valor);
+						  valor = "";
+					  }
+
+
+						  $.ajax({
+							  url: "@Url.Action("GuardarRegistroReserva", "Reserva")",
+							  method: 'POST',
+							  data: fileData,
+							  contentType: false,
+							  processData: false,
+							  success: function (reserva) {
+								  if (reserva.mensaje.CodigoMensaje == 0) {
+								   $("#txtRegIdReserva").val(reserva.IdReserva);
+									  toastr.success(reserva.mensaje.DescripcionMensaje);
+									  ActualizarTablaReserva();
+								  }
+								  else {
+									  toastr.error(reserva.mensaje.DescripcionMensaje);
+									  console.log(reserva.mensaje.DescripcionMensajeSistema);
+								  }
+							  },
+							  error: function (mensaje) {
+								  console.log(mensaje);
+								  toastr.error('Sucedió un error en la interface [GuardarRegistroReserva], verifique consola');
+							  },
+								complete: function (respuesta) {
+								$("#btnGuardarReserva").removeClass("disabled");
+							  $("#spGuardarReserva").removeClass("spinner-grow spinner-grow-sm me-1");
+							  $("#spGuardarReserva").addClass("mdi mdi-content-save");
+								  ValidarSesionActual(respuesta);
+												  }
+						  });
+					  }
+				  }
+			  }
+		  });
+
+	  });
+</script>

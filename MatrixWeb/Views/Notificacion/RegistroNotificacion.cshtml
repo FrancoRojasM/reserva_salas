@@ -1,0 +1,310 @@
+﻿@model Casilla.Notificacion
+@{
+    ViewBag.Title = "Registro Notificacion";
+    Layout = null;
+}
+
+<form id="frmRegistroNotificacion" name="frmRegistroNotificacion" method="POST">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header"><h4 class="my-0">Registro de Notificación</h4></div>
+                <div class="card-body">
+                    <input type="hidden" id="txtRegIdNotificacion" name="txtRegIdNotificacion" value="@Model.IdNotificacion" />
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="mb-1">
+                                <div class="form-group">
+                                    <label class="form-label" for="cmbCatalogoCategoria">Categoria</label>
+                                    <select class="form-control form-select" id="cmbCatalogoCategoria" name="cmbCatalogoCategoria" data-toggle="select2" data-width="100%" data-validation="[V>0]" data-validation-message="Seleccione una Categoria"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="mb-1">
+                                <div class="form-group">
+                                    <label class="form-label" for="txtAdministradoNotificado">Administrado a Notificar</label>
+                                    <input type="hidden" id="txtIdAdministradoNotificado" name="txtIdAdministradoNotificado" value="@Model.administradonotificado.IdAdministrado" />
+                                    <input autocomplete="off" type="text" class="form-control" name="txtAdministradoNotificado" id="txtAdministradoNotificado" value="@Model.administradonotificado.persona.NombreCompleto" data-validation="[NOTEMPTY]" data-validation-message="Seleccione una Administrado">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="mb-1">
+                                <div class="form-group">
+                                    <label class="form-label" for="txtAsuntoNotificacion">Asunto</label>
+                                    <input type="text" class="form-control" name="txtAsuntoNotificacion" id="txtAsuntoNotificacion" value="@Model.AsuntoNotificacion" data-validation="[NOTEMPTY]" data-validation-message="Escriba el Asunto">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+
+                            <div class="mb-1">
+                                <div class="form-group">
+                                    <label class="form-label" for="txtMensajeNotificacionHtml">Mensaje</label>
+                                    <div id="txtMensajeNotificacionHtml" style="height: 100px;">
+                                        @Html.Raw(Model.MensajeNotificacionHtml)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div hidden class="col-md-2">
+                            <div class="mb-1">
+                                <div class="form-group" id="divtxtFechaHoraNotificacionEnviada">
+                                    <label class="form-label" for="txtFechaHoraNotificacionEnviada">FechaHoraNotificacionEnviada</label>
+                                    <input type="date" autocomplete="off" class="form-control" name="txtFechaHoraNotificacionEnviada" id="txtFechaHoraNotificacionEnviada" value="@String.Format("{0:yyyy-MM-dd}",Model.FechaHoraNotificacionEnviada)">
+                                </div>
+                            </div>
+                        </div>
+                        <div hidden class="col-md-2">
+                            <div class="mb-1">
+                                <div class="form-group">
+                                    <label class="form-label" for="optNotificacionEnviada">NotificacionEnviada</label>
+
+                                    <select class="form-select" id="optNotificacionEnviada" name="optNotificacionEnviada">
+                                        @if (Model.NotificacionEnviada == true)
+                                        {
+                                            <option value="1" selected="">Si</option>
+                                            <option value="0">No</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="1">Si</option>
+                                            <option value="0" selected="">No</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div hidden class="col-md-2">
+                            <div class="mb-1">
+                                <div class="form-group" id="divtxtFechaHoraRecepcionNotificacion">
+                                    <label class="form-label" for="txtFechaHoraRecepcionNotificacion">FechaHoraRecepcionNotificacion</label>
+                                    <input type="date" autocomplete="off" class="form-control" name="txtFechaHoraRecepcionNotificacion" id="txtFechaHoraRecepcionNotificacion" value="@String.Format("{0:yyyy-MM-dd}",Model.FechaHoraRecepcionNotificacion)">
+                                </div>
+                            </div>
+                        </div>
+                        <div hidden class="col-md-2">
+                            <div class="mb-1">
+                                <div class="form-group">
+                                    <label class="form-label" for="optNotificacionRecibida">NotificacionRecibida</label>
+
+                                    <select class="form-select" id="optNotificacionRecibida" name="optNotificacionRecibida">
+                                        @if (Model.NotificacionRecibida == true)
+                                        {
+                                            <option value="1" selected="">Si</option>
+                                            <option value="0">No</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="1">Si</option>
+                                            <option value="0" selected="">No</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer" style="text-align:end;">
+                    <button type="button" class="btn btn-primary waves-effect waves-light" title="Nuevo registro" onclick="VerEditarNotificacion(0)">
+                        Nuevo
+                        <span id="spNuevaNotificacion" class="mdi mdi-file" role="status" aria-hidden="true"></span>
+                    </button>
+                    @if (!Model.NotificacionEnviada)
+                    {
+                        <button type="submit" id="btnGuardarNotificacion" class="btn btn-success waves-effect waves-light" title="Grabar registro">
+                            Guardar
+                            <span id="spGuardarNotificacion" class="mdi mdi-content-save" role="status" aria-hidden="true"></span>
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    /*
+    function ListarAdministradoPorAutoComplete() {
+        $('#txtAdministradoNotificado').select2({
+            placeholder: '',
+            allowClear: true,
+            theme: "bootstrap",
+            ajax: {
+                delay: 250,
+                method: 'POST',
+                url: "@Url.Action("ListarAdministradoPorAutoComplete", "Persona")",
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        type: 'public'
+                    }
+                    return query;
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.items
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1
+        });
+        // $('#cmbPersonaEmpresa').val(null).trigger('change');
+    }
+    */
+
+    function ListarAdministradoPorAutoComplete() {
+        $("#txtAdministradoNotificado").jqxInput({
+            placeHolder: "Escriba y seleccione una Administrado",
+            source: function (query, response) {
+                var dataAdapter = new $.jqx.dataAdapter
+                    ({
+                        datatype: "json",
+                        datafields: [{ name: 'IdAdministrado' }, { name: 'NombreCompleto' }],
+                        url: "@Url.Action("ListarAdministradoPorAutoComplete", "Administrado")",
+                        data: { NombreCompleto: query }
+                    },
+                        {
+                            autoBind: true,
+                            formatData: function (data) {
+                                data.name_startsWith = query;
+                                return data;
+                            },
+                            loadComplete: function (data) {
+                                response($.map(data, function (item) {
+                                    return {
+                                        label: item.NombreCompleto,
+                                        value: item.IdAdministrado
+                                    }
+                                }));
+                            }
+                        });
+            }, displayMember: "NombreCompleto", valueMember: "IdAdministrado", height: 22
+        });
+        $("#txtAdministradoNotificado").on('select', function (event) {
+            $("#txtIdAdministradoNotificado").val(0);
+            if (event.args) {
+                var item = event.args.item;
+                if (item) {
+                    $("#txtIdAdministradoNotificado").val(item.value);
+                }
+                else {
+                    $("#txtIdAdministradoNotificado").val(0);
+                }
+            }
+            else {
+                $("#txtIdAdministradoNotificado").val(0);
+            }
+        });
+    }
+
+    function ListarCatalogoCategoria() {
+        $.ajax({
+            url: "@Url.Action("ListarCatalogoCategoria", "CatalogoCasilla")",
+            method: 'POST',
+            success: function (data) {
+                $("#cmbCatalogoCategoria").empty();
+                $("#cmbCatalogoCategoria").append("<option value=0>Seleccione</option>");
+                $.each(data, function (i, item) {
+                    if (item.IdCatalogo == "@Model.catalogocategoria.IdCatalogo") {
+                        $("#cmbCatalogoCategoria").append("<option value=" + item.IdCatalogo + " selected='selected'>" + item.Descripcion + "</option>");
+                    }
+                    else {
+                        $("#cmbCatalogoCategoria").append("<option value=" + item.IdCatalogo + ">" + item.Descripcion + "</option>");
+                    }
+                });
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la interface [ListarCatalogoCategoria], verifique consola');
+            }
+        });
+    }
+
+    $(function () {
+        var quill = new Quill("#txtMensajeNotificacionHtml", {
+            theme: "snow", modules: {
+                toolbar: [[{ font: [] }, { size: [] }],
+                ["bold", "italic", "underline", "strike"],
+                [{ color: [] },
+                { background: [] }], [{ script: "super" },
+                { script: "sub" }],
+                [{ header: [!1, 1, 2, 3, 4, 5, 6] },
+                    "blockquote", "code-block"], [{ list: "ordered" }, { list: "bullet" }, { indent: "-1" }, { indent: "+1" }],
+                ["direction", { align: [] }], ["link", "image", "video"], ["clean"]]
+            }
+        });
+        ListarAdministradoPorAutoComplete();
+
+        ListarCatalogoCategoria();
+        // $("#cmbCatalogoCategoria").select2();
+        $("#cmbCatalogoCategoria").on("select2:select", function (e) {
+            const selectedData = e.params.data;
+            if (selectedData.id && selectedData.id != 0) {
+                $("#frmRegistroNotificacion").removeError("cmbCatalogoCategoria")
+            }
+        });
+
+
+        // $("#nombreCombo").select2({ theme: 'bootstrap', dropdownParent: $('#NombreModal') });
+        $("#frmRegistroNotificacion").validate({
+            submit: {
+                settings: {
+                    inputContainer: '.field',
+                    errorClass: 'LabelError', errorListClass: 'ListaError'
+                },
+                callback: {
+                    onBeforeSubmit: function (node) {
+                        $("#btnGuardarNotificacion").addClass("disabled");
+                        $("#spGuardarNotificacion").removeClass("mdi mdi-content-save");
+                        $("#spGuardarNotificacion").addClass("spinner-grow spinner-grow-sm me-1");
+                    },
+                    onSubmit: function (node, formData) {
+                        //var files = $("#txtRutaArchivo").get(0).files;
+                        var fileData = new FormData();
+                        for (var control in formData) {
+                            var valor = $("#" + control).val();
+                            fileData.append(control, valor);
+                            valor = "";
+                        }
+                        console.log(quill);
+                        fileData.append('txtMensajeNotificacionHtml', quill.root.innerHTML);
+                        fileData.append('txtMensajeNotificacion', quill.root.innerText);
+
+                        $.ajax({
+                            url: "@Url.Action("GuardarRegistroNotificacion", "Notificacion")",
+                            method: 'POST',
+                            data: fileData,
+                            contentType: false,
+                            processData: false,
+                            success: function (notificacion) {
+                                if (notificacion.mensaje.CodigoMensaje == 0) {
+                                    toastr.success(notificacion.mensaje.DescripcionMensaje);
+                                    ActualizarTablaNotificacion();
+                                }
+                                else {
+                                    toastr.error(notificacion.mensaje.DescripcionMensaje);
+                                    console.log(notificacion.mensaje.DescripcionMensajeSistema);
+                                }
+                            },
+                            error: function (mensaje) {
+                                console.log(mensaje);
+                                toastr.error('Sucedió un error en la interface [GuardarRegistroNotificacion], verifique consola');
+                            },
+                            complete: function (respuesta) {
+                                $("#btnGuardarNotificacion").removeClass("disabled");
+                                $("#spGuardarNotificacion").removeClass("spinner-grow spinner-grow-sm me-1");
+                                $("#spGuardarNotificacion").addClass("mdi mdi-content-save");
+
+                                ValidarSesionActual(respuesta);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    });
+</script>

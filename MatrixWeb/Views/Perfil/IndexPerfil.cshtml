@@ -1,0 +1,237 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    Layout = "~/Views/Shared/Inicial.cshtml";
+    Context.Session.SetString("ModuloActual", "Seguridad");
+    Context.Session.SetString("PaginaActual", "Perfil");
+    Context.Session.SetString("SubPaginaActual", "");
+
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item">@Context.Session.GetString("ModuloActual")</li>
+                        <li class="breadcrumb-item active">@Context.Session.GetString("PaginaActual")</li>
+                    </ol>
+                </div>
+                <h4 class="page-title">@Context.Session.GetString("PaginaActual")</h4>
+            </div>
+        </div>
+    </div>
+</div>
+@if (ViewBag.conpermiso == 0)
+{
+    <div style="font-weight:bold;color:red;">Usted no tiene permiso para ver este recurso</div>
+}
+else
+{
+    <div class="card border-info border mb-3">
+        <div class="card-body px-1 py-1">
+            <div id="divEditarPerfil">
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12">
+                    <table id="dtbPerfil" class="table table-striped table-hover table-bordered" cellspacing="0" style="width:100%"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="ModalPerfilOpcion" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Accesos</h5>
+                    <span type="button" class="close" onclick="CerrarModalPerfilOpcion()"><i class="fas fa-times"></i></span>
+                </div>
+                <div class="modal-body">
+                    <div id="divModalPerfilOpcion"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="ModalEliminarPerfil" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <input type="hidden" class="form-control" name="txtIdPerfilEliminar" id="txtIdPerfilEliminar" value="">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Eliminar Perfil</h5>
+                    <span type="button" onclick="CerrarEliminarPerfil()"><i class="fas fa-times"></i></span>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro de eliminar el registro seleccionado?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Eliminar registro seleccionado" onclick="EliminarPerfil()"> Eliminar <i class="ti-trash"></i></button>
+                    <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Regresar al formulario anterior" onclick="CerrarEliminarPerfil()"> Cerrar <i class="ti-back-left"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @section scripts {
+    <script>
+        function CerrarModalPerfil() {
+            $("#ModalPerfil").modal("hide");
+            $("#divEditarPerfil").empty();
+            ActualizarTablaPerfil();
+        }
+        function CerrarEliminarPerfil() {
+            $("#ModalEliminarPerfil").modal("hide");
+        }
+        function EliminarPerfil() {
+            var IdPerfilEliminar = $('#txtIdPerfilEliminar').val();
+            $.ajax({
+                url: "@Url.Action("EliminarPerfil")",
+                method: 'POST',
+                data: { IdPerfil: IdPerfilEliminar },
+                success: function (mensaje) {
+                    $("#modalEliminarPerfil").modal('hide');
+                    if (mensaje.CodigoMensaje == 0) {
+                        toastr.success(mensaje.DescripcionMensaje);
+                        ActualizarTablaPerfil();
+                        VerEditarPerfil(0);
+                        CerrarEliminarPerfil();
+                    }
+                    else {
+                        toastr.error(mensaje.DescripcionMensaje);
+                        console.log(mensaje.DescripcionMensajeSistema);
+                    }
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la interface [EliminarPerfil], verifique consola');
+                },
+                complete: function (respuesta) {
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+        function VerModalEliminarPerfil(IdPerfil) {
+            $("#txtIdPerfilEliminar").val(IdPerfil);
+            $("#ModalEliminarPerfil").modal("show");
+        }
+        function CerrarModalPerfilOpcion() {
+            $("#ModalPerfilOpcion").modal("hide");
+            $("#divModalPerfilOpcion").empty();
+        }
+        function VerModalPerfilOpcion(IdPerfil) {
+            $.ajax({
+                url: "@Url.Action("IndexPerfilOpcion", "PerfilOpcion")",
+                type: "POST",
+                async: true,
+                data: { IdPerfil: IdPerfil },
+                success: function (vistaParcial) {
+                    $("#divModalPerfilOpcion").html(vistaParcial);
+                    $("#ModalPerfilOpcion").modal("show");
+                },
+                error: function (mensaje) {
+                    console.log(mensaje.responseText);
+                    toastr.error('Sucedió un error en la llamada, verifique consola');
+                },
+                complete: function (respuesta) {
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+        function VerEditarPerfil(tipo) {
+            var IdPerfil = 0;
+            if (tipo == 1) {
+                var data = ListaPerfil.dtPerfil.rows('.selected').data();
+                if (data.length == 1) {
+                    IdPerfil = data[0].IdPerfil;
+                }
+            }
+            $.ajax({
+                beforeSend: function () {
+                    $('#iBtnNuevoIdPerfil').removeClass("ti-file").addClass("fa fa-spinner fa-spin fa-fw");
+                },
+                url: "@Url.Action("RegistroPerfil", "Perfil")",
+                type: "POST",
+                async: true,
+                data: { IdPerfil: IdPerfil },
+                success: function (vistaParcial) {
+                    $("#divEditarPerfil").html(vistaParcial);
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la llamada, verifique consola');
+                },
+                complete: function (respuesta) {
+                    $('#iBtnNuevoIdPerfil').removeClass("fa fa-spinner fa-spin fa-fw").addClass("ti-file");
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+
+        function ActualizarTablaPerfil() {
+            ListaPerfil.refresh();
+        }
+        $(function () {
+            VerEditarPerfil(0);
+            ListaPerfil = {
+                dtPerfil: null,
+                init: function () {
+                    this.dtPerfil = $('#dtbPerfil').DataTable({
+                        responsive: true,
+                        rowId: 'IdPerfil',
+                        language: {
+                            url: '/assets/libs/datatables.net/js/es-ES.json',
+                        },
+                        "ordering": false,
+                        "lengthMenu": [[10, 25, 50, 100, 100000], [10, 25, 50, 100, 'Todo']],
+                        select: {
+                            style: 'single',
+                            info: false
+                        },
+                        "serverSide": true,
+                        "ajax": {
+                            "url": "@Url.Action("ListarPerfil", "Perfil")",
+                            "error": function (respuesta, error, thrown) {
+                                ValidarSesionActual(respuesta);
+                            },
+                            "type": "POST"
+                        },
+                        "columns": [
+                            { "title": "Perfil", "data": "NombrePerfil", "className": "dt-head-center dt-body-left", "width": "40%" },
+                            { "title": "Detalle", "data": "DetallePerfil", "className": "dt-head-center dt-body-left", "width": "40%" },
+                            { "title": "Activo", "data": "Activo", "className": "dt-head-center dt-body-center", "width": "10%" },
+                            {
+                                "title": "Accesos",
+                                "data": function (row, type, val, meta) {
+                                    return '<button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Opciones" onclick="VerModalPerfilOpcion(' + row.IdPerfil + ')"><i id="btnPerfilOpcion' + row.IdPerfil + '" class="fas fa-bars"></i></button>';
+                                },
+                                "className": "dt-head-center dt-body-center", "width": "10%"
+                            },
+                            {
+                                "title": "Eliminar",
+                                "data": function (row, type, val, meta) {
+                                    return '<button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Opciones" onclick="VerModalEliminarPerfil(' + row.IdPerfil + ')"><i id="btnPerfil' + row.IdPerfil + '" class="fa fa-trash"></i></button>';
+                                },
+                                "className": "dt-head-center dt-body-center", "width": "5%"
+                            }
+                        ]
+                    });
+                },
+                refresh: function () {
+                    this.dtPerfil.ajax.reload(null, false);
+                }
+            }
+            ListaPerfil.init();
+            ListaPerfil.dtPerfil.on('select', function (e, dt, type, indexes) {
+                var count = ListaPerfil.dtPerfil.rows({ selected: true }).count();
+                if (count > 0) {
+                    VerEditarPerfil(1);
+                }
+            });
+        });
+    </script>
+    }
+}

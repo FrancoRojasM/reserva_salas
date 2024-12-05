@@ -1,0 +1,81 @@
+﻿@{
+    ViewBag.Title = "ListaProducto";
+    Layout = "~/Views/Shared/Inicial.cshtml";
+
+}
+    <div class="card card-topline-aqua">
+        <div class="card-head" style="border-bottom: 1px solid rgba(0, 0, 0, 0.2);">
+            <header style="text-transform: uppercase;"><span><i class="fa fa-tasks"></i></span> Producto </header>
+        </div>
+        <div class="card-body" style="padding: 5px;">
+
+            <div class="col-md-12" style="padding: 0px 15px 0px 15px;">
+
+                <select class="form-control" id="cmbEmpresaSede" name="cmbEmpresaSede"></select>
+
+            </div>
+            <div class="col-md-12">
+                <div id="divProducto">
+                </div>
+            </div>
+        </div>
+    </div>
+@section scripts{
+    <script>
+        function ListarComboEmpresaSede() {
+            $.ajax({
+                url: "@Url.Action("ListarComboEmpresaSede", "EmpresaSede")",
+                method: 'POST',
+                async: false,
+                success: function (data) {
+                    $("#cmbEmpresaSede").empty();
+                    $("#cmbEmpresaSede").append("<option value=0>Seleccione</option>");
+                    $.each(data, function (i, item) {
+
+                            $("#cmbEmpresaSede").append("<option value=" + item.IdEmpresaSede + ">" + item.NombreEmpresaSede + "</option>");
+
+                    });
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la llamada ListarComboEmpresaSede, verifique consola');
+                },
+                complete: function (respuesta) {
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+        function VerProductos() {
+            $("#divProducto").empty();
+            IdEmpresaSede = $('#cmbEmpresaSede').val();
+            console.log(IdEmpresaSede);
+            if (IdEmpresaSede != 0) {
+                $.ajax({
+                    url: "@Url.Action("IndexProducto", "Producto")",
+                    method: 'GET',
+                    data: { IdEmpresaSede: IdEmpresaSede },
+                    success: function (vistaParcial) {
+                        $("#divProducto").html(vistaParcial);
+                    },
+                    error: function (mensaje) {
+                        console.log(mensaje);
+                        toastr.error('Sucedió un error en la llamada, verifique consola');
+                    }
+                });
+            }
+        }
+        $(function () {
+            ListarComboEmpresaSede();
+            $('#cmbEmpresaSede').select2({ theme: "bootstrap"});
+            $('#cmbEmpresaSede').change(function () { VerProductos(); });
+
+        });
+    </script>
+}
+
+
+
+
+
+
+

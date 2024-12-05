@@ -1,0 +1,141 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    ViewBag.Title = "ListaExpediente";
+    Layout = "~/Views/Shared/Inicial.cshtml";
+    // Context.Session.SetString("ModuloActual", "Sancion");
+    // Context.Session.SetString("PaginaActual", "Catálogo Sancion");
+    // Context.Session.SetString("SubPaginaActual", "");
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box">
+                    <div class="page-title-right">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item">Sanciones</li>
+                            <li class="breadcrumb-item active">Catálogo</li>
+                        </ol>
+                    </div>
+                    <h4 class="page-title">Catálogo</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (ViewBag.conpermiso == 0)
+    {
+        <div style="font-weight:bold;color:red;">Usted no tiene permiso para ver esta pagina</div>
+    }
+    else
+    {
+
+        <div class="card border-info border mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <table id="dtbCatalogoPadre" class="table table-striped table-hover table-bordered" cellspacing="0" style="width:100%"></table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div id="contenedorDetallesCatalogo" class="card d-none">
+                            <div class="card-body px-1 py-1">
+                                <div id="divDetalleCatalogo">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @section scripts {
+        <script>
+            function VerDetalleCatalogo(tipo) {
+
+                var IdCatalogoPadre = 0;
+                $("#divDetalleCatalogo").empty();
+                if (tipo == 1) {
+                    var data = ListaCatalogoPadre.dtCatalogoPadre.rows('.selected').data();
+                    if (data.length == 1) {
+                        IdCatalogoPadre = data[0].IdCatalogo;
+                    }
+                }
+
+                $.ajax({
+                    url: "@Url.Action("IndexCatalogo", "CatalogoSancion")",
+                    type: "GET",
+                    async: true,
+                    data: { IdCatalogoPadre: IdCatalogoPadre },
+                    success: function (vistaParcial) {
+                        $("#divDetalleCatalogo").empty();
+                        $("#divDetalleCatalogo").html(vistaParcial);
+                    },
+                    error: function (mensaje) {
+                        console.log(mensaje);
+                        toastr.error('Sucedió un error en la llamada, verifique consola');
+                    }
+                });
+
+            }
+            $(function () {
+                ListaCatalogoPadre = {
+                    dtCatalogoPadre: null,
+                    init: function () {
+                        this.dtCatalogoPadre = $('#dtbCatalogoPadre').DataTable({
+                            responsive: true,
+                            rowId: 'IdCatalogo',
+                            language: {
+                                url: '/assets/libs/datatables.net/js/es-ES.json',
+                            },
+                            "ordering": false,
+                            "lengthMenu": [[25, 50, 100, 100000], [25, 50, 100, 'Todo']],
+                            select: {
+                                style: 'single',
+                                info: false
+                            },
+                            "serverSide": true,
+                            "ajax": {
+                                "url": "@Url.Action("ListarCatalogoPadre", "CatalogoSancion")",
+                                "error": function (respuesta, error, thrown) {
+                                    ValidarSesionActual(respuesta);
+                                },
+                                "type": "POST"
+                            },
+                            "columns": [
+                                //{ "title": "Orden", "data": "OrdenItem","className": "dt-head-center dt-body-left","width": "10%" },
+                                { "title": "Descripcion", "data": "Descripcion", "className": "dt-head-center dt-body-left", "width": "100%" },
+                                //	{ "title": "Detalle", "data": "Detalle","className": "dt-head-center dt-body-left","width": "30%" },
+                            ]
+                        });
+                    },
+                    refresh: function () {
+                        this.dtCatalogoPadre.ajax.reload(null, false);
+                    }
+                }
+                ListaCatalogoPadre.init();
+                ListaCatalogoPadre.dtCatalogoPadre.on('select', function (e, dt, type, indexes) {
+                    var count = ListaCatalogoPadre.dtCatalogoPadre.rows({ selected: true }).count();
+                    if (count > 0) {
+                        $("#contenedorDetallesCatalogo").removeClass("d-none");
+                        VerDetalleCatalogo(1);
+                    }
+                });
+            });
+        </script>
+
+        }
+    }
+
+
+
+
+
+
+
+}

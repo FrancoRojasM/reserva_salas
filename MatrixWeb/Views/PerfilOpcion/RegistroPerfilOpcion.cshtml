@@ -1,0 +1,490 @@
+﻿
+
+@model Seguridad.PerfilOpcion
+@{
+    ViewBag.Title = "Registro PerfilOpcion";
+    Layout = null;
+}
+@{
+    string disabledVer = "";
+    string disabledNuevo = "";
+    string disabledEditar = "";
+    string disabledGuardar = "";
+    string disabledEliminar = "";
+    string disabledConsultar = "";
+    string disabledImprimir = "";
+    string disabledExportar = "";
+    string disabledVistaPrevia = "";
+
+    if (!Model.Ver0) { disabledVer = "disabled"; }
+    if (!Model.Nuevo0) { disabledNuevo = "disabled"; }
+    if (!Model.Editar0) { disabledEditar = "disabled"; }
+    if (!Model.Guardar0) { disabledGuardar = "disabled"; }
+    if (!Model.Eliminar0) { disabledEliminar = "disabled"; }
+    if (!Model.Imprimir0) { disabledImprimir = "disabled"; }
+    if (!Model.Consultar0) { disabledConsultar = "disabled"; }
+    if (!Model.Exportar0) { disabledExportar = "disabled"; }
+    if (!Model.VistaPrevia0) { disabledVistaPrevia = "disabled"; }
+
+
+}
+@if (Model.mensaje.CodigoMensaje > 0)
+{
+    <span>ERROR</span>
+    <span>@Model.mensaje.DescripcionMensaje</span>
+    <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Regresar al formulario anterior" onclick="NombreFuncionCerrarModal()"><i class="ti-back-left"></i></button>
+}
+else
+{
+ 
+
+  
+<form id="frmRegistroPerfilOpcion" name="frmRegistroPerfilOpcion" method="POST">
+    <div class="card card-topline-aqua">
+        <div class="card-head">
+            <h5 style="text-align:center;" class="bold">@Model.perfil.NombrePerfil</h5>
+        </div>
+        <div class="card-body">
+            <input type="hidden" id="txtRegIdPerfilOpcion" name="txtRegIdPerfilOpcion" value="@Model.IdPerfilOpcion" />
+            <div class="row justify-content-md-center">
+            <div class="col-md-1">
+                <div class="form-group">
+                    <label class="form-label" for="optVer">Ver</label>
+                    <br />
+                    @if (disabledVer == "disabled")
+                    {
+                        <select @disabledVer id="optVer" name="optVer" class="form-control"><option value="0"></option></select>
+
+                    }
+                    else
+                    {
+                        <select @disabledVer id="optVer" name="optVer" class="form-control">
+                            @if (Model.Ver == true)
+                            {
+                                <option value="1" selected="">Si</option>
+                                <option value="0">No</option>
+                            }
+                            else
+                            {
+                                <option value="1">Si</option>
+                                <option value="0" selected="">No</option>
+                            }
+                        </select>
+                    }
+                </div>
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    <label class="form-label" for="optNuevo">Nuevo</label>
+                    <br />
+                    @if (disabledNuevo == "disabled")
+                    {
+                        <select @disabledNuevo id="optNuevo" name="optNuevo" class="form-control"><option value="0"></option></select>
+
+                    }
+                    else
+                    {
+                        <select @disabledNuevo id="optNuevo" name="optNuevo" class="form-control">
+                            @if (Model.Nuevo == true)
+                            {
+                                <option value="1" selected="">Si</option>
+                                <option value="0">No</option>
+                            }
+                            else
+                            {
+                                <option value="1">Si</option>
+                                <option value="0" selected="">No</option>
+                            }
+                        </select>
+                    }
+                </div>
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    <label class="form-label" for="optEditar">Editar</label>
+                    <br />
+                    @if (disabledEditar == "disabled")
+                    {
+                        <select @disabledEditar id="optEditar" name="optEditar" class="form-control"><option value="0"></option></select>
+
+                    }
+                    else
+                    {
+                        <select @disabledEditar id="optEditar" name="optEditar" class="form-control">
+                            @if (Model.Editar == true)
+                            {
+                                <option value="1" selected="">Si</option>
+                                <option value="0">No</option>
+                            }
+                            else
+                            {
+                                <option value="1">Si</option>
+                                <option value="0" selected="">No</option>
+                            }
+                        </select>
+                    }
+                </div>
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    <label class="form-label" for="optGuardar">Guardar</label>
+                    <br />
+                    @if (disabledGuardar == "disabled")
+                    {
+                        <select @disabledGuardar id="optGuardar" name="optGuardar" class="form-control"><option value="0"></option></select>
+
+                    }
+                    else
+                    {
+                        <select @disabledGuardar id="optGuardar" name="optGuardar" class="form-control">
+                            @if (Model.Guardar == true)
+                            {
+                                <option value="1" selected="">Si</option>
+                                <option value="0">No</option>
+                            }
+                            else
+                            {
+                                <option value="1">Si</option>
+                                <option value="0" selected="">No</option>
+                            }
+                        </select>
+                    }
+                </div>
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    <label class="form-label" for="optEliminar">Eliminar</label>
+                    <br />
+                    @if (disabledEliminar == "disabled")
+                    {
+                        <select @disabledEliminar id="optEliminar" name="optEliminar" class="form-control"><option value="0"></option></select>
+
+                    }
+                    else
+                    {
+                        <select @disabledEliminar id="optEliminar" name="optEliminar" class="form-control">
+                            @if (Model.Eliminar == true)
+                            {
+                                <option value="1" selected="">Si</option>
+                                <option value="0">No</option>
+                            }
+                            else
+                            {
+                                <option value="1">Si</option>
+                                <option value="0" selected="">No</option>
+                            }
+                        </select>
+                    }
+                </div>
+
+            </div>
+            <div class="col-md-1">
+
+                <div class="form-group">
+                    <label class="form-label" for="optImprimir">Imprimir</label>
+                    <br />
+                    @if (disabledImprimir == "disabled")
+                    {
+                        <select @disabledImprimir id="optImprimir" name="optImprimir" class="form-control"><option value="0"></option></select>
+
+                    }
+                    else
+                    {
+                        <select @disabledImprimir id="optImprimir" name="optImprimir" class="form-control">
+                            @if (Model.Imprimir == true)
+                            {
+                                <option value="1" selected="">Si</option>
+                                <option value="0">No</option>
+                            }
+                            else
+                            {
+                                <option value="1">Si</option>
+                                <option value="0" selected="">No</option>
+                            }
+                        </select>
+                    }
+                </div>
+
+            </div>
+            <div class="col-md-1">
+
+                <div class="form-group">
+                    <label class="form-label" for="optExportar">Exportar</label>
+                    <br />
+                    @if (disabledExportar == "disabled")
+                    {
+                        <select @disabledExportar id="optExportar" name="optExportar" class="form-control"><option value="0"></option></select>
+
+                    }
+                    else
+                    {
+                        <select @disabledExportar id="optExportar" name="optExportar" class="form-control">
+                            @if (Model.Exportar == true)
+                            {
+                                <option value="1" selected="">Si</option>
+                                <option value="0">No</option>
+                            }
+                            else
+                            {
+                                <option value="1">Si</option>
+                                <option value="0" selected="">No</option>
+                            }
+                        </select>
+                    }
+                </div>
+
+            </div>
+            <div class="col-md-1">
+
+                <div class="form-group">
+                    <label class="form-label" for="optVistaPrevia">VistaPrevia</label>
+                    <br />
+                    @if (disabledVistaPrevia == "disabled")
+                    {
+                        <select @disabledVistaPrevia id="optVistaPrevia" name="optVistaPrevia" class="form-control"><option value="0"></option></select>
+
+                    }
+                    else
+                    {
+                        <select @disabledVistaPrevia id="optVistaPrevia" name="optVistaPrevia" class="form-control">
+                            @if (Model.VistaPrevia == true)
+                            {
+                                <option value="1" selected="">Si</option>
+                                <option value="0">No</option>
+                            }
+                            else
+                            {
+                                <option value="1">Si</option>
+                                <option value="0" selected="">No</option>
+                            }
+                        </select>
+                    }
+                </div>
+
+            </div>
+            <div class="col-md-1">
+
+                <div class="form-group">
+                    <label class="form-label" for="optConsultar">Consultar</label>
+                    <br />
+                    @if (disabledConsultar == "disabled")
+                    {
+                        <select @disabledConsultar id="optConsultar" name="optConsultar" class="form-control"><option value="0"></option></select>
+
+                    }
+                    else
+                    {
+                        <select @disabledConsultar id="optConsultar" name="optConsultar" class="form-control">
+                            @if (Model.Consultar == true)
+                            {
+                                <option value="1" selected="">Si</option>
+                                <option value="0">No</option>
+                            }
+                            else
+                            {
+                                <option value="1">Si</option>
+                                <option value="0" selected="">No</option>
+                            }
+                        </select>
+                    }
+                </div>
+
+            </div>
+        </div>
+        </div>
+        <div class="card-footer" style="text-align:right;">
+                <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Actualizar tabla de registros" onclick="ActualizarTablaPerfilOpcion()"> Refrescar &nbsp;<i class="fas fa-sync-alt"></i></button>
+                <button type="submit" data-toggle="tooltip" class="btn btn-blue label" title="Grabar registro"> Guardar &nbsp;<i class="ti-save"></i></button>
+                <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Regresar al formulario anterior" onclick="CerrarModalPerfilOpcion()"> Regresar &nbsp;<i class="ti-back-left"></i></button>
+        </div>
+    </div>
+</form>
+       
+            <input type="hidden" class="form-control" name="txtIdPerfilOpcionEliminar" id="txtIdPerfilOpcionEliminar" value="">
+            <div class="modal fade" id="ModalEliminarPerfilOpcion">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="#" class="close" onclick="CerrarEliminarPerfilOpcion()"><i class="fas fa-times"></i></a>
+                            <h4 class="modal-title">Eliminar PerfilOpcion</h4>
+                        </div>
+                        <div class="modal-body">
+                            ¿Está seguro de eliminar el registro seleccionado?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Eliminar registro seleccionado" onclick="EliminarPerfilOpcion()"><i class="ti-trash"></i></button>
+                            <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Regresar al formulario anterior" onclick="CerrarEliminarPerfilOpcion()"><i class="ti-back-left"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+
+        function CerrarEliminarPerfilOpcion() {
+            $("#txtIdPerfilOpcionEliminar").val(0);
+            $("#ModalEliminarPerfilOpcion").modal("hide");
+        }
+        function EliminarPerfilOpcion() {
+            var IdPerfilOpcionEliminar = $('#txtIdPerfilOpcionEliminar').val();
+            $.ajax({
+                beforeSend: function () {
+                    $('#btnNuevoPerfilOpcion').prop('disabled', true);
+                    $('#btnGrabarPerfilOpcion').prop('disabled', true);
+                    $('#btnVerModalEliminarPerfilOpcion').prop('disabled', true);
+                },
+                url: "@Url.Action("EliminarPerfilOpcion")",
+                method: 'POST',
+                async: true,
+                data: { IdPerfilOpcion: IdPerfilOpcionEliminar },
+                success: function (mensaje) {
+                    $("#modalEliminarPerfilOpcion").modal('hide');
+                    if (mensaje.CodigoMensaje == 0) {
+                        $("#" + IdPerfilOpcionEliminar).remove();
+                        $('#btnVerEditarPerfilOpcion').prop('disabled', true);
+                        $('#btnVerModalEliminarPerfilOpcion').prop('disabled', true);
+                        toastr.success(mensaje.DescripcionMensaje);
+                        VerEditarPerfilOpcion(0);
+                        CerrarEliminarPerfilOpcion();
+                    }
+                    else {
+                        toastr.error(mensaje.DescripcionMensaje);
+                    }
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la llamada, verifique consola');
+                },
+                complete: function (respuesta) {
+                    $('#btnNuevoPerfilOpcion').prop('disabled', false);
+                    $('#btnGrabarPerfilOpcion').prop('disabled', false);
+                    $('#btnVerModalEliminarPerfilOpcion').prop('disabled', false);
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+        function VerModalEliminarPerfilOpcion() {
+            var data = ListaPerfilOpcion.dtPerfilOpcion.rows('.selected').data();
+            if (data.length > 0) {
+                IdPerfilOpcion = data[0].IdPerfilOpcion;
+                $("#txtIdPerfilOpcionEliminar").val(IdPerfilOpcion);
+                $("#ModalEliminarPerfilOpcion").modal("show");
+            }
+        }
+
+        function ListarComboPerfil() {
+            $.ajax({
+                url: "@Url.Action("ListarComboPerfil", "Perfil")",
+                method: 'POST',
+                async: false,
+                success: function (data) {
+                    $("#cmbPerfil").empty();
+                    $("#cmbPerfil").append("<option value=''>Seleccione</option>");
+                    $.each(data, function (i, item) {
+                        if (item.IdPerfil == "@Model.perfil.IdPerfil") {
+                            $("#cmbPerfil").append("<option value='" + item.IdPerfil + "' selected='selected'>" + item.NombrePerfil + "</option>");
+                        }
+                        else {
+                            $("#cmbPerfil").append("<option value='" + item.IdPerfil + "'>" + item.NombrePerfil + "</option>");
+                        }
+                    });
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la llamada, verifique consola');
+                },
+                complete: function (respuesta) {
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+        function ListarComboOpcion() {
+            $.ajax({
+                url: "@Url.Action("ListarComboOpcion", "Opcion")",
+                method: 'POST',
+                async: false,
+                success: function (data) {
+                    $("#cmbOpcion").empty();
+                    $("#cmbOpcion").append("<option value=''>Seleccione</option>");
+                    $.each(data, function (i, item) {
+                        if (item.IdOpcion == "@Model.opcion.IdOpcion") {
+                            $("#cmbOpcion").append("<option value='" + item.IdOpcion + "' selected='selected'>" + item.NombreOpcion + "</option>");
+                        }
+                        else {
+                            $("#cmbOpcion").append("<option value='" + item.IdOpcion + "'>" + item.NombreOpcion + "</option>");
+                        }
+                    });
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la llamada, verifique consola');
+                },
+                complete: function (respuesta) {
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+
+        $(function () {
+            $("#frmRegistroPerfilOpcion").validate({
+                submit: {
+                    settings: {
+                        inputContainer: '.field',
+                        errorClass: 'LabelError', errorListClass: 'ListaError'
+                    },
+                    callback: {
+                        onBeforeSubmit: function (node) {
+                        },
+                        onSubmit: function (node, formData) {
+
+						   // var files = $("#txtRutaArchivo").get(0).files;
+                            var fileData = new FormData();
+                            for (var key in formData) {
+                                fileData.append(key, formData[key]);
+                            }
+                            fileData.append('IdPerfil', @Model.perfil.IdPerfil);
+
+
+                            $.ajax({
+                                beforeSend: function () {
+                                    $('.preloader').fadeIn();
+                                },
+                                url: "@Url.Action("GuardarRegistroPerfilOpcion", "PerfilOpcion")",
+                                method: 'POST',
+                                async: false,
+                                data: fileData,
+                                contentType: false,
+                                processData: false,
+                                success: function (perfilopcion) {
+                                    if (perfilopcion.mensaje.CodigoMensaje == 0) {
+                                        toastr.success(perfilopcion.mensaje.DescripcionMensaje);
+                                        $("#txtRegIdPerfilOpcion").val(perfilopcion.IdPerfilOpcion);
+                                        ActualizarTablaPerfilOpcion();
+                                    }
+                                    else {
+                                        toastr.error(perfilopcion.mensaje.DescripcionMensaje);
+                                    }
+                                },
+                                error: function (mensaje) {
+                                    console.log(mensaje);
+                                    toastr.error('Sucedió un error en la llamada, verifique consola');
+                                },
+                                complete: function (respuesta) {
+                                    $('.preloader').fadeOut();
+                                    ValidarSesionActual(respuesta);
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+        });
+            </script>
+            }
+
+
+
+
+
+
+
+

@@ -1,0 +1,185 @@
+﻿@{
+    ViewBag.Title = "ListaUsuarioPerfil";
+    Layout = null;
+
+}
+
+<div class="card border-info border mb-3" style="box-shadow:none">
+    <div class="card-body px-1 py-1">
+        <div id="divEditarUsuarioPerfil">
+        </div>
+    </div>
+</div>
+
+<div class="card" style="box-shadow:none">
+    <div class="card-body px-1 py-1">
+        <div class="row">
+            <div class="col-12">
+                <table id="dtbUsuarioPerfil" class="table table-striped table-hover table-bordered" cellspacing="0" style="width:100%"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="ModalEliminarUsuarioPerfil">
+    <input type="hidden" class="form-control" name="txtIdUsuarioPerfilEliminar" id="txtIdUsuarioPerfilEliminar" value="">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Eliminar UsuarioPerfil</h4>
+                <a class="close" onclick="CerrarEliminarUsuarioPerfil()"><i class="fas fa-times"></i></a>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro de eliminar el registro seleccionado?
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Eliminar registro seleccionado" onclick="EliminarUsuarioPerfil()"><i class="ti-trash"></i></button>
+                <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Regresar al formulario anterior" onclick="CerrarEliminarUsuarioPerfil()"><i class="ti-back-left"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    function CerrarEliminarUsuarioPerfil() {
+        $("#ModalEliminarUsuarioPerfil").modal("hide");
+    }
+    function EliminarUsuarioPerfil() {
+        IdUsuarioPerfil = $("#txtIdUsuarioPerfilEliminar").val();
+        $.ajax({
+            url: "@Url.Action("EliminarUsuarioPerfil")",
+            method: 'POST',
+            data: { IdUsuarioPerfil: IdUsuarioPerfil },
+            success: function (mensaje) {
+                $("#modalEliminarUsuarioPerfil").modal('hide');
+                if (mensaje.CodigoMensaje == 0) {
+                    toastr.success(mensaje.DescripcionMensaje);
+                    ActualizarTablaUsuarioPerfil();
+                    VerEditarUsuarioPerfil(0);
+                    CerrarEliminarUsuarioPerfil();
+                }
+                else {
+                    toastr.error(mensaje.DescripcionMensaje);
+                    console.log(mensaje.DescripcionMensajeSistema);
+                }
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la interface [EliminarUsuarioPerfil], verifique consola');
+            },
+            complete: function (respuesta) {
+                ValidarSesionActual(respuesta);
+            }
+        });
+    }
+    function VerModalEliminarUsuarioPerfil(IdUsuarioPerfil) {
+        $("#txtIdUsuarioPerfilEliminar").val(IdUsuarioPerfil);
+        $("#ModalEliminarUsuarioPerfil").modal("show");
+
+    }
+    function VerEditarUsuarioPerfil(tipo) {
+        var IdUsuarioPerfil = 0;
+        if (tipo == 1) {
+            var data = ListaUsuarioPerfil.dtUsuarioPerfil.rows('.selected').data();
+            if (data.length == 1) {
+                IdUsuarioPerfil = data[0].IdUsuarioPerfil;
+            }
+        }
+        $.ajax({
+            beforeSend: function () {
+                $('#iBtnNuevoIdUsuarioPerfil').removeClass("ti-file").addClass("fa fa-spinner fa-spin fa-fw");
+            },
+            url: "@Url.Action("RegistroUsuarioPerfil", "UsuarioPerfil")",
+            type: "POST",
+            async: true,
+            data: { IdUsuario: @ViewBag.IdUsuario, IdUsuarioPerfil: IdUsuarioPerfil },
+            success: function (vistaParcial) {
+                $("#divEditarUsuarioPerfil").html(vistaParcial);
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la llamada, verifique consola');
+            },
+            complete: function (respuesta) {
+                $('#iBtnNuevoIdUsuarioPerfil').removeClass("fa fa-spinner fa-spin fa-fw").addClass("ti-file");
+                ValidarSesionActual(respuesta);
+            }
+        });
+    }
+
+    function ActualizarTablaUsuarioPerfil() {
+        ListaUsuarioPerfil.refresh();
+    }
+    $(function () {
+        ListaUsuarioPerfil = {
+            dtUsuarioPerfil: null,
+            init: function () {
+                this.dtUsuarioPerfil = $('#dtbUsuarioPerfil').DataTable({
+                    responsive: true,
+                    rowId: 'IdUsuarioPerfil',
+                    "lengthMenu": [[10, 25, 50, 100, 100000], [10, 25, 50, 100, 'Todo']],
+                    language: {
+                        url: '/assets/libs/datatables.net/js/es-ES.json',
+                    },
+                    select: {
+                        style: 'single',
+                        info: false
+                    },
+                    "serverSide": true,
+                    "ordering": false,
+                    "ajax": {
+                        "url": "@Url.Action("ListarUsuarioPerfil", "UsuarioPerfil")",
+                        "error": function (respuesta, error, thrown) {
+                            ValidarSesionActual(respuesta);
+                        },
+                        "type": "POST",
+                        "data": function (d) {
+                            d.IdUsuario = @ViewBag.IdUsuario;
+                        }
+                    },
+                    "columns": [
+                        { "title": "Empresa / Sede / Area / Cargo", "data": "NombreEmpleadoPerfil", "className": "dt-head-center dt-body-left", "width": "10%" },
+                        { "title": "Perfil", "data": "NombrePerfil", "className": "dt-head-center dt-body-left", "width": "10%" },
+                        { "title": "Activo", "data": "Activo", "className": "dt-head-center dt-body-left", "width": "10%" },
+                        {
+                            "title": "Eliminar",
+                            "data": function (row, type, val, meta) {
+                                return '<button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Opciones" onclick="VerModalEliminarUsuarioPerfil(' + row.IdUsuarioPerfil + ')"><i id="btnUsuarioPerfil' + row.IdUsuarioPerfil + '" class="fa fa-trash"></i></button>';
+                            },
+                            "className": "dt-head-center dt-body-center", "width": "5%"
+                        }
+                    ]
+                });
+            },
+            refresh: function () {
+                this.dtUsuarioPerfil.ajax.reload(null, false);
+            }
+        }
+        ListaUsuarioPerfil.init();
+        ListaUsuarioPerfil.dtUsuarioPerfil.on('select', function (e, dt, type, indexes) {
+            var count = ListaUsuarioPerfil.dtUsuarioPerfil.rows({ selected: true }).count();
+            if (count > 0) {
+                $('#btnVerModalEliminarUsuarioPerfil').prop('disabled', false);
+                VerEditarUsuarioPerfil(1);
+            }
+        });
+        ListaUsuarioPerfil.dtUsuarioPerfil.on('deselect', function (e, dt, type, indexes) {
+            var count = ListaUsuarioPerfil.dtUsuarioPerfil.rows({ selected: true }).count();
+            if (count == 0) {
+                $('#btnVerModalEliminarUsuarioPerfil').prop('disabled', true);
+
+            }
+        });
+        VerEditarUsuarioPerfil(0);
+    });
+</script>
+
+
+
+
+
+
+
+
+

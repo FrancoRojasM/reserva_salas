@@ -1,0 +1,548 @@
+﻿@using System.Configuration
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="auth-fluid">
+    <!--Auth fluid left content -->
+    <div class="auth-fluid-form-box">
+        <div class="align-items-center d-flex h-300">
+            <div class="p-1">
+
+                <!-- Logo -->
+                <div class="auth-brand text-center text-lg-start mb-1">
+                    <div class="auth-brand mb-0">
+                        <a href="index.html" class="logo logo-dark text-center">
+                            <span class="logo-lg">
+                                <img src="@ConfigurationManager.AppSettings["HostImagenes"]LogoInstitucion.png" alt="" height="50">
+                            </span>
+                        </a>
+
+                        <a href="index.html" class="logo logo-light text-center">
+                            <span class="logo-lg">
+                                <img src="@ConfigurationManager.AppSettings["HostImagenes"]LogoInstitucion.png" alt="" height="50">
+                            </span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- title-->
+                <h4 style="text-align:center;" class="mt-0"></h4>
+                <h4 class="mt-3">Registrate</h4>
+                <p class="text-muted mb-3">No tienes una cuenta, create una cuenta, te tomara unos segundos.</p>
+
+                <!-- form -->
+                <form name="frmRegistroUsuarioCasilla" id="frmRegistroUsuarioCasilla">
+
+
+                    <form>
+                        <div id="progressbarwizard">
+
+                            <ul class="nav nav-pills bg-light nav-justified form-wizard-header mb-3" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a href="#account-2" data-bs-toggle="tab" class="nav-link rounded-0 pt-2 pb-2 active" aria-selected="true" role="tab">
+                                        <i class="mdi mdi-account-circle me-1"></i>
+                                        <span class="d-none d-sm-inline">Validacion</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item" role="presentation" id="tab-to-hide">
+                                    <a href="#profile-tab-2" data-bs-toggle="tab" class="nav-link rounded-0 pt-2 pb-2" aria-selected="false" role="tab" tabindex="-1">
+                                        <i class="mdi mdi-face-profile me-1"></i>
+                                        <span class="d-none d-sm-inline">Registro</span>
+                                    </a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content b-0 mb-0 pt-0">
+
+                                <div id="bar" class="progress mb-3" style="height: 7px;">
+                                    <div class="bar progress-bar progress-bar-striped progress-bar-animated bg-success" style="width: 0%;"></div>
+                                </div>
+                                <input type="hidden" class="form-control" name="txtIdVerificacion" id="txtIdVerificacion">
+
+                                <div class="tab-pane active show" id="account-2" role="tabpanel">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="mb-2">
+                                                <label for="txtEmail" class="form-label">Email *</label>
+
+                                                <input type="text" class="form-control" name="txtEmail" id="txtEmail" placeholder="Ingrese Email" data-validation="[L>=1]" data-validation-message="Ingrese Email de Notificacion">
+                                            </div>
+                                                <div class="mb-2">
+                                                <label for="txtCelular" class="form-label">N° de Celular *</label>
+                                                <input type="text" class="form-control" name="txtCelular" id="txtCelular" placeholder="Ingresa tu N° de Celular" data-validation="[L>=1]" data-validation-message="Ingrese Telefono de Notificacion">
+                                                
+
+                                            </div>
+                                            
+
+                                        </div> <!-- end col -->
+                                    </div> <!-- end row -->
+                                    <div class="col-12">
+                                        <button id="btnCodigoCorreoConfirmacion" type="button" class="btn input-group-text btn-primary waves-effect waves-light" onclick="EnvioCorreoConfirmacion()" style="width:100%">Enviar Codigo Verificacion<i class="fe-mail"></i></button>
+                                    </div>
+                                    <br />
+                                    <div class="col-12">
+
+                                        <div class="mb-2">
+
+                                            <label for="txtEmail" class="form-label">Codigo de Email *</label>
+                                                <input type="text" class="form-control" name="txtCodigoCorreoConfirmacion" placeholder="Ingresa el codigo enviado a tu Email" id="txtCodigoCorreoConfirmacion" @* data-validation="[L>=1]" data-validation-message="Ingrese la codigo de verificación" *@>
+                                                <input type="hidden" class="form-control" name="txtCodigoCorreoValidar" id="txtCodigoCorreoValidar" value="0">
+                                               
+                                            </div>
+                                        <div class="mb-2">
+                                            <label for="txtCelular" class="form-label">Codigo de N° de Celular *</label>
+                                                <input type="text" class="form-control" name="txtCodigoTelefonoConfirmacion" id="txtCodigoTelefonoConfirmacion" placeholder="Ingresa el codigo enviado a tu Celular" data-validation="[L>=1]" data-validation-message="Ingrese Telefono de Notificacion">
+                                                <input type="hidden" class="form-control" name="txtCodigoTelefonoValidar" id="txtCodigoTelefonoValidar" value="0">
+
+
+                                            
+
+
+
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-12">
+                                        <button id="btnCodigoCorreoConfirmacion" type="button" class="btn input-group-text btn-primary waves-effect waves-light"  onclick="EnvioCorreoValidacion()" style="width:100%">Validar<i class="fe-mail"></i></button>
+                                    </div>
+                                </div>
+
+                                <div class="tab-pane" id="profile-tab-2" role="tabpanel">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="alert alert-warning d-none fade show">
+                                                <h4 class="mt-0 text-warning">Algo está mal!</h4>
+                                                <p class="mb-0">Debe completar todos los campos obligatorios (*)</p>
+                                            </div>
+                                            <div class="mb-2">
+                                                <label for="cmbTipoDocumento" class="form-label">Tipo de Documento *</label>
+                                                <select class="form-select" type="text" name="cmbTipoDocumento" id="cmbTipoDocumento" placeholder="Seleccione tu Tipo de Documento" required>
+                                                    <option value="2">DNI</option>
+                                                    <option value="3">CEX</option>
+                                                    <option value="14">RUC</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-2">
+                                                <label for="txtNumeroDocumento" class="form-label">N° de Documento *</label>
+                                                <input class="form-control" type="text" name="txtNumeroDocumento" id="txtNumeroDocumento" placeholder="Ingresa tu N° de Documento" required digits minlength="5" maxlength="12">
+                                            </div>
+                                            <div id="divApellidoPaterno" class="mb-2">
+                                                <label for="txtApellidoPaterno" class="form-label">Apellido Paterno *</label>
+                                                <input class="form-control" type="text" name="txtApellidoPaterno" id="txtApellidoPaterno" placeholder="Ingresa tu Apellido Paterno" required minlength="2">
+                                            </div>
+                                            <div id="divApellidoMaterno" class="mb-2">
+                                                <label for="txtApellidoMaterno" class="form-label">Apellido Materno *</label>
+                                                <input class="form-control" type="text" name="txtApellidoMaterno" id="txtApellidoMaterno" placeholder="Ingresa tu Apellido Materno" required minlength="2">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label id="lblNombreCompleto" for="txtNombreCompleto" class="form-label">Nombre Completo *</label>
+                                                <input class="form-control" type="text" name="txtNombreCompleto" id="txtNombreCompleto" placeholder="Ingresa el Nombre Completo" required minlength="2">
+                                            </div>
+
+                                            <div class="mb-2">
+                                                <div class="form-check">
+                                                    <input type="checkbox" class="form-check-input" onclick="Aceptar()" required name="chkCondiciones" id="chkCondiciones">
+                                                    <label class="form-check-label" for="checkbox-signup"><a href="#" onclick="VerModalTerminos()" class="text-dark">Acepto Los Terminos y Condicions *</a></label>
+                                                    <input type="hidden" class="form-control" id="txtAceptar" value="0">
+                                                </div>
+                                            </div>
+                                            <div class="text-center d-grid">
+                                                <button type="submit" id="btnRegistrarCuenta" class="btn btn-success waves-effect waves-light" title="Registrar Cuenta">
+                                                    Registrar
+                                                    <span id="spRegistrarCuenta" class="mdi mdi-content-save" role="status" aria-hidden="true"></span>
+                                                </button>
+                                            </div>
+                                        </div> <!-- end col -->
+                                    </div> <!-- end row -->
+                                </div>
+
+
+
+                            </div> <!-- tab-content -->
+                        </div> <!-- end #progressbarwizard-->
+                    </form>
+
+
+
+
+                </form>
+                <!-- end form-->
+                <!-- Footer-->
+                <footer class="footer footer-alt">
+                    <p class="text-muted">Ya tienes un cuenta? <a href="@Url.Action("Login", "Usuario")" class="text-muted ms-1"><b>Inicia Sesión</b></a></p>
+                </footer>
+
+
+            </div> <!-- end .card-body -->
+        </div> <!-- end .align-items-center.d-flex.h-100-->
+    </div>
+    <!-- end auth-fluid-form-box-->
+    <!-- Auth fluid right content -->
+    @*  <div class="auth-fluid-right text-center">
+    <div class="auth-user-testimonial">
+    <h2 class="mb-2 text-white">I love the color!</h2>
+    <p class="lead">
+    <i class="mdi mdi-format-quote-open"></i> I've been using your theme from the previous developer for our web app, once I knew new version is out, I immediately bought with no hesitation. Great themes, good documentation with lots of customization available and sample app that really fit our need. <i class="mdi mdi-format-quote-close"></i>
+    </p>
+    <h5 class="text-white">
+    - Fadlisaad (Ubold Admin User)
+    </h5>
+    </div> <!-- end auth-user-testimonial-->
+    </div> *@
+    <!-- end Auth fluid right content -->
+</div>
+
+<div class="modal fade" id="ModalTerminos" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Términos y Condiciones</h4>
+                <button type="button" class="btn-close" onclick="CerrarModalTerminos()" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <embed id="embedPdf" src="@ConfigurationManager.AppSettings["RutaTerminosCasilla"]" type="application/pdf" style="width:100%;height:800px;">
+            </div>
+            @*  <div class="modal-footer">
+            <button type="button" data-toggle="tooltip" class="btn btn-warning waves-effect waves-light" title="Cerrar" onclick="CerrarEliminarNotificacionArchivo()"> Cerrar <i class="ti-back-left"></i></button>
+            </div> *@
+        </div>
+    </div>
+</div>
+<!-- Long Content Scroll Modal -->
+<div class="modal fade" id="scrollable-modal" tabindex="-1" role="dialog"
+     aria-labelledby="scrollableModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scrollableModalTitle">Términos y Condiciones</h5>
+                <button type="button" class="btn-close" onclick="CerrarModalTerminos()" data-bs-dismiss="modal" aria-label="Close">
+                    </butto>
+                    @* <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button> *@
+            </div>
+            <div class="modal-body">
+                <embed id="embedPdf" src="@ConfigurationManager.AppSettings["RutaTerminosCasilla"]" type="application/pdf" style="width:100%;height:800px;">
+            </div>
+            <div class="modal-footer">
+                <input type="checkbox" class="form-check-input" required name="chkCondiciones" id="chkCondicionesConfirmacion" onclick="AceptarCondiciones();">
+                <label class="form-check-label" for="checkbox-signup"><a class="text-dark">Acepto Los Terminos y Condicions *</a></label>
+                <button type="button" class="btn btn-secondary" onclick="CerrarModalTerminos()" data-dismiss="modal">Close</button>
+                @* <button type="button" class="btn btn-primary">Save changes</button> *@
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scrollableModalTitle">Se esta enviando los codigos de verificación</h5>
+            </div>
+            <div class="modal-body" style="text-align:center">
+                <img src="~/content/contenedor/imagenes/loading2.gif" />
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .campo-desabilitado {
+        background-color: #f2f2f2; /* Puedes ajustar el color de fondo según tus preferencias */
+        color: #808080; /* Puedes ajustar el color del texto según tus preferencias */
+    }
+</style>
+@section scripts {
+    <script>
+        
+        // function abrir() {
+
+        //     $("#staticBackdrop").modal("show");
+        // }
+        // function Cerrar() {
+
+        //     $("#staticBackdrop").modal("hide");
+        // }
+
+        function EnvioCorreoConfirmacion() {
+
+
+           
+            var EmailNotificacion = $("#txtEmail").val();
+            var NumeroCelularNotificacion = $("#txtCelular").val();
+
+
+            $.ajax({
+                url: "@Url.Action("EnviarCodigoCorreoConfirmacionLogin","Administrado")",
+                beforeSend: function () {
+                    $("#staticBackdrop").modal("show");
+                },
+                method: 'POST',
+                data: { EmailNotificacion: EmailNotificacion, NumeroCelularNotificacion: NumeroCelularNotificacion },
+                success: function (mensaje) {
+
+                    if (mensaje.CodigoMensaje == 0) {
+                        toastr.success(mensaje.DescripcionMensaje);
+                        $("#btnCodigoCorreoConfirmacion").removeClass("disabled");
+                        $("#txtCodigoCorreoValidar").val(1);
+                        $("#txtIdVerificacion").val(mensaje.CodigoRegistroTabla);
+                        
+                    }
+                    else {
+                        toastr.error(mensaje.DescripcionMensaje);
+                        console.log(mensaje.DescripcionMensajeSistema);
+                    }
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la interface [Codigo Incorrecto], verifique consola');
+                },
+                complete: function (respuesta) {
+                    $("#staticBackdrop").modal("hide");
+
+
+
+                }
+            });
+        }
+        function IrSiguienteTab() {
+
+            $("#tab-to-hide").show();
+            // $("#tab-to-hide").trigger('click');
+            var $activeTab = $('.nav-pills .nav-link.active');
+            // Encuentra el siguiente tab
+            var $nextTab = $activeTab.closest('li').next().find('.nav-link');
+
+            // Si existe un siguiente tab
+            if ($nextTab.length > 0) {
+                $nextTab.tab('show'); // Muestra el siguiente tab
+            } else {
+                alert('No hay más tabs.');
+            }
+        }
+        function EnvioCorreoValidacion() {
+
+
+            var IdVerificacion = $("#txtIdVerificacion").val();
+            var EmailNotificacion = $("#txtEmail").val();
+            var NumeroCelularNotificacion = $("#txtCelular").val();
+
+
+            var CodigoCorreoConfirmacion = $("#txtCodigoCorreoConfirmacion").val();
+            var CodigoTelefonoConfirmacion = $("#txtCodigoTelefonoConfirmacion").val();
+
+            $.ajax({
+                url: "@Url.Action("EnviarCodigoCorreoValidacionLogin", "Administrado")",
+                method: 'POST',
+                data: { IdVerificacion: IdVerificacion, EmailNotificacion: EmailNotificacion, NumeroCelularNotificacion: NumeroCelularNotificacion, CodigoCorreoConfirmacion: CodigoCorreoConfirmacion, CodigoTelefonoConfirmacion: CodigoTelefonoConfirmacion },
+                success: function (mensaje) {
+
+                    if (mensaje.CodigoMensaje == 0) {
+                        toastr.success(mensaje.DescripcionMensaje);
+                        $("#btnCodigoCorreoConfirmacion").removeClass("disabled");
+                        IrSiguienteTab();
+                      
+                    }
+                    else {
+                        toastr.error(mensaje.DescripcionMensaje);
+                        console.log(mensaje.DescripcionMensajeSistema);
+                        $("#tab-to-hide").hide();
+                    }
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la interface [Validacion Incorrecta], verifique consola');
+                },
+                // complete: function (respuesta) {
+                // 		$("#btnCodigoCorreoConfirmacion").removeClass("disabled");
+                // 		$("#txtCodigoCorreoValidar").val(1);
+
+
+
+                // }
+            });
+        }
+
+        
+       
+        function AceptarCondiciones() {
+
+            if ($("#chkCondicionesConfirmacion").is(":checked")) {
+                $("#txtAceptar").val(1);
+            } else {
+                $("#txtAceptar").val(0);
+                $("#chkCondiciones").prop('checked', false);
+            }
+
+        }
+
+        function Aceptar() {
+
+            if ($("#chkCondiciones").is(":checked")) {
+                if ($("#txtAceptar").val() == 0) {
+                    $("#chkCondiciones").prop('checked', false);
+                    VerModalTerminos();
+                }
+            }
+            // else {
+
+            //     $("#txtAceptar").val(0);
+            // }
+
+        }
+
+        function CerrarModalTerminos() {
+            //  $("#ModalTerminos").modal("hide");
+            $("#scrollable-modal").modal("hide");
+        }
+        function VerModalTerminos() {
+            $("#scrollable-modal").modal("show");
+            // $("#ModalTerminos").modal("show");
+        }
+
+        function habilitarSoloNumerosCelular(inputId, maxLength) {
+            $("#" + inputId).on("input", function () {
+                // Limpiar caracteres no numéricos y limitar la longitud
+                var sanitizedValue = $(this).val().replace(/\D/g, '').substring(0, maxLength);
+                $(this).val(sanitizedValue);
+            });
+        }
+
+        $(function () {
+
+            // $("#btnRegistrarCuenta").hide();
+
+            $("#tab-to-hide").hide();
+
+            function habilitarSoloNumeros(inputId, maxLength) {
+                $("#" + inputId).off("input").on("input", function () {
+                    // Limpiar caracteres no numéricos y limitar la longitud
+                    var sanitizedValue = $(this).val().replace(/\D/g, '').substring(0, maxLength);
+                    $(this).val(sanitizedValue);
+                });
+            }
+
+            // Función para habilitar solo números y configurar campos readonly en función del tipo de documento
+            function habilitarNumeroDocumento() {
+                var tipoDocumentoSeleccionado = $("#cmbTipoDocumento").val();
+                var maxLength;
+
+                switch (tipoDocumentoSeleccionado) {
+                    case "2": // DNI
+                        maxLength = 8;
+                        $("#txtApellidoPaterno, #txtApellidoMaterno").prop("readonly", false).removeClass("campo-desabilitado"); // Permitir edición
+                        $("#lblNombreCompleto").text("Nombre Completo"); // Restaurar el texto del label
+                        $("#divApellidoPaterno, #divApellidoMaterno").show(); // Mostrar Apellidos
+                        break;
+                    case "3": // CEX
+                        maxLength = 12;
+                        $("#txtApellidoPaterno, #txtApellidoMaterno").prop("readonly", false).removeClass("campo-desabilitado"); // Permitir edición
+                        $("#lblNombreCompleto").text("Nombre Completo"); // Restaurar el texto del label
+                        $("#divApellidoPaterno, #divApellidoMaterno").show(); // Mostrar Apellidos
+                        break;
+                    case "14": // RUC
+                        maxLength = 11;
+                        $("#txtApellidoPaterno, #txtApellidoMaterno").prop("readonly", true).addClass("campo-desabilitado"); // Hacer readonly y agregar estilo
+                        $("#lblNombreCompleto").text("Razon Social"); // Cambiar el texto del label
+                        $("#divApellidoPaterno, #divApellidoMaterno").hide(); // Ocultar Apellidos
+                        break;
+                    default:
+                        maxLength = 8; // Por defecto
+                        $("#txtApellidoPaterno, #txtApellidoMaterno").prop("readonly", false).removeClass("campo-desabilitado"); // Permitir edición
+                        $("#lblNombreCompleto").text("Nombre Completo"); // Restaurar el texto del label
+                        $("#divApellidoPaterno, #divApellidoMaterno").show(); // Mostrar Apellidos
+                        break;
+                }
+
+                habilitarSoloNumeros("txtNumeroDocumento", maxLength);
+            }
+
+            // Llamamos a la función cuando el valor del select cambia
+            $("#cmbTipoDocumento").on("change", function () {
+                // Aplicar la función para habilitar solo números y limitar la longitud
+                habilitarNumeroDocumento();
+            });
+
+            // Llamamos a la función inicial al cargar el formulario
+            habilitarNumeroDocumento();
+
+
+
+
+
+            habilitarSoloNumerosCelular("txtCelular", 9);
+
+            $("#frmRegistroUsuarioCasilla").parsley().on("field:validated", function () {
+                event.preventDefault(); // Evitar la acción predeterminada
+                var e = 0 === $(".parsley-error").length;
+                $(".alert-info").toggleClass("d-none", !e);
+                $(".alert-warning").toggleClass("d-none", e);
+            }).on("form:submit", function (node, formData) {
+                var fileData = new FormData();
+                var formulario = node.$element;
+
+                // Obtén todos los controles del formulario
+                var controls = formulario.find(":input");
+                var Email = '';
+                var Celular = '';
+                // Recorre cada control
+                controls.each(function () {
+                    var control = $(this);
+                    var nombreControl = control.attr("name");
+                    if (nombreControl == 'txtEmail') {
+                        Email = control.val();
+                    }
+                    if (nombreControl == 'txtCelular') {
+                        Celular = control.val();
+                    }
+                    var valorControl = control.val();
+                    // Agrega el control y su valor a FormData
+                    fileData.append(nombreControl, valorControl);
+                });
+                console.log(fileData);
+                $.ajax({
+                    beforeSend: function (respuesta) {
+                        $("#btnRegistrarCuenta").addClass("disabled");
+                        $("#spRegistrarCuenta").removeClass("mdi mdi-content-save");
+                        $("#spRegistrarCuenta").addClass("spinner-grow spinner-grow-sm me-1");
+                    },
+                    url: "@Url.Action("GuardarNuevaCuentaCasilla", "Usuario")",
+                    method: 'POST',
+                    data: fileData,
+                    contentType: false,
+                    processData: false,
+                    success: function (mensaje) {
+                        if (mensaje.CodigoMensaje == 0) {
+                            // toastr.success(mensaje.DescripcionMensaje);
+                            formulario.trigger("reset");
+
+                            var form = $('<form action="@Url.Action("ConfirmacionCreacionCuenta", "Usuario")" method="post"></form>');
+                            form.append('<input type="hidden" name="Email" value="' + Email + '" />');
+                            form.append('<input type="hidden" name="Celular" value="' + Celular + '" />');
+                            form.appendTo('body').submit();
+
+                        } else {
+                            toastr.error(mensaje.DescripcionMensaje);
+                            console.log(mensaje.DescripcionMensajeSistema);
+                        }
+                    },
+                    complete: function (respuesta) {
+                        $("#btnRegistrarCuenta").removeClass("disabled");
+                        $("#spRegistrarCuenta").removeClass("spinner-grow spinner-grow-sm me-1");
+                        $("#spRegistrarCuenta").addClass("mdi mdi-content-save");
+                    },
+                    error: function (mensaje) {
+                        toastr.error('Sucedió un error en la interfaz [AutenticarUsuario], verifique la consola');
+                    }
+                });
+            });
+        });
+    </script>
+}

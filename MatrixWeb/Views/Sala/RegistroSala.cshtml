@@ -1,0 +1,143 @@
+﻿@model Reservas.Sala
+@{
+	ViewBag.Title = "Registro Sala";
+	Layout = null;
+}
+<form id="frmRegistroSala" name="frmRegistroSala" method="POST">
+	<div class="row">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-header"><h4 class="my-0">Registro de Sala</h4></div>
+				<div class="card-body">
+					<input type="hidden" id="txtRegIdSala" name="txtRegIdSala" value="@Model.IdSala" />
+					<div class="row">
+						<div class="col-md-2">
+							<div class="mb-1">
+								<div class="form-group">
+									<label class="form-label" for="txtNombre">Nombre</label>
+									<input type="text" class="form-control" name="txtNombre" id="txtNombre" value="@Model.Nombre">
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2">
+							<div class="mb-1">
+								<div class="form-group">
+									<label class="form-label" for="txtAforo">Aforo</label>
+									<input type="number" class="form-control" name="txtAforo" id="txtAforo" value="@Model.Aforo" data-validation="[V>=0]" data-validation-message="El valor debe ser mayor igual a cero">
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2">
+							<div class="mb-1">
+								<div class="form-group">
+									<label class="form-label" for="cmbCatalogoPiso">CatalogoPiso</label>
+									<select class="form-control" id="cmbCatalogoPiso" name="cmbCatalogoPiso" data-toggle="select2" data-width="100%" data-validation="[V>0]" data-validation-message="Seleccione el CatalogoPiso"></select>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2">
+							<div class="mb-1">
+								<div class="form-group">
+									<label class="form-label" for="txtObservaciones">Observaciones</label>
+									<input type="text" class="form-control" name="txtObservaciones" id="txtObservaciones" value="@Model.Observaciones">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card-footer" style="text-align:end;">
+					<button type="button" class="btn btn-primary waves-effect waves-light" title="Nuevo registro" onclick="VerEditarSala(0)">Nuevo<span id="spNuevaSala" class="mdi mdi-file" role="status" aria-hidden="true"></span></button>
+					<button type="submit" id="btnGuardarSala" class="btn btn-success waves-effect waves-light" title="Grabar registro">Guardar<span id="spGuardarSala" class="mdi mdi-content-save" role="status" aria-hidden="true"></span></button>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>
+<script>
+
+
+				  function ListarCatalogoPiso() {
+					  $.ajax({
+						   url: "@Url.Action("ListarCatalogoPiso", "CatalogoReservas")",
+						  method: 'POST',
+						  success: function (data) {
+							  $("#cmbCatalogoPiso").empty();
+							  $("#cmbCatalogoPiso").append("<option value=0>Seleccione</option>");
+							  $.each(data, function (i, item) {
+								  if (item.IdCatalogo == "@Model.catalogopiso.IdCatalogo") {
+									  $("#cmbCatalogoPiso").append("<option value=" + item.IdCatalogo + " selected='selected'>" + item.Descripcion + "</option>");
+								  }
+								  else {
+									  $("#cmbCatalogoPiso").append("<option value=" + item.IdCatalogo + ">" + item.Descripcion + "</option>");
+								  }
+							  });
+						  },
+						   error: function (mensaje) {
+								  console.log(mensaje);
+								  toastr.error('Sucedió un error en la interface [ListarCatalogoPiso], verifique consola');
+							  }
+					  });
+				  }
+
+	$(function () {
+
+						  ListarCatalogoPiso();
+						  $("#cmbCatalogoPiso").select2();
+
+		  // $("#nombreCombo").select2({ theme: 'bootstrap', dropdownParent: $('#NombreModal') });
+			  $("#frmRegistroSala").validate({
+		  submit: {
+			  settings: {
+				  inputContainer: '.field',
+				  errorClass: 'LabelError', errorListClass: 'ListaError'
+			  },
+			  callback: {
+				  onBeforeSubmit: function (node) {
+					  $("#btnGuardarSala").addClass("disabled");
+					  $("#spGuardarSala").removeClass("mdi mdi-content-save");
+					  $("#spGuardarSala").addClass("spinner-grow spinner-grow-sm me-1");
+				  },
+				  onSubmit: function (node, formData) {
+			  var fileData = new FormData();
+					  for (var control in formData) {
+						  var valor = $("#" + control).val();
+						  fileData.append(control, valor);
+						  valor = "";
+					  }
+
+
+						  $.ajax({
+							  url: "@Url.Action("GuardarRegistroSala", "Sala")",
+							  method: 'POST',
+							  data: fileData,
+							  contentType: false,
+							  processData: false,
+							  success: function (sala) {
+								  if (sala.mensaje.CodigoMensaje == 0) {
+								   $("#txtRegIdSala").val(sala.IdSala);
+									  toastr.success(sala.mensaje.DescripcionMensaje);
+									  ActualizarTablaSala();
+								  }
+								  else {
+									  toastr.error(sala.mensaje.DescripcionMensaje);
+									  console.log(sala.mensaje.DescripcionMensajeSistema);
+								  }
+							  },
+							  error: function (mensaje) {
+								  console.log(mensaje);
+								  toastr.error('Sucedió un error en la interface [GuardarRegistroSala], verifique consola');
+							  },
+								complete: function (respuesta) {
+								$("#btnGuardarSala").removeClass("disabled");
+							  $("#spGuardarSala").removeClass("spinner-grow spinner-grow-sm me-1");
+							  $("#spGuardarSala").addClass("mdi mdi-content-save");
+								  ValidarSesionActual(respuesta);
+												  }
+						  });
+					  }
+				  }
+			  }
+		  });
+
+	  });
+</script>

@@ -1,0 +1,34 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    Layout = "~/Views/Shared/Inicial.cshtml";
+    Context.Session.SetString("ModuloActual", "Intranet");
+    Context.Session.SetString("PaginaActual", "Movimiento de Personal");
+    Context.Session.SetString("SubPaginaActual", "");
+
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        iframe {
+            border: 1px solid black;
+            width: 100%;
+            height: 83vh; /* takes precedence over the width set with the HTML width attribute */
+        }
+
+    </style>
+</head>
+<body>
+    <iframe id="inlineFrame"
+            title="Movimiento de Personal"
+            width="300"
+            height="200"
+            src="@ViewBag.Link">
+    </iframe>
+</body>
+</html>

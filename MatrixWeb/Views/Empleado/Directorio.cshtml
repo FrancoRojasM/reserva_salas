@@ -1,0 +1,238 @@
+﻿@using Microsoft.AspNetCore.Http @{
+    ViewBag.Title = "ListaExpediente";
+    Layout = "~/Views/Shared/Inicial.cshtml";
+    Context.Session.SetString("ModuloActual", "Intranet");
+    Context.Session.SetString("PaginaActual", "Directorio");
+    Context.Session.SetString("SubPaginaActual", "");
+}
+@if (ViewBag.conpermiso == 0)
+{
+    <div style="font-weight:bold;color:red;">Usted no tiene permiso para ver este recurso</div>
+}
+else
+{
+    <div class="card card-topline-aqua">
+        <div class="card-head" style="font-weight:normal;">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <select class="form-control" id="cmbEmpresaSede" name="cmbEmpresaSede" data-validation="[V>0]" data-validation-message="Seleccione una sede de la empresa"></select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <select class="form-control" id="cmbArea" name="cmbArea" data-validation="[V>0]" data-validation-message="Seleccione Area"></select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <select class="form-control" id="cmbCargo" name="cmbCargo" data-validation="[V>0]" data-validation-message="Seleccione Cargo"></select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <input class="form-control" type="text" name="txtNombreCompleto" id="txtNombreCompleto" placeholder="Buscar por Nombre Completo" />
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div id="IdContactos">
+            </div>
+        </div>
+    </div>
+    <style>
+        .box-64 {
+            width: 124px;
+            height: 124px;
+            line-height: 124px;
+        }
+
+        .user-1 .u-counters {
+            border: 1px solid rgba(0, 0, 0, 0.125);
+        }
+    </style>
+    <div class="modal fade" id="ModalEmpleadoPerfil" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-sdm modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ModalEmpleadoPerfilLabel">Funciones administrativas</h5>
+                    <a class="close" data-dismiss="modal"><i class="fas fa-times"></i></a>
+                </div>
+                <div class="modal-body" style="padding:0px;" id="divModalEmpleadoPerfil">
+                </div>
+            </div>
+        </div>
+    </div>
+    @section scripts{
+        <script>
+
+            function ListarComboEmpresaSede() {
+                $("#cmbEmpresaSede").empty();
+                $("#cmbEmpresaSede").append("<option value=0>Toda la Entidad</option>");
+                $.ajax({
+                    url: "@Url.Action("ListarComboEmpresaSede", "EmpresaSede")",
+                    method: 'POST',
+                    async: true,
+                    success: function (data) {
+
+                        $.each(data, function (i, item) {
+                            $("#cmbEmpresaSede").append("<option value=" + item.IdEmpresaSede + ">" + item.NombreEmpresaSede + "</option>");
+                        });
+                    },
+                    error: function (mensaje) {
+                        console.log(mensaje);
+                        toastr.error('Sucedió un error en la llamada ListarComboEmpresaSede, verifique consola');
+                    }
+                });
+            }
+            function ListarComboArea() {
+                $("#cmbArea").empty();
+                $("#cmbArea").append("<option value=0>Todas las Areas</option>");
+                var IdEmpresaSede = 0;
+                IdEmpresaSede = $('#cmbEmpresaSede').val() == null ? 0 : $('#cmbEmpresaSede').val();
+                $.ajax({
+                    url: "@Url.Action("ListarComboArea", "Area")",
+                    method: 'POST',
+                    async: true,
+                    data: { IdEmpresaSede: IdEmpresaSede },
+                    success: function (data) {
+                        $.each(data.lista, function (i, item) {
+                            $("#cmbArea").append("<option value=" + item.IdArea + ">" + item.NombreArea + "</option>");
+                        });
+                    },
+                    error: function (mensaje) {
+                        console.log(mensaje);
+                        toastr.error('Sucedió un error en la interface [ListarComboArea], verifique consola');
+                    }
+                });
+            }
+            function ListarComboCargo() {
+                $.ajax({
+                    url: "@Url.Action("ListarComboCargo", "Cargo")",
+                    method: 'POST',
+                    success: function (data) {
+                        $("#cmbCargo").empty();
+                        $("#cmbCargo").append("<option value=0>Todos los Cargos</option>");
+                        $.each(data, function (i, item) {
+                            $("#cmbCargo").append("<option value=" + item.IdCargo + ">" + item.NombreCargo + "</option>");
+                        });
+                    },
+                    error: function (mensaje) {
+                        console.log(mensaje);
+                        toastr.error('Sucedió un error en la interface [ListarComboCargo], verifique consola');
+                    },
+                    complete: function (respuesta) {
+                        ValidarSesionActual(respuesta);
+                    }
+                });
+            }
+            function VerPerfilEmpleado(IdEmpleado) {
+               if (IdEmpleado > 0) {
+                    $.ajax({
+                         url: "@Url.Action("DirectorioPerfil", "EmpleadoPerfil")",
+                        type: "GET",
+                        data: { IdEmpleado: IdEmpleado },
+                        success: function (partialView) {
+                            $("#divModalEmpleadoPerfil").html(partialView);
+                            $("#ModalEmpleadoPerfil").modal('show');
+                        },
+                        complete: function (respuesta) {
+                            ValidarSesionActual(respuesta);
+                        }
+                    });
+                }
+                else {
+                    swal("Informativo", "Debe seleccionar un registro")
+                }
+            }
+            function VerContactos() {
+                $.ajax({
+                    url: "@Url.Action("ListarDirectorio", "Empleado")",
+                    type: "POST",
+                    async: true,
+                    data: {
+                        NombreCompleto: $("#txtNombreCompleto").val() == null ? "" : $("#txtNombreCompleto").val(),
+                        IdCargo: $("#cmbCargo").val() == null ? 0 : $("#cmbCargo").val(),
+                        IdArea: $("#cmbArea").val() == null ? 0 : $("#cmbArea").val(),
+                    },
+                    success: function (data) {
+                        var html = '<div class="row" style="margin-bottom: 50px!important;">';
+                        var htmlliCarrousel = "";
+                        var active = "";
+                        var i = 1;
+                        $.each(data, function (key, value) {
+                            html = html + '<div class="col-md-3">' +
+                                '<div class="box bg-white user-1"  style = "height:100%">' +
+                                '       <div class="u-img img-cover" style="background:#004d81;height:80px"></div>' +
+                                '      <div class="u-content" style = "height:70%">' +
+                                '         <div class="avatar box-64">' +
+                                '            <img style = "height:120px" class="b-a-radius-circle shadow-white" src="@(System.Configuration.ConfigurationManager.AppSettings["HostImagenes"])' + value.RutaArchivoFoto + '" alt="">' +
+                                /*'           <i class="status bg-success bottom right"></i>' +*/
+                                '      </div>' +
+                                '<strong><label class="text-black" href="#">' + value.NombreCompleto + '</label></strong>' +
+                                '<p class="text-muted" style="cursor:pointer;" onclick="VerPerfilEmpleado('+value.IdEmpleado+')"> Ver Funciones Administrativas </p>' +
+                                //'<p class="text-muted">' + value.cargo.NombreCargo + '</p>' +
+                                '</div>' +
+                                '       <div class="u-counters">' +
+                                '         <div class="row no-gutter" style="margin: 0px;padding: 0px!important;">' +
+                                '            <div class="col-md-3 uc-item">' +
+                                '         <label class="text-black" style="display: block;padding: 1rem 0 0.75rem; ">' +
+                                '                  <strong>Anexo</strong>' +
+                                '                 <br><span>' + value.TelefonoFijo + '</span>' +
+                                '            </label>' +
+                                '       </div>' +
+                                '      <div class="col-md-6 uc-item">' +
+                                '         <label class="text-black" style="display: block;padding: 1rem 0 0.75rem; ">' +
+                                '            <strong>Correo</strong>' +
+                                '           <br><span style="font-size: 12px;!important;text-transform: lowercase!important;">' + value.Email.replace(";", " ") + '</span>' +
+                                '      </label>' +
+                                ' </div>' +
+                                '<div class="col-md-3 uc-item">' +
+                                '         <label class="text-black" style="display: block;padding: 1rem 0 0.75rem; ">' +
+                                '      <strong>Movil</strong>' +
+                                '     <br><span>' + value.Celular + '</span>' +
+                                '                  </label>' +
+                                '               </div>' +
+                                '            </div>' +
+                                '         </div>' +
+                                '      </div>' +
+                                '   </div>';
+                            if ((i % 4) == 0) {
+                                html = html + '</div><div class="row" style="margin-bottom: 50px!important;">';
+                            }
+                            i++;
+                        });
+                        htmlliCarrousel = htmlliCarrousel  + html +'</div>';
+                        $("#IdContactos").html(htmlliCarrousel);
+
+
+                    },
+                    error: function (mensaje) {
+                        console.log(mensaje.responseText);
+                        toastr.error('Sucedió un error en la llamada, verifique consola');
+                    },
+                    complete: function (respuesta) {
+                        $('#iBtnVerModalInstitucionDatosImagenes').removeClass("fa fa-spinner fa-spin fa-fw").addClass("icon-menu");
+                        ValidarSesionActual(respuesta);
+                    }
+                });
+            }
+
+            $(function () {
+                ListarComboEmpresaSede();
+                ListarComboCargo();
+                ListarComboArea();
+                $('#cmbEmpresaSede').select2({ theme: "bootstrap" });
+                $('#cmbEmpresaSede').change(function () { ListarComboArea(); VerContactos(); });
+                $('#cmbArea').change(function () { ListarComboCargo(); VerContactos(); });
+                $('#cmbCargo').change(function () {VerContactos(); });
+                $('#cmbCargo').select2({ theme: "bootstrap"});
+                $('#cmbArea').select2({ theme: "bootstrap"});
+                VerContactos();
+
+                $("#txtNombreCompleto").keyup(function () {
+                    VerContactos();
+                });
+            });
+        </script>
+    }
+}

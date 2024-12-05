@@ -1,0 +1,61 @@
+﻿.thumbnail-fixed {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    margin: 5px;
+    position: relative;
+}
+
+.image-container {
+    position: relative;
+    display: inline-block;
+    margin: 5px;
+    width: 150px;
+}
+
+.delete-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 10;
+    padding: 2px 6px;
+    font-size: 16px;
+    border-radius: 50%;
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    .delete-button:hover {
+        background-color: #ff0000;
+    }
+
+@media (max-width: 768px) {
+    .thumbnail-fixed {
+        width: 100px;
+        height: 100px;
+    }
+
+    .image-container {
+        width: 100px;
+    }
+
+    .delete-button {
+        padding: 1px 4px;
+        font-size: 14px;
+        top: 2px;
+        right: 2px;
+    }
+
+    .card-footer {
+        text-align: center;
+    }
+
+        .card-footer button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+}

@@ -1,0 +1,59 @@
+﻿@using System.Configuration
+@{
+    Layout = null;
+}
+<p hidden class="form-group current_captcha">
+    @ViewBag.captcha_value
+</p>
+
+<p style="margin:0px;padding:0px;" class="text form-group">
+    <label class="captha_numbers">
+        @foreach (var item in ViewBag.captcha_numbers)
+        {
+            <a style="margin-left:3px;" href="#" data="@item">@item</a>
+        }
+        <a id="btnRefrescarCaptcha" href="#" data="-1"><i style="color:black;padding:2px!important;font-size:14px;" class="ti-reload"></i></a>       
+    </label>
+    <span class="text-muted" id="spanMarcacion"> Digita el número </span>
+    <span class="text-muted" style="font-weight:bold;" id="spanMarcacion1">(@ViewBag.captcha_value)</span>
+   
+    <input type="hidden" size="4" maxlength="4" id="captcha" name="captcha">
+    <input type="hidden" id="current_captcha" name="current_captcha" value="@ViewBag.captcha_value">
+    <input type="hidden" id="current_captcha_codificado" name="current_captcha_codificado" value="@ViewBag.current_captcha_codificado">
+</p>
+<script>
+    $(function () {
+        $('.captha_numbers a').on('click', function () {
+            var cap = $('#captcha').val();
+            var capc = $('#current_captcha').val();
+            var c = $(this).attr('data');
+            if (cap.length + 1 <= 4) {
+                if (c != -1) {
+                    var data = $(this).attr('data');
+                    $('#captcha').val($('#captcha').val() + data);
+                    $('#spanMarcacion').html($('#captcha').val());
+                    if (capc == $('#captcha').val()) {
+                        $('#spanMarcacion').css("color", "white");
+                        $('#spanMarcacion1').html("");
+                        $('#spanMarcacion').html("Perfecto!!! Da un clic en Autenticar");
+                    }
+                    else {
+                        $('#spanMarcacion').css("color", "orange");
+                        if (cap.length + 1 == 4) {
+                            $('#spanMarcacion').html($('#captcha').val() + " - <i class='text-muted' style='color:#f1556c!important'>Vuélvelo a intentar</i>");
+                        }
+
+                    }
+                    $(this).css("background-color", "white");
+                }
+                else {
+                    ObtenerCaptcha();
+                }
+            }
+           
+            if (c == -1) {
+                ObtenerCaptcha();
+            }
+        });
+    });
+</script>

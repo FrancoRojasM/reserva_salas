@@ -1,0 +1,165 @@
+﻿@using Microsoft.AspNetCore.Http 
+@{
+
+    ViewBag.Title = "ListaIngreso";
+    Layout = "~/Views/Shared/Inicial.cshtml";
+    Context.Session.SetString("ModuloActual", "Seguridad");
+    Context.Session.SetString("PaginaActual", "Usuario");
+}
+<div class="card card-topline-aqua">
+    <div class="card-body">
+        <div id="divEditarUsuario">
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-block">
+        <table id="dtbUsuario" class="table table-striped table-hover table-bordered" cellspacing="0" style="width:100%"></table>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalUsuarioPerfil">
+    <div class="modal-dialog modal-se">
+        <div class="modal-content">
+            <div class="modal-header">
+                <a href="#" class="close" onclick="CerrarModalUsuarioPerfil()"><i class="fas fa-times"></i></a>
+                <h4 class="modal-title">Perfiles de sistema</h4>
+            </div>
+            <div class="modal-body">
+                <div id="divModalUsuarioPerfil"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        function CerrarModalUsuarioPerfil() {
+            $("#ModalUsuarioPerfil").modal("hide");
+            $("#divModalUsuarioPerfil").empty();
+        }
+        function VerModalUsuarioPerfil(IdUsuario) {
+            $.ajax({
+                url: "@Url.Action("IndexUsuarioPerfil","UsuarioPerfil")",
+                type: "GET",
+                data: { IdUsuario: IdUsuario },
+                success: function (vistaParcial) {
+                    $("#divModalUsuarioPerfil").html(vistaParcial);
+                    $("#ModalUsuarioPerfil").modal("show");
+                },
+                error: function (mensaje) {
+                    console.log(mensaje.responseText);
+                    toastr.error('Sucedió un error en la llamada, verifique consola');
+                },
+                complete: function (respuesta) {
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+		function VerEditarUsuario(tipo) {
+			var IdUsuario = 0;
+			 if(tipo==1)
+			 {
+				var data = ListaUsuario.dtUsuario.rows('.selected').data();
+				if (data.length ==1) {
+					IdUsuario = data[0].IdUsuario;
+				}
+			}
+			 $.ajax({
+                beforeSend: function () {
+                    $('#iBtnNuevoIdUsuario').removeClass("ti-file").addClass("fa fa-spinner fa-spin fa-fw");
+                },
+                url: "@Url.Action("RegistroUsuario", "Usuario")",
+                type: "POST",
+				async: true,
+                data: { IdUsuario: IdUsuario},
+                success: function (vistaParcial) {
+                    $("#divEditarUsuario").html(vistaParcial);
+                },
+				error: function (mensaje) {
+					console.log(mensaje);
+                    toastr.error('Sucedió un error en la llamada, verifique consola');
+                },
+                complete: function (respuesta) {
+                    $('#iBtnNuevoIdUsuario').removeClass("fa fa-spinner fa-spin fa-fw").addClass("ti-file");
+					ValidarSesionActual(respuesta);
+                }
+            });
+        }
+
+		 function ActualizarTablaUsuario() {
+            ListaUsuario.refresh();
+        }
+		 $(function () {
+		 VerEditarUsuario(0);
+		            ListaUsuario = {
+                dtUsuario: null,
+                init: function () {
+                    this.dtUsuario = $('#dtbUsuario').DataTable({
+                        responsive: true,
+						rowId: 'IdUsuario',
+						language: {
+                            url: '/assets/libs/datatables.net/js/es-ES.json',
+                        },
+                        "ordering": false,
+						initComplete: function () {
+						    this.api().row({ order: 'current' }, 0).select();//selecciona la rimera fila
+						},
+						"lengthMenu": [[10, 25, 50, 100, 100000], [10, 25, 50, 100, 'Todo']],
+                        select: {
+                            style: 'single',
+info: false
+                        },
+                        "serverSide": true,
+                        "ajax": {
+                            "url": "@Url.Action("ListarUsuario", "Usuario")",
+							"error": function (respuesta, error, thrown) {
+                                ValidarSesionActual(respuesta);
+                            },
+							"type": "POST"
+							//"data": function (d) {|
+                            //    d.extra_search = $('#extra').val();
+                            //}
+                        },
+                        "columns": [
+                            { "title": "Tipo", "data": "CatalogoTipoUsuario","className": "dt-head-center dt-body-center","width": "10%" },
+							{ "title": "Nombre completo del usuario", "data": "Persona", "className": "dt-head-center dt-body-left", "width": "40%" },
+                            { "title": "Email", "data": "Email", "className": "dt-head-center dt-body-center", "width": "10%" },
+							{ "title": "Login", "data": "Logueo", "className": "dt-head-center dt-body-center", "width": "10%" },
+							{ "title": "Bloqueado", "data": "Bloqueado", "className": "dt-head-center dt-body-center", "width": "10%" },
+                            {
+                                "title": "Perfiles",
+                                "data": function (row, type, val, meta) {
+                                    return '<button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Opciones" onclick="VerModalUsuarioPerfil(' + row.IdUsuario + ')"><i id="btnUsuarioPerfil' + row.IdUsuario + '" class="icon-menu"></i></button>';
+                                },
+                                "className": "dt-head-center dt-body-center", "width": "8%"
+                            }
+                        ]
+                    });
+                },
+                refresh: function () {
+                    this.dtUsuario.ajax.reload( null, false );
+                }
+
+            }
+
+            ListaUsuario.init();
+            ListaUsuario.dtUsuario.on('select', function (e, dt, type, indexes) {
+                var count = ListaUsuario.dtUsuario.rows({ selected: true }).count();
+                if (count > 0) {
+					 VerEditarUsuario(1);
+                }
+            });
+        });
+    </script>
+
+}
+
+
+
+
+
+
+
+

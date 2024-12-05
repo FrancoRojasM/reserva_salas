@@ -1,0 +1,50 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    ViewBag.Title = "ListaNotificacion";
+    Layout = "~/Views/Shared/Inicial.cshtml";
+    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="page-title-box">
+                                    <div class="page-title-right">
+                                        <ol class="breadcrumb m-0">
+                                            <li class="breadcrumb-item">Casilla Eléctronica</li>
+
+                                            <li class="breadcrumb-item active">Firmador</li>
+                                        </ol>
+                                    </div>
+                                    <h4 class="page-title">Firmador</h4>
+                                </div>
+                            </div>
+                        </div>
+    </div>
+}
+<div style="display:none;" id="addComponent"></div>
+<button type="button" class="btn btn-lq btn-primary" onclick="sendParam();"> INICIAR FIRMA</button>
+
+  @section scripts{
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@*     <script src="~/assets/libs/firmaperu/firmaperu.min.js"></script> *@
+    <script src="https://apps.firmaperu.gob.pe/web/clienteweb/firmaperu.min.js"></script>
+   
+<script>
+
+        var jqFirmaPeru = jQuery.noConflict(true);
+    function signatureInit() {
+        alert('PROCESO INICIADO');
+    }
+    function signatureOk() {
+        alert('DOCUMENTO FIRMADO');
+    }
+    function signatureCancel() {
+        alert('OPERACION CANCELADA');
+    }
+    function sendParam() {
+        var param = '@ViewBag.paramBase64';
+        var port = "48596";
+        console.log(param);
+        startSignature(port, param);
+    }
+        
+</script>
+  }

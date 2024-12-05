@@ -1,0 +1,413 @@
+﻿ 	
+
+@model Reservas.Solicitud
+@{
+    ViewBag.Title = "Registro Solicitud";
+    Layout = null;
+}
+                <form id="frmRegistroSolicitud" name="frmRegistroSolicitud" method="POST">
+		<div class="row">
+			<div class="col-12">
+				 <div class="card">
+       <div class="card-header"><h4 class="my-0">Registro de Solicitud</h4></div>
+				<div class="card-body">
+                    <input type="hidden" id="txtRegIdSolicitud" name="txtRegIdSolicitud" value="@Model.IdSolicitud" />
+					<div class="row">
+						<div class="col-md-2"><div class="mb-1">
+											<div class="form-group">
+												<label class="form-label" for="cmbCatalogoConsejoRegional">CatalogoConsejoRegional</label>												
+													<select class="form-control" id="cmbCatalogoConsejoRegional" name="cmbCatalogoConsejoRegional"  data-toggle="select2" data-width="100%" data-validation="[V>0]" data-validation-message="Seleccione el CatalogoConsejoRegional"></select>
+											</div>
+										</div>
+										</div>
+										<div class="col-md-2"><div class="mb-1">
+											<div class="form-group">
+												<label class="form-label" for="cmbCatalogoSecretaria">CatalogoSecretaria</label>												
+													<select class="form-control" id="cmbCatalogoSecretaria" name="cmbCatalogoSecretaria"  data-toggle="select2" data-width="100%" data-validation="[V>0]" data-validation-message="Seleccione el CatalogoSecretaria"></select>
+											</div>
+										</div>
+										</div>
+										<div class="col-md-2"><div class="mb-1">
+											<div class="form-group">
+												<label class="form-label" for="cmbCatalogoComite">CatalogoComite</label>												
+													<select class="form-control" id="cmbCatalogoComite" name="cmbCatalogoComite"  data-toggle="select2" data-width="100%" data-validation="[V>0]" data-validation-message="Seleccione el CatalogoComite"></select>
+											</div>
+										</div>
+										</div>
+									<div class="col-md-2"><div class="mb-1">																						
+										<div class="form-group">									
+															<label class="form-label" for="txtNombreEvento">NombreEvento</label>
+																															<input type="text" class="form-control" name="txtNombreEvento" id="txtNombreEvento" value="@Model.NombreEvento">																						
+																</div>
+												</div></div>								
+								<div class="col-md-2"><div class="mb-1">																						
+										<div class="form-group">									
+															<label class="form-label" for="txtNumeroParticipantes">NumeroParticipantes</label>
+																															<input type="number" class="form-control" name="txtNumeroParticipantes" id="txtNumeroParticipantes" value="@Model.NumeroParticipantes" data-validation="[V>=0]" data-validation-message="El valor debe ser mayor igual a cero">
+																</div>
+												</div></div>								
+								<div class="col-md-2"><div class="mb-1">																						
+										<div class="form-group" id="divtxtFechaDesde">
+															<label class="form-label" for="txtFechaDesde">FechaDesde</label>																
+															<input type="date" autocomplete="off" class="form-control"  name="txtFechaDesde" id="txtFechaDesde" value="@String.Format("{0:yyyy-MM-dd}",Model.FechaDesde)">																																	
+														</div>																												
+													</div></div>								
+								<div class="col-md-2"><div class="mb-1">																						
+										<div class="form-group" id="divtxtFechaHasta">
+															<label class="form-label" for="txtFechaHasta">FechaHasta</label>																
+															<input type="date" autocomplete="off" class="form-control"  name="txtFechaHasta" id="txtFechaHasta" value="@String.Format("{0:yyyy-MM-dd}",Model.FechaHasta)">																																	
+														</div>																												
+													</div></div>								
+								<div class="col-md-2"><div class="mb-1">																						
+										<div class="form-group">									
+															<label class="form-label" for="txtNumeroDias">NumeroDias</label>
+																															<input type="number" class="form-control" name="txtNumeroDias" id="txtNumeroDias" value="@Model.NumeroDias" data-validation="[V>=0]" data-validation-message="El valor debe ser mayor igual a cero">
+																</div>
+												</div></div>								
+								<div class="col-md-2"><div class="mb-1">																						
+										<div class="form-group">									
+															<label class="form-label" for="txtHoraInicio">HoraInicio</label>
+																															<input type="time" class="form-control" name="txtHoraInicio" id="txtHoraInicio" value="@Model.HoraInicio">																						
+																</div>
+												</div></div>								
+								<div class="col-md-2"><div class="mb-1">																						
+										<div class="form-group">									
+															<label class="form-label" for="txtHoraFin">HoraFin</label>
+																															<input type="time" class="form-control" name="txtHoraFin" id="txtHoraFin" value="@Model.HoraFin">																						
+																</div>
+												</div></div>								
+								<div class="col-md-2"><div class="mb-1">																						
+										<div class="form-group">									
+															<label class="form-label" for="txtNumeroAuditorios">NumeroAuditorios</label>
+																															<input type="number" class="form-control" name="txtNumeroAuditorios" id="txtNumeroAuditorios" value="@Model.NumeroAuditorios" data-validation="[V>=0]" data-validation-message="El valor debe ser mayor igual a cero">
+																</div>
+												</div></div>								
+								<div class="col-md-2"><div class="mb-1">																						
+										<div class="form-group">									
+															<label class="form-label" for="txtResponsableEvento">ResponsableEvento</label>
+																															<input type="text" class="form-control" name="txtResponsableEvento" id="txtResponsableEvento" value="@Model.ResponsableEvento">																						
+																</div>
+												</div></div>								
+								<div class="col-md-2"><div class="mb-1">																						
+										<div class="form-group">									
+															<label class="form-label" for="txtTelefonoContacto">TelefonoContacto</label>
+																															<input type="text" class="form-control" name="txtTelefonoContacto" id="txtTelefonoContacto" value="@Model.TelefonoContacto">																						
+																</div>
+												</div></div>								
+								<div class="col-md-2"><div class="mb-1">																						
+										<div class="form-group">									
+															<label class="form-label" for="txtCorreoContacto">CorreoContacto</label>
+																															<input type="text" class="form-control" name="txtCorreoContacto" id="txtCorreoContacto" value="@Model.CorreoContacto">																						
+																</div>
+												</div></div>								
+								<div class="col-md-2"><div class="mb-1">																						
+										<div class="form-group">									
+															<label class="form-label" for="txtObservaciones">Observaciones</label>
+																															<input type="text" class="form-control" name="txtObservaciones" id="txtObservaciones" value="@Model.Observaciones">																						
+																</div>
+												</div></div>								
+								<div class="col-md-2"><div class="mb-1">
+																	<div class="form-group">
+									<label class="form-label" for="cmbCatalogoSalaAsignada">SalaAsignada</label>
+									<select class="form-control" id="cmbCatalogoSalaAsignada" name="cmbSalaAsignada"  data-toggle="select2" data-width="100%" data-validation="[V>0]" data-validation-message="Seleccione SalaAsignada"></select>																
+																  </div>
+																</div>		
+															</div>
+																<div class="col-md-2"><div class="mb-1">
+											<div class="form-group">
+												<label class="form-label" for="cmbCatalogoEstadoSolicitud">CatalogoEstadoSolicitud</label>												
+													<select class="form-control" id="cmbCatalogoEstadoSolicitud" name="cmbCatalogoEstadoSolicitud"  data-toggle="select2" data-width="100%" data-validation="[V>0]" data-validation-message="Seleccione el CatalogoEstadoSolicitud"></select>
+											</div>
+										</div>
+										</div>
+									</div></div>
+					<div class="card-footer" style="text-align:end;"> 						
+						<button type="button" class="btn btn-primary waves-effect waves-light" title="Nuevo registro" onclick="VerEditarSolicitud(0)">Nuevo<span id="spNuevaSolicitud" class="mdi mdi-file" role="status" aria-hidden="true"></span></button>
+						<button  type="submit"  id="btnGuardarSolicitud" class="btn btn-success waves-effect waves-light" title="Grabar registro">Guardar<span id="spGuardarSolicitud" class="mdi mdi-content-save" role="status" aria-hidden="true"></span></button>												
+											</div>
+					</div>
+					</div>
+					</div>
+                </form> 
+<script>   	
+							
+					function ListarCatalogoConsejoRegional() {
+						$.ajax({							
+							 url: "@Url.Action("ListarCatalogoConsejoRegional", "CatalogoReservas")",							
+							method: 'POST',
+							success: function (data) {
+								$("#cmbCatalogoConsejoRegional").empty();
+								$("#cmbCatalogoConsejoRegional").append("<option value=0>Seleccione</option>");
+								$.each(data, function (i, item) {
+									if (item.IdCatalogo == "@Model.catalogoconsejoregional.IdCatalogo") {
+										$("#cmbCatalogoConsejoRegional").append("<option value=" + item.IdCatalogo + " selected='selected'>" + item.Descripcion + "</option>");
+									}
+									else {
+										$("#cmbCatalogoConsejoRegional").append("<option value=" + item.IdCatalogo + ">" + item.Descripcion + "</option>");
+									}
+								});
+							},
+							 error: function (mensaje) {
+									console.log(mensaje);
+                                    toastr.error('Sucedió un error en la interface [ListarCatalogoConsejoRegional], verifique consola');
+                                }
+						});
+					}						
+										
+					// function ListarCatalogoSecretaria() {
+					// 	$.ajax({							
+					// 		 url: "@Url.Action("ListarCatalogoSecretaria", "CatalogoReservas")",							
+					// 		method: 'POST',
+					// 		success: function (data) {
+					// 			$("#cmbCatalogoSecretaria").empty();
+					// 			$("#cmbCatalogoSecretaria").append("<option value=0>Seleccione</option>");
+					// 			$.each(data, function (i, item) {
+					// 				if (item.IdCatalogo == "@Model.catalogosecretaria.IdCatalogo") {
+					// 					$("#cmbCatalogoSecretaria").append("<option value=" + item.IdCatalogo + " selected='selected'>" + item.Descripcion + "</option>");
+					// 				}
+					// 				else {
+					// 					$("#cmbCatalogoSecretaria").append("<option value=" + item.IdCatalogo + ">" + item.Descripcion + "</option>");
+					// 				}
+					// 			});
+					// 		},
+					// 		 error: function (mensaje) {
+					// 				console.log(mensaje);
+     //                                toastr.error('Sucedió un error en la interface [ListarCatalogoSecretaria], verifique consola');
+     //                            }
+					// 	});
+					// }						
+										
+					// function ListarCatalogoComite() {
+					// 	$.ajax({							
+					// 		 url: "@Url.Action("ListarCatalogoComite", "CatalogoReservas")",							
+					// 		method: 'POST',
+					// 		success: function (data) {
+					// 			$("#cmbCatalogoComite").empty();
+					// 			$("#cmbCatalogoComite").append("<option value=0>Seleccione</option>");
+					// 			$.each(data, function (i, item) {
+					// 				if (item.IdCatalogo == "@Model.catalogocomite.IdCatalogo") {
+					// 					$("#cmbCatalogoComite").append("<option value=" + item.IdCatalogo + " selected='selected'>" + item.Descripcion + "</option>");
+					// 				}
+					// 				else {
+					// 					$("#cmbCatalogoComite").append("<option value=" + item.IdCatalogo + ">" + item.Descripcion + "</option>");
+					// 				}
+					// 			});
+					// 		},
+					// 		 error: function (mensaje) {
+					// 				console.log(mensaje);
+     //                                toastr.error('Sucedió un error en la interface [ListarCatalogoComite], verifique consola');
+     //                            }
+					// 	});
+					// }
+
+	function ListarCatalogoSecretaria() {
+		$.ajax({
+			url: "@Url.Action("ListarCatalogoSecretaria", "CatalogoReservas")",
+			method: 'POST',
+			success: function (data) {
+				$("#cmbCatalogoSecretaria").empty();
+				$("#cmbCatalogoSecretaria").append("<option value=0>Seleccione</option>");
+				$.each(data, function (i, item) {
+					if (item.IdCatalogo == "@Model.catalogosecretaria.IdCatalogo") {
+						$("#cmbCatalogoSecretaria").append("<option value=" + item.IdCatalogo + " selected='selected'>" + item.Descripcion + "</option>");
+					} else {
+						$("#cmbCatalogoSecretaria").append("<option value=" + item.IdCatalogo + ">" + item.Descripcion + "</option>");
+					}
+				});
+
+				// Vincular el evento de cambio
+				$("#cmbCatalogoSecretaria").on("change", function () {
+					const idSecretaria = $(this).val();
+					// Si no se selecciona una opción válida, vaciar el combo de Comité
+					if (idSecretaria == 0) {
+						$("#cmbCatalogoComite").empty();
+						$("#cmbCatalogoComite").append("<option value=0>Seleccione una secretaría primero</option>");
+					} else {
+						// Si hay una selección válida, listar los comités
+						ListarCatalogoComite(idSecretaria);
+					}
+				});
+			},
+			error: function (mensaje) {
+				console.log(mensaje);
+				toastr.error('Sucedió un error en la interface [ListarCatalogoSecretaria], verifique consola');
+			}
+		});
+	}
+
+	function ListarCatalogoComite(idSecretaria) {
+		$.ajax({
+			url: "@Url.Action("ListarCatalogoComite", "CatalogoReservas")",
+			method: 'POST',
+			data: { idSecretaria: idSecretaria },
+			success: function (data) {
+				$("#cmbCatalogoComite").empty();
+				$("#cmbCatalogoComite").append("<option value=0>Seleccione</option>");
+				$.each(data, function (i, item) {
+					if (item.IdCatalogo == "@Model.catalogocomite.IdCatalogo") {
+						$("#cmbCatalogoComite").append("<option value=" + item.IdCatalogo + " selected='selected'>" + item.Descripcion + "</option>");
+					} else {
+						$("#cmbCatalogoComite").append("<option value=" + item.IdCatalogo + ">" + item.Descripcion + "</option>");
+					}
+				});
+			},
+			error: function (mensaje) {
+				console.log(mensaje);
+				toastr.error('Sucedió un error en la interface [ListarCatalogoComite], verifique consola');
+			}
+		});
+	}
+								
+												// function ListarComboSalaAsignada() {
+												// 	$.ajax({						
+												// 		 url: "@Url.Action("ListarComboSalaAsignada", "SalaAsignada")",							
+												// 		method: 'POST',
+												// 		success: function (lista) {
+												// 			if (lista.mensaje.CodigoMensaje == 0) {
+												// 				$("#cmbSalaAsignada").empty();
+												// 				$("#cmbSalaAsignada").append("<option value=0>Seleccione</option>");
+												// 				$.each(lista.lista, function (i, item) {
+												// 					if (item.IdSala == "@Model.salaasignada.IdSala") {
+												// 					  $("#cmbSalaAsignada").append("<option value=" + item.IdSala + " selected='selected'>" + item.NombreSalaAsignada + "</option>");
+												// 					}
+												// 					else {
+												// 					  $("#cmbSalaAsignada").append("<option value=" + item.IdSala + ">" + item.NombreSalaAsignada + "</option>");
+												// 					}
+												// 				});
+												// 			}
+												// 			 else
+												// 			{
+												// 				console.log(lista.mensaje.DescripcionMensajeSistema);
+												// 				toastr.error(lista.mensaje.DescripcionMensaje);
+												// 			}
+												// 		},
+												// 		 error: function (mensaje) {
+												// 				console.log(mensaje);
+												// 				toastr.error('Sucedió un error en la llamada ListarComboSalaAsignada, verifique consola');
+												// 			}
+												// 	});
+												// }	
+			function ListarCatalogoSala() {
+						$.ajax({
+							 url: "@Url.Action("ListarCatalogoSala", "CatalogoReservas")",
+							method: 'POST',
+							success: function (data) {
+								$("#cmbCatalogoSalaAsignada").empty();
+								$("#cmbCatalogoSalaAsignada").append("<option value=0>Seleccione</option>");
+								$.each(data, function (i, item) {
+									if (item.IdCatalogo == "@Model.catalogoestadosolicitud.IdCatalogo") {
+										$("#cmbCatalogoSalaAsignada").append("<option value=" + item.IdCatalogo + " selected='selected'>" + item.Descripcion + "</option>");
+									}
+									else {
+										$("#cmbCatalogoSalaAsignada").append("<option value=" + item.IdCatalogo + ">" + item.Descripcion + "</option>");
+									}
+								});
+							},
+							 error: function (mensaje) {
+									console.log(mensaje);
+									toastr.error('Sucedió un error en la interface [ListarCatalogoSala], verifique consola');
+								}
+						});
+					}
+
+
+					function ListarCatalogoEstadoSolicitud() {
+						$.ajax({							
+							 url: "@Url.Action("ListarCatalogoEstadoSolicitud", "CatalogoReservas")",							
+							method: 'POST',
+							success: function (data) {
+								$("#cmbCatalogoEstadoSolicitud").empty();
+								$("#cmbCatalogoEstadoSolicitud").append("<option value=0>Seleccione</option>");
+								$.each(data, function (i, item) {
+									if (item.IdCatalogo == "@Model.catalogoestadosolicitud.IdCatalogo") {
+										$("#cmbCatalogoEstadoSolicitud").append("<option value=" + item.IdCatalogo + " selected='selected'>" + item.Descripcion + "</option>");
+									}
+									else {
+										$("#cmbCatalogoEstadoSolicitud").append("<option value=" + item.IdCatalogo + ">" + item.Descripcion + "</option>");
+									}
+								});
+							},
+							 error: function (mensaje) {
+									console.log(mensaje);
+                                    toastr.error('Sucedió un error en la interface [ListarCatalogoEstadoSolicitud], verifique consola');
+                                }
+						});
+					}						
+							
+	  $(function () { 
+	  			
+							ListarCatalogoConsejoRegional();
+							$("#cmbCatalogoConsejoRegional").select2();
+							
+							ListarCatalogoSecretaria();
+							$("#cmbCatalogoSecretaria").select2();
+							
+							ListarCatalogoComite();
+							$("#cmbCatalogoComite").select2();
+							
+							ListarCatalogoSala();
+							$("#cmbCatalogoSalaAsignada").select2();
+
+
+							ListarCatalogoEstadoSolicitud();
+							$("#cmbCatalogoEstadoSolicitud").select2();
+
+						  
+			// $("#nombreCombo").select2({ theme: 'bootstrap', dropdownParent: $('#NombreModal') });           
+                $("#frmRegistroSolicitud").validate({
+			submit: {
+				settings: {
+					inputContainer: '.field',
+					errorClass: 'LabelError', errorListClass: 'ListaError'
+				},
+				callback: {
+					onBeforeSubmit: function (node) {
+						$("#btnGuardarSolicitud").addClass("disabled");
+						$("#spGuardarSolicitud").removeClass("mdi mdi-content-save");
+						$("#spGuardarSolicitud").addClass("spinner-grow spinner-grow-sm me-1");
+					},
+					onSubmit: function (node, formData) {
+                var fileData = new FormData();
+                        for (var control in formData) {
+                            var valor = $("#" + control).val();                        
+                            fileData.append(control, valor);
+                            valor = "";
+                        }
+						                        
+						 						 
+                            $.ajax({
+                                url: "@Url.Action("GuardarRegistroSolicitud","Solicitud")",
+                                method: 'POST',
+                                data: fileData,
+								contentType: false,
+								processData: false,
+                                success: function (solicitud) {                                                                
+                                    if (solicitud.mensaje.CodigoMensaje == 0) {   
+									 $("#txtRegIdSolicitud").val(solicitud.IdSolicitud);
+                                        toastr.success(solicitud.mensaje.DescripcionMensaje);																				
+										ActualizarTablaSolicitud();
+                                    }
+                                    else {                                        
+                                        toastr.error(solicitud.mensaje.DescripcionMensaje);
+										console.log(solicitud.mensaje.DescripcionMensajeSistema);
+                                    }
+                                },
+                                error: function (mensaje) {
+									console.log(mensaje);
+                                    toastr.error('Sucedió un error en la interface [GuardarRegistroSolicitud], verifique consola');
+                                },
+								  complete: function (respuesta) {		
+								  $("#btnGuardarSolicitud").removeClass("disabled");
+								$("#spGuardarSolicitud").removeClass("spinner-grow spinner-grow-sm me-1");
+								$("#spGuardarSolicitud").addClass("mdi mdi-content-save");
+									ValidarSesionActual(respuesta);
+													}
+							});
+						}
+					}
+				}
+			});
+                    
+        });       
+		</script>
+		

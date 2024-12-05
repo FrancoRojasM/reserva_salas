@@ -1,0 +1,111 @@
+﻿@model Seguridad.Perfil
+@{
+    ViewBag.Title = "Registro Perfil";
+    Layout = null;
+}
+<form id="frmRegistroPerfil" name="frmRegistroPerfil" method="POST">
+    <input type="hidden" id="txtRegIdPerfil" name="txtRegIdPerfil" value="@Model.IdPerfil" />
+    <div class="row">
+        <div class="col-12">
+            <div class="card" style="box-shadow:none">
+                <div class="card-header"><h4 class="my-0">Registro de Perfil</h4></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtNombrePerfil">Nombre</label>
+                                <input type="text" class="form-control" name="txtNombrePerfil" id="txtNombrePerfil" value="@Model.NombrePerfil" data-validation="[L>=1]" data-validation-message="Ingrese el Nombre del Perfil">
+                            </div>
+
+                        </div>
+                        <div class="col-md-7">
+                            <div class="form-group">
+                                <label class="form-label" for="txtDetallePerfil">Descripción del perfil</label>
+                                <input type="text" class="form-control" name="txtDetallePerfil" id="txtDetallePerfil" value="@Model.DetallePerfil" data-validation="[L>=1]" data-validation-message="Ingrese un Detalle alPerfil">
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="form-group">
+                                <label class="form-label" for="optActivo">Activo</label>
+                                <br />
+                                <select id="optActivo" name="optActivo" class="form-control form-select">
+                                    @if (Model.Activo == true)
+                                    {
+                                        <option value="1" selected="">Si</option>
+                                        <option value="0">No</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="1">Si</option>
+                                        <option value="0" selected="">No</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer" style="text-align:right;">
+                    <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Actualizar tabla de registros" onclick="ActualizarTablaPerfil()"> Refrescar &nbsp;<i class="fas fa-sync"></i></button>
+                    <button type="button" data-toggle="tooltip" class="btn btn-primary label" title="Nuevo registro" onclick="VerEditarPerfil(0)"> Nuevo  &nbsp;<i id="iBtnNuevoPerfil" class="ti-file"></i></button>
+                    <button type="submit" data-toggle="tooltip" class="btn btn-blue label" title="Grabar registro"> Guardar  &nbsp;<i class="ti-save"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+
+
+    $(function () {
+
+        $("#frmRegistroPerfil").validate({
+            submit: {
+                settings: {
+                    inputContainer: '.field',
+                    errorClass: 'LabelError', errorListClass: 'ListaError'
+                },
+                callback: {
+                    onBeforeSubmit: function (node) {
+                    },
+                    onSubmit: function (node, formData) {
+                        /*
+                        var files = $("#txtRutaArchivo").get(0).files;
+                        var fileData = new FormData();
+                        for (var key in formData) {
+                            fileData.append(key, formData[key]);
+                        }
+                        fileData.append('Archivo', files[0]);
+                        */
+
+                        $.ajax({
+                            url: "@Url.Action("GuardarRegistroPerfil")",
+                            method: 'POST',
+                            data: formData,//fileData,
+                            //contentType: false,
+                            //processData: false,
+                            success: function (perfil) {
+                                if (perfil.mensaje.CodigoMensaje == 0) {
+                                    toastr.success(perfil.mensaje.DescripcionMensaje);
+                                    $("#txtRegIdPerfil").val(perfil.IdPerfil);
+                                    ActualizarTablaPerfil();
+                                }
+                                else {
+                                    toastr.error(perfil.mensaje.DescripcionMensaje);
+                                    console.log(perfil.mensaje.DescripcionMensajeSistema);
+                                }
+                            },
+                            error: function (mensaje) {
+                                console.log(mensaje);
+                                toastr.error('Sucedió un error en la interface [GuardarRegistroPerfil], verifique consola');
+                            },
+                            complete: function (respuesta) {
+                                ValidarSesionActual(respuesta);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    });
+</script>

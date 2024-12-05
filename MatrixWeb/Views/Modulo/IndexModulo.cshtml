@@ -1,0 +1,207 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    Layout = "~/Views/Shared/Inicial.cshtml";
+    Context.Session.SetString("ModuloActual", "Sistema");
+    Context.Session.SetString("PaginaActual", "Módulo");
+    Context.Session.SetString("SubPaginaActual", "");
+
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item">Sistema</li>
+                        <li class="breadcrumb-item active">Modulo</li>
+                    </ol>
+                </div>
+                <h4 class="page-title">Modulo</h4>
+            </div>
+        </div>
+    </div>
+</div>
+@if (ViewBag.conpermiso == 0)
+{
+    <div style="font-weight:bold;color:red;">Usted no tiene permiso para ver este recurso</div>
+}
+else
+{
+    <div class="card border-info border mb-3">
+        <div class="card-body">
+            <div id="divEditarModulo">
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            
+            <div class="row">
+                <div class="col-12">
+                    <table id="dtbModulo" class="table table-striped table-hover table-bordered" cellspacing="0" style="width:100%"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="ModalEliminarModulo" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <input type="hidden" class="form-control" name="txtIdModuloEliminar" id="txtIdModuloEliminar" value="">
+                    <h5 class="modal-title">Eliminar Modulo</h5>
+                    <a class="close" onclick="CerrarEliminarModulo()"><i class="fas fa-times"></i></a>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro de eliminar el registro seleccionado?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Eliminar registro seleccionado" onclick="EliminarModulo()"> Eliminar <i class="ti-trash"></i></button>
+                    <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Regresar al formulario anterior" onclick="CerrarEliminarModulo()"> Cerrar <i class="ti-back-left"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @section scripts {
+    <script>
+        function CerrarEliminarModulo() {
+            $("#txtIdModuloEliminar").val(0);
+            $("#ModalEliminarModulo").modal("hide");
+        }
+        function EliminarModulo() {
+            var IdModuloEliminar = $('#txtIdModuloEliminar').val();
+            $.ajax({
+                beforeSend: function () {
+                    $('#btnNuevoModulo').prop('disabled', true);
+                    $('#btnGrabarModulo').prop('disabled', true);
+                    $('#btnVerModalEliminarModulo').prop('disabled', true);
+                },
+                url: "@Url.Action("EliminarModulo")",
+                method: 'POST',
+                async: true,
+                data: { IdModulo: IdModuloEliminar },
+                success: function (mensaje) {
+                    $("#modalEliminarModulo").modal('hide');
+                    if (mensaje.CodigoMensaje == 0) {
+                        $("#" + IdModuloEliminar).remove();
+                        $('#btnVerEditarModulo').prop('disabled', true);
+                        $('#btnVerModalEliminarModulo').prop('disabled', true);
+                        toastr.success(mensaje.DescripcionMensaje);
+                        VerEditarModulo(0);
+                        CerrarEliminarModulo();
+                    }
+                    else {
+                        toastr.error(mensaje.DescripcionMensaje);
+                    }
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la llamada EliminarModulo, verifique consola');
+                },
+                complete: function (respuesta) {
+                    $('#btnNuevoModulo').prop('disabled', false);
+                    $('#btnGrabarModulo').prop('disabled', false);
+                    $('#btnVerModalEliminarModulo').prop('disabled', false);
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+        function VerModalEliminarModulo(IdModulo) {
+            if (IdModulo > 0) {
+                $("#txtIdModuloEliminar").val(IdModulo);
+                $("#ModalEliminarModulo").modal("show");
+            }
+        }
+
+        function VerEditarModulo(tipo) {
+            var IdModulo = 0;
+            if (tipo == 1) {
+                var data = ListaModulo.dtModulo.rows('.selected').data();
+                if (data.length == 1) {
+                    IdModulo = data[0].IdModulo;
+                }
+            }
+            $.ajax({
+                beforeSend: function () {
+                    $('#iBtnNuevoIdModulo').removeClass("ti-file").addClass("fa fa-spinner fa-spin fa-fw");
+                },
+                url: "@Url.Action("RegistroModulo", "Modulo")",
+                type: "POST",
+                async: true,
+                data: { IdModulo: IdModulo },
+                success: function (vistaParcial) {
+                    $("#divEditarModulo").html(vistaParcial);
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la llamada, verifique consola');
+                },
+                complete: function (respuesta) {
+                    $('#iBtnNuevoIdModulo').removeClass("fa fa-spinner fa-spin fa-fw").addClass("ti-file");
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+
+        function ActualizarTablaModulo() {
+            ListaModulo.refresh();
+        }
+        $(function () {
+            ListaModulo = {
+                dtModulo: null,
+                init: function () {
+                    this.dtModulo = $('#dtbModulo').DataTable({
+                        responsive: true,
+                        rowId: 'IdModulo',
+                        language: {
+                            url: '/assets/libs/datatables.net/js/es-ES.json',
+                        },
+                        "ordering": false,
+                        "lengthMenu": [[10, 25, 50, 100, 100000], [10, 25, 50, 100, 'Todo']],
+                        select: {
+                            style: 'single',
+                            info: false
+                        },
+                        "serverSide": true,
+                        "ajax": {
+                            "url": "@Url.Action("ListarModulo", "Modulo")",
+                            "error": function (respuesta, error, thrown) {
+                                ValidarSesionActual(respuesta);
+                            },
+                            "type": "POST"
+                        },
+                        "columns": [
+                            { "title": "Interface", "data": "CatalogoTipoModulo", "className": "dt-head-left dt-body-left", "width": "10%" },
+                            { "title": "Nombre", "data": "NombreModulo", "className": "dt-head-left dt-body-left", "width": "10%" },
+                            { "title": "Detalle", "data": "DetalleModulo", "className": "dt-head-left dt-body-left", "width": "10%" },
+                            { "title": "Orden", "data": "OrdenModulo", "className": "dt-head-left dt-body-left", "width": "10%" },
+                            { "title": "Icono", "data": "RutaImagenModulo", "className": "dt-head-left dt-body-left", "width": "10%" },
+                            { "title": "Activo", "data": "Activo", "className": "dt-head-left dt-body-left", "width": "10%" },
+                            {
+                                "title": "Eliminar",
+                                "data": function (row, type, val, meta) {
+                                    return '<button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Opciones" onclick="VerModalEliminarModulo(' + row.IdModulo + ')"><i id="btnModulo' + row.IdModulo + '" class="fa fa-trash"></i></button>';
+                                },
+                                "className": "dt-head-center dt-body-center", "width": "10%"
+                            }
+
+                        ]
+                    });
+                },
+                refresh: function () {
+                    this.dtModulo.ajax.reload(null, false);
+                }
+            }
+            ListaModulo.init();
+            ListaModulo.dtModulo.on('select', function (e, dt, type, indexes) {
+                var count = ListaModulo.dtModulo.rows({ selected: true }).count();
+                if (count > 0) {
+                    VerEditarModulo(1);
+                }
+            });
+            VerEditarModulo(0);
+        });
+    </script>
+    }
+}

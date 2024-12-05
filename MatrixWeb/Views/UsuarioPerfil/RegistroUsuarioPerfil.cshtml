@@ -1,0 +1,176 @@
+﻿@model Seguridad.UsuarioPerfil
+@{
+    ViewBag.Title = "Registro UsuarioPerfil";
+    Layout = null;
+}
+<form id="frmRegistroUsuarioPerfil" name="frmRegistroUsuarioPerfil" method="POST">
+    <input type="hidden" id="txtRegIdUsuarioPerfil" name="txtRegIdUsuarioPerfil" value="@Model.IdUsuarioPerfil" />
+    <div class="card" style="box-shadow:none">
+        <div class="card-head" style="text-align:center;">
+            <h5 class="bold">@Model.usuario.persona.NombreCompleto (@Model.usuario.Logueo)</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-7">
+                    <div class="form-group">
+                        <label class="form-label" for="cmbEmpleadoUsuarioPerfil">Empresa/Sede/Area/Cargo</label>
+                        <select class="select2 form-control form-select" style="width:100%" id="cmbEmpleadoUsuarioPerfil" name="cmbEmpleadoUsuarioPerfil" data-validation="[NOTEMPTY]" data-validation-message="Seleccione un perfil"></select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label" for="cmbPerfil">Perfil</label>
+                        <select class="select2 form-control form-select" id="cmbPerfil" name="cmbPerfil" data-validation="[V>0]" data-validation-message="Seleccione Perfil"></select>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="form-group">
+                        <label class="form-label" for="optActivo">Activo</label>
+                        <br />
+                        <select id="optActivo" name="optActivo" class="form-control form-select">
+                            @if (Model.Activo == true)
+                            {
+                                <option value="1" selected="">Si</option>
+                                <option value="0">No</option>
+                            }
+                            else
+                            {
+                                <option value="1">Si</option>
+                                <option value="0" selected="">No</option>
+                            }
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <div class="card-footer" style="text-align:right;">
+
+            <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Actualizar tabla de registros" onclick="ActualizarTablaUsuarioPerfil()"> Refrescar &nbsp; <i class="fas fa-sync"></i></button>
+            <button type="button" data-toggle="tooltip" class="btn btn-primary label" title="Nuevo registro" onclick="VerEditarUsuarioPerfil(0)"> Nuevo &nbsp; <i id="iBtnNuevoUsuarioPerfil" class="ti-file"></i></button>
+            <button type="submit" data-toggle="tooltip" class="btn btn-blue label" title="Grabar registro"> Guardar &nbsp; <i class="ti-save"></i></button>
+            <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Regresar al formulario anterior" onclick="CerrarModalUsuarioPerfil()"> Regresar &nbsp; <i class="ti-back-left"></i></button>
+        </div>
+    </div>
+</form>
+
+<script>
+    function ListarComboEmpleadoUsuarioPerfil() {
+
+        $.ajax({
+            url: "@Url.Action("ListarComboEmpleadoPerfil", "EmpleadoPerfil")",
+            method: 'POST',
+            data: { IdPersona: '@Model.usuario.persona.IdPersona' },
+            success: function (data) {
+                $("#cmbEmpleadoUsuarioPerfil").empty();
+                $("#cmbEmpleadoUsuarioPerfil").append("<option value=0>Seleccione</option>");
+                $.each(data, function (i, item) {
+                    if (item.IdEmpleadoPerfil == "@Model.empleadoperfil.IdEmpleadoPerfil") {
+                        $("#cmbEmpleadoUsuarioPerfil").append("<option value=" + item.IdEmpleadoPerfil + " selected='selected'>" + item.NombreEmpleadoPerfil + "</option>");
+                    }
+                    else {
+                        $("#cmbEmpleadoUsuarioPerfil").append("<option value=" + item.IdEmpleadoPerfil + ">" + item.NombreEmpleadoPerfil + "</option>");
+                    }
+                });
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la llamada ListarComboUsuarioPerfil, verifique consola');
+            }
+        });
+    }
+    function ListarComboPerfil() {
+        $.ajax({
+            url: "@Url.Action("ListarComboPerfil", "Perfil")",
+            method: 'POST',
+            success: function (listausuarioperfil) {
+                if (listausuarioperfil.mensaje.CodigoMensaje == 0) {
+                    $("#cmbPerfil").empty();
+                    $("#cmbPerfil").append("<option value=0>Seleccione</option>");
+                    $.each(listausuarioperfil.lista, function (i, item) {
+                        if (item.IdPerfil == "@Model.perfil.IdPerfil") {
+                            $("#cmbPerfil").append("<option value=" + item.IdPerfil + " selected='selected'>" + item.NombrePerfil + "</option>");
+                        }
+                        else {
+                            $("#cmbPerfil").append("<option value=" + item.IdPerfil + ">" + item.NombrePerfil + "</option>");
+                        }
+                    });
+                }
+                else {
+                    console.log(listausuarioperfil.mensaje.DescripcionMensajeSistema);
+                    toastr.error(listausuarioperfil.mensaje.DescripcionMensaje);
+                }
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la interface [ListarComboPerfil], verifique consola');
+            },
+            complete: function (respuesta) {
+                ValidarSesionActual(respuesta);
+            }
+        });
+    }
+
+    $(function () {
+        ListarComboEmpleadoUsuarioPerfil();
+        ListarComboPerfil();
+        $('#cmbEmpleadoUsuarioPerfil').select2({ dropdownParent: $('#ModalUsuarioPerfil') }).on("select2:select", function (e) {
+
+            $("#frmRegistroUsuarioPerfil").removeError("cmbEmpleadoUsuarioPerfil")
+        });;
+        $('#cmbPerfil').select2({ dropdownParent: $('#ModalUsuarioPerfil') }).on("select2:select", function (e) {
+
+            $("#frmRegistroUsuarioPerfil").removeError("cmbPerfil")
+        });;
+        $("#frmRegistroUsuarioPerfil").validate({
+            submit: {
+                settings: {
+                    inputContainer: '.field',
+                    errorClass: 'LabelError', errorListClass: 'ListaError'
+                },
+                callback: {
+                    onBeforeSubmit: function (node) {
+                    },
+                    onSubmit: function (node, formData) {
+                        var fileData = new FormData();
+                        var fileData = new FormData();
+                        for (var control in formData) {
+                            var valor = $("#" + control).val();
+                            fileData.append(control, valor);
+                            valor = "";
+                        }
+                        fileData.append('IdUsuario', @Model.usuario.IdUsuario);
+
+
+                        $.ajax({
+                            url: "@Url.Action("GuardarRegistroUsuarioPerfil", "UsuarioPerfil")",
+                            method: 'POST',
+                            data: fileData,
+                            contentType: false,
+                            processData: false,
+                            success: function (usuarioperfil) {
+                                if (usuarioperfil.mensaje.CodigoMensaje == 0) {
+                                    toastr.success(usuarioperfil.mensaje.DescripcionMensaje);
+                                    VerEditarUsuarioPerfil(0);
+                                    ActualizarTablaUsuarioPerfil();
+                                }
+                                else {
+                                    toastr.error(usuarioperfil.mensaje.DescripcionMensaje);
+                                    console.log(usuarioperfil.mensaje.DescripcionMensajeSistema);
+                                }
+                            },
+                            error: function (mensaje) {
+                                console.log(mensaje);
+                                toastr.error('Sucedió un error en la interface [GuardarRegistroUsuarioPerfil], verifique consola');
+                            },
+                            complete: function (respuesta) {
+                                ValidarSesionActual(respuesta);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    });
+</script>

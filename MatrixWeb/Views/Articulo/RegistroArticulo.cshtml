@@ -1,0 +1,751 @@
+﻿@model Inventario.Articulo
+@{
+    ViewBag.Title = "Registro Articulo";
+    Layout = null;
+}
+<link href="~/assets/css/articulos.css" rel="stylesheet" type="text/css" />
+<form id="frmRegistroArticulo" name="frmRegistroArticulo" method="POST">
+    <input type="hidden" id="txtRegId" name="txtRegId" value="@Model.Id" />
+    <input type="hidden" id="imagenesGuardadas" name="imagenesGuardadas" value="@Html.Raw(Json.Serialize(ViewBag.ImagenesCargadas ?? new List<string>()))" />
+    <div class="row">
+        <div class="col-12">
+            <div class="card-header"><h4 class="my-0">Registro de Artículo</h4></div>
+            <div class="card" style="box-shadow:none">
+                <div class="card-body">
+                    <div class="row mb-1">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtCodigoBarra">Código Barra</label>
+                                <div class="input-group">
+                                    <div class="input-group input-group-merge">
+                                        <div title="Leer Código de Barra" onclick="LeerCodigo()" class="input-group-text btn btn-primary" id="openButton">
+                                            <span id="iBtnCodigoBarra" class="fas fa-barcode"></span>
+                                        </div>
+                                        <input type="text" class="form-control" id="txtCodigoBarra" name="txtCodigoBarra" value="@Model.Codigo_Barra" data-validation="[L>=1]" data-validation-message="Asigne el Código de Barra" readonly>
+                                        <div title="Buscar Código de Barra" onclick="SearchCode()" class="input-group-text btn btn-success" id="SearchCode">
+                                            <span id="iBtnCodigoBarraBuscar" class="fas fa-search"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtItemCode">Código QR</label>
+                                <div class="input-group">
+                                    <div class="input-group input-group-merge">
+                                        <input type="text" class="form-control" id="txtItemCode" name="txtItemCode" value="@Model.ItemCode" data-validation="[L>=1]" data-validation-message="Asigne el Código QR">
+                                        <div title="Generar Código QR" onclick="Correlativo(0)" class="input-group-text btn btn-primary">
+                                            <span id="iBtnItemCode" class="fas fa-sync"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="optSucursal">Sucursal</label>
+                                <div class="input-group">
+                                    <select class="form-control" id="optSucursal" name="optSucursal_display" data-validation="[V>0]" data-validation-message="Seleccione una Sucursal" disabled>
+                                        @foreach (var sucursal in ViewBag.Sucursales)
+                                        {
+                                            <option value="@sucursal.Id.ToString()" @(sucursal.Id.ToString() == ViewBag.SucursalSeleccionada ? "selected" : "")>
+                                                @sucursal.BPLName
+                                            </option>
+                                        }
+                                    </select>
+                                    <input type="hidden" id="optSucursal" name="optSucursal" value="@ViewBag.SucursalSeleccionada" />
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtUbicacionRegion">Ubicación Región</label>
+                                <input type="text" class="form-control autocomplete-input" id="txtUbicacionRegion" name="txtUbicacionRegion" value="@(string.IsNullOrEmpty(ViewBag.region) ? Model.Ubicacion_Region : ViewBag.region)" data-validation="[L>=1]" data-validation-message="Ingrese la región" data-field="Ubicacion_Region" autocomplete="off">
+                                <div id="Ubicacion_RegionList" class="autocomplete-items"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtUbicacionSede">Ubicación Sede</label>
+                                <input type="text" class="form-control autocomplete-input" id="txtUbicacionSede" name="txtUbicacionSede" value="@(string.IsNullOrEmpty(ViewBag.sede) ? Model.Ubicacion_Sede : ViewBag.sede)" data-validation="[L>=1]" data-validation-message="Ingrese la Sede" data-field="Ubicacion_Sede" autocomplete="off">
+                                <div id="Ubicacion_SedeList" class="autocomplete-items"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtUbicacionArea">Ubicación Área</label>
+                                <input type="text" class="form-control autocomplete-input" id="txtUbicacionArea" name="txtUbicacionArea" value="@Model.Ubicacion_Area" data-validation="[L>=1]" data-validation-message="Ingrese Ingrese el Area" data-field="Ubicacion_Area" autocomplete="off">
+                                <div id="Ubicacion_AreaList" class="autocomplete-items"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtUbicacionSubArea">Ubicación Sub Área</label>
+                                <input type="text" class="form-control autocomplete-input" id="txtUbicacionSubArea" name="txtUbicacionSubArea" value="@Model.Ubicacion_Sub_Area" data-validation="[L>=1]" data-validation-message="Ingrese la Sub Area" data-field="Ubicacion_Sub_Area" autocomplete="off">
+                                <div id="Ubicacion_Sub_AreaList" class="autocomplete-items"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtPiso">Piso</label>
+                                <input type="text" class="form-control autocomplete-input" id="txtPiso" name="txtPiso" value="@Model.Piso" data-validation="[L>=1]" data-validation-message="Ingrese el Piso" data-field="Piso" autocomplete="off">
+                                <div id="PisoList" class="autocomplete-items"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtItemName">Nombre del Artículo</label>
+                                <input type="text" class="form-control autocomplete-input" id="txtItemName" name="txtItemName" value="@Model.ItemName" data-validation="[L>=1]" data-validation-message="Ingrese el Nombre del Artículo" data-field="ItemName" autocomplete="off">
+                                <div id="ItemNameList" class="autocomplete-items"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtDetalle">Detalle</label>
+                                <input type="text" class="form-control autocomplete-input" id="txtDetalle" name="txtDetalle" value="@Model.Detalle" data-validation="[L>=1]" data-validation-message="Ingrese los detalles del Artículo" data-field="Detalle" autocomplete="off">
+                                <div id="DetalleList" class="autocomplete-items"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtMarca">Marca</label>
+                                <input type="text" class="form-control autocomplete-input" id="txtMarca" name="txtMarca" value="@Model.Marca" data-validation="[L>=1]" data-validation-message="Ingrese la Marca" data-field="Marca" autocomplete="off">
+                                <div id="MarcaList" class="autocomplete-items"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtModelo">Modelo/Tipo</label>
+                                <input type="text" class="form-control autocomplete-input" id="txtModelo" name="txtModelo" value="@Model.Modelo" data-validation="[L>=1]" data-validation-message="Ingrese el Modelo" data-field="Modelo" autocomplete="off">
+                                <div id="ModeloList" class="autocomplete-items"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtSerie">Serie</label>
+                                <input type="text" class="form-control autocomplete-input" id="txtSerie" name="txtSerie" value="@Model.Serie" data-validation="[L>=1]" data-validation-message="Ingrese la Serie" data-field="Serie" autocomplete="off">
+                                <div id="SerieList" class="autocomplete-items"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtMaterial">Material</label>
+                                <input type="text" class="form-control autocomplete-input" id="txtMaterial" name="txtMaterial" value="@Model.Material" data-validation="[L>=1]" data-validation-message="Ingrese el Material" data-field="Material" autocomplete="off">
+                                <div id="MaterialList" class="autocomplete-items"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtMedida">Medida</label>
+                                <input type="text" class="form-control autocomplete-input" id="txtMedida" name="txtMedida" value="@Model.Medida" data-validation="[L>=1]" data-validation-message="Ingrese la Medida" data-field="Medida" autocomplete="off">
+                                <div id="MedidaList" class="autocomplete-items"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtColor">Color</label>
+                                <input type="text" class="form-control autocomplete-input" id="txtColor" name="txtColor" value="@Model.Color" data-validation="[L>=1]" data-validation-message="Ingrese el Color" data-field="Color" autocomplete="off">
+                                <div id="ColorList" class="autocomplete-items"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtEstado">Estado de Conservación</label>
+                                <select class="form-control" id="optEstado" name="optEstado" data-validation="[L>=1]" data-validation-message="Seleccione el Estado de Conservación">
+                                    <option value="BUENO" @(Model.Estado == "BUENO" ? "selected" : "")>BUENO</option>
+                                    <option value="MALO" @(Model.Estado == "MALO" ? "selected" : "")>MALO</option>
+                                    <option value="OBSOLETO" @(Model.Estado == "OBSOLETO" ? "selected" : "")>OBSOLETO</option>
+                                    <option value="REGULAR" @(Model.Estado == "REGULAR" ? "selected" : "")>REGULAR</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtCondicionUso">Condición de Uso</label>
+                                <select class="form-control" id="optCondicionUso" name="optCondicionUso" data-validation="[L>=1]" data-validation-message="Seleccione la Condición de Uso">
+                                    <option value="EN USO" @(Model.Condicion_Uso == "EN USO" ? "selected" : "")>EN USO</option>
+                                    <option value="SIN USO" @(Model.Condicion_Uso == "SIN USO" ? "selected" : "")>SIN USO</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="optDocumento">Documento</label>
+                                <select class="form-control" id="optDocumento" name="optDocumento" data-validation="[V>0]" data-validation-message="Seleccione el Documento">
+                                    @if (String.IsNullOrEmpty(Model.Documento))
+                                    {
+                                        <option value="">Seleccione un documento</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@Model.Documento" selected="selected">@Model.Documento - @Model.Usuario</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtUsuario">Usuario</label>
+                                <input type="text" class="form-control" id="txtUsuario" name="txtUsuario" value="@Model.Usuario" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtCargo">Cargo</label>
+                                <input type="text" class="form-control" id="txtCargo" name="txtCargo" value="@Model.Cargo" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtGerencia">Área Funcional</label>
+                                <input type="text" class="form-control autocomplete-input" id="txtGerencia" name="txtGerencia" value="@Model.Gerencia" data-validation="[L>=1]" data-validation-message="Ingrese el Área Funcional" data-field="Gerencia" autocomplete="off">
+                                <div id="GerenciaList" class="autocomplete-items"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtPeriodo">Periodo</label>
+                                <input type="number" class="form-control autocomplete-input" id="txtPeriodo" name="txtPeriodo" value="@Model.Periodo" data-validation="[V>=2024]" data-validation-message="Ingrese un Periodo" data-field="Periodo" autocomplete="off">
+                                <div id="PeriodoList" class="autocomplete-items"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="inputFotos">Subir Fotos (min: 2, max: 4)</label>
+                                <div class="input-group">
+                                    <div class="input-group input-group-merge">
+                                        <input type="file" id="inputFotos" name="fotos[]" accept="image/*" capture="camera" multiple onchange="previewImages(this)" style="display: none;">
+                                        <button type="button" class="btn btn-primary" onclick="document.getElementById('inputFotos').click();">
+                                            <i class="fas fa-camera"></i> Tomar Foto
+                                        </button>
+                                    </div>
+                                </div>
+                                <small class="text-muted">Puedes tomar entre 2 y 4 fotos con la cámara de tu dispositivo</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="form-label" for="optTipoAsignacion">Tipo de Asignacion</label>
+                                <select class="form-control" id="optTipoAsignacion" name="optTipoAsignacion">
+                                    <option value="INDIVIDUAL" @(Model.Tipo_Asignacion == "INDIVIDUAL" ? "selected" : "")>INDIVIDUAL</option>
+                                    <option value="COLECTIVA" @(Model.Tipo_Asignacion == "COLECTIVA" ? "selected" : "")>COLECTIVA</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="form-label" for="optTipoInventario">Tipo de Inventario</label>
+                                <select class="form-control" id="optTipoInventario" name="optTipoInventario">
+                                    <option value="INICIAL" @(Model.Tipo_Inventario == "INICIAL" ? "selected" : "")>INICIAL</option>
+                                    <option value="FINAL" @(Model.Tipo_Inventario == "FINAL" ? "selected" : "")>FINAL</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="previewContainer" class="col-md-8">
+                            <label>Imágenes Cargadas:</label>
+                            <div class="row" id="previewImages"></div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="card-footer" style="text-align:right;">
+                    <button type="button" data-toggle="tooltip" class="btn btn-warning waves-effect waves-light" title="Actualizar tabla de registros" onclick="ActualizarTablaArticulo()"> Refrescar &nbsp;<i class="fas fa-sync"></i></button>
+                    <button type="button" data-toggle="tooltip" class="btn btn-success waves-effect waves-light" title="Nuevo registro" onclick="NuevoRegistro()"> Nuevo &nbsp;<i id="iBtnNuevoArticulo" class="ti-file"></i></button>
+                    <button type="submit" data-toggle="tooltip" id="iBtnGuardarArticulo" class="btn btn-primary waves-effect waves-light" title="Grabar registro"> Guardar &nbsp;<i class="ti-save"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Vista de Imagen</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" class="img-fluid" src="#" alt="Imagen ampliada" />
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    var imagenesExistentes = [];
+
+    function CerrarModalArticulo() {
+        $("#ModalArticulo").modal("hide");
+        $("#divEditarArticulo").empty();
+        ActualizarTablaArticulo();
+    }
+
+    function NuevoRegistro() {
+        Correlativo(1);
+        VerEditarArticulo(0);
+    }
+
+    function Correlativo(tipo) {
+        let Id = $("#txtItemCode").val();
+        if ((!Id && tipo == 0) || (Id && tipo == 1)) {
+            $.ajax({
+                beforeSend: function () {
+                    $('#iBtnItemCode').removeClass("fas fa-sync").addClass("fa fa-spinner fa-spin fa-fw");
+                },
+                url: tipo == 1 ? "@Url.Action("LiberarCorrelativo", "Articulo")" : "@Url.Action("ReservarCorrelativo", "Articulo")",
+                type: "POST",
+                async: true,
+                data: { Id: Id },
+                success: function (data) {
+                    $("#txtItemCode").val(data.correlativo);
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la llamada, verifique consola');
+                },
+                complete: function (respuesta) {
+                    $('#iBtnItemCode').removeClass("fa fa-spinner fa-spin fa-fw").addClass("fas fa-sync");
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        } else {
+            if (tipo == 0) {
+                toastr.error('Ya existe un correlativo asignado!!');
+            }
+        }
+    }
+
+    window.addEventListener("beforeunload", function (event) {
+        Correlativo(1);
+    });
+
+    document.querySelector('.close').addEventListener('click', closeModal);
+
+    function SearchCode() {
+        let Id = $("#txtCodigoBarra").val();
+        if (Id) {
+            $.ajax({
+                beforeSend: function () {
+                    $('#iBtnCodigoBarraBuscar').removeClass("ti-file").addClass("fa fa-spinner fa-spin fa-fw");
+                },
+                url: "@Url.Action("BuscarCodigo", "Articulo")",
+                type: "POST",
+                async: true,
+                data: { Id: Id },
+                success: function (vistaParcial) {
+                    $("#divEditarArticulo").html(vistaParcial);
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la llamada, verifique consola');
+                },
+                complete: function (respuesta) {
+                    $('#iBtnCodigoBarraBuscar').removeClass("fa fa-spinner fa-spin fa-fw").addClass("ti-file");
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+    }
+
+    function LeerCodigo() {
+        var input = document.getElementById("txtCodigoBarra");
+        input.value = "";
+        input.removeAttribute("readonly");
+        input.focus();
+
+        input.addEventListener('blur', function () {
+            if (input.value.trim() !== "") {
+                input.setAttribute("readonly", "readonly");
+            }
+        });
+    }
+
+    $(function () {
+        $("#frmRegistroArticulo").validate({
+            submit: {
+                settings: {
+                    inputContainer: '.field',
+                    errorClass: 'LabelError', errorListClass: 'ListaError'
+                },
+                callback: {
+                    onBeforeSubmit: function (node) {
+                    },
+                    onSubmit: function (node, formData) {
+
+                        if (imagenesExistentes.length < 2 || imagenesExistentes.length > 4) {
+                            toastr.error("Debes tener entre 2 y 4 fotos.");
+                            node.preventDefault();
+                            return;
+                        }
+
+                        var boton = document.getElementById("iBtnGuardarArticulo");
+                        boton.disabled = true;
+
+                        updateInputFiles();
+
+                        var formData = new FormData(document.getElementById("frmRegistroArticulo"));
+
+                        $.ajax({
+                            url: "@Url.Action("GuardarRegistroArticulo")",
+                            method: 'POST',
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            success: function (articulo) {
+                                if (articulo.mensaje.CodigoMensaje == 0) {
+                                    toastr.success(articulo.mensaje.DescripcionMensaje);
+                                    $("#txtRegId").val(articulo.Id);
+                                    ActualizarTablaArticulo();
+                                }
+                                else {
+                                    toastr.error(articulo.mensaje.DescripcionMensaje);
+                                    console.log(articulo.mensaje.DescripcionMensajeSistema);
+                                }
+                            },
+                            error: function (mensaje) {
+                                console.log(mensaje);
+                                toastr.error('Sucedió un error en la interface [GuardarRegistroArticulo], verifique consola');
+                                var boton = document.getElementById("iBtnGuardarArticulo");
+                                boton.disabled = false;
+                            },
+                            complete: function (respuesta) {
+                                var boton = document.getElementById("iBtnGuardarArticulo");
+                                boton.disabled = false;
+                                ValidarSesionActual(respuesta);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    });
+
+    function previewImages(input) {
+        const previewContainer = document.getElementById("previewImages");
+
+        if (imagenesExistentes.length + input.files.length > 4) {
+            toastr.error("No puedes agregar más de 4 imágenes.");
+            input.value = "";
+            return;
+        }
+
+        if (input.files) {
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const imgElement = document.createElement("div");
+                    imgElement.classList.add("image-container", "col-md-2");
+
+                    const deleteButton = document.createElement("button");
+                    deleteButton.classList.add("btn", "btn-danger", "btn-sm", "delete-button");
+                    deleteButton.innerHTML = "&times;";
+                    deleteButton.onclick = function () {
+                        imgElement.remove();
+                        imagenesExistentes = imagenesExistentes.filter(img => img !== file);
+                        updateExistingImagesField();
+                    };
+
+                    const image = document.createElement("img");
+                    image.src = e.target.result;
+                    image.classList.add("img-thumbnail", "thumbnail-fixed");
+                    image.style.cursor = "pointer";
+                    image.onclick = function () {
+                        showImageInModal(e.target.result);
+                    };
+
+                    imgElement.appendChild(deleteButton);
+                    imgElement.appendChild(image);
+                    previewContainer.appendChild(imgElement);
+
+                    imagenesExistentes.push(file);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    }
+
+
+    function updateInputFiles() {
+        const dataTransfer = new DataTransfer();
+
+        imagenesExistentes.forEach(file => {
+            if (file instanceof File) {
+                dataTransfer.items.add(file);
+            }
+        });
+
+        document.getElementById('inputFotos').files = dataTransfer.files;
+    }
+
+    function showImageInModal(imageSrc) {
+        const modalImage = document.getElementById("modalImage");
+        modalImage.src = '/uploads/inventario_imagenes/' + imageSrc;
+        $('#imageModal').modal('show');
+    }
+
+    function closeModal() {
+        $('#imageModal').modal('hide');
+    }
+
+    function loadImagesFromConsulta(images) {
+        const previewContainer = document.getElementById("previewImages");
+        previewContainer.innerHTML = "";
+
+        images.forEach(imageUrl => {
+            const imgElement = document.createElement("div");
+            imgElement.classList.add("image-container", "col-md-2");
+
+            const deleteButton = document.createElement("button");
+            deleteButton.classList.add("btn", "btn-danger", "btn-sm", "delete-button");
+            deleteButton.innerHTML = "&times;";
+            deleteButton.onclick = function () {
+                imgElement.remove();
+                imagenesExistentes = imagenesExistentes.filter(img => img !== imageUrl);
+                updateExistingImagesField();
+            };
+
+            const image = document.createElement("img");
+            image.src = '/uploads/inventario_imagenes/' + imageUrl;
+            image.classList.add("img-thumbnail", "thumbnail-fixed");
+            image.style.cursor = "pointer";
+            image.onclick = function () {
+                showImageInModal(imageUrl);
+            };
+
+            imgElement.appendChild(deleteButton);
+            imgElement.appendChild(image);
+            previewContainer.appendChild(imgElement);
+
+            imagenesExistentes.push(imageUrl);
+        });
+
+        updateExistingImagesField();
+    }
+
+    function updateExistingImagesField() {
+        const imagenesGuardadasField = document.getElementById("imagenesGuardadas");
+        imagenesGuardadasField.value = JSON.stringify(imagenesExistentes);
+    }
+
+    $(document).ready(function () {
+        ListarDocumentosAutoComplete();
+        setup();
+        const imagenesDeRegistro = @Html.Raw(Json.Serialize(ViewBag.ImagenesCargadas ?? new List<string>()));
+        if (imagenesDeRegistro.length > 0) {
+            loadImagesFromConsulta(imagenesDeRegistro);
+        }
+        $('.autocomplete-input').on('input', function () {
+            var input = $(this);
+            var query = input.val();
+            var field = input.data('field');
+            var listId = field + 'List';
+
+            if (query.length > 2) {
+                $.ajax({
+                    url: "@Url.Action("BuscarCampo", "Articulo")",
+                    type: 'POST',
+                    data: { query: query, field: field },
+                    success: function (data) {
+                        $('#' + listId).empty();
+                        if (data.length > 0) {
+                            data.forEach(function (item) {
+                                $('#' + listId).append('<div onclick="selectValue(\'' + input.attr('id') + '\', \'' + item + '\', \'' + listId + '\')">' + item + '</div>');
+                            });
+                        }
+                    }
+                });
+            } else {
+                $('#' + listId).empty();
+            }
+        });
+    });
+
+    function ListarDocumentosAutoComplete() {
+        $('#optDocumento').select2({
+            placeholder: 'Selecciona un documento',
+            allowClear: true,
+            ajax: {
+                delay: 250,
+                method: 'POST',
+                url: "@Url.Action("ListarDocumentos", "Articulo")",
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        type: 'public'
+                    }
+                    return query;
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.items
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1
+        }).on("select2:select", function (e) {
+            var selectedData = e.params.data;
+            $.ajax({
+                method: 'POST',
+                dataType: 'json',
+                url: "@Url.Action("ObtenerCargo", "Articulo")",
+                data: { search: selectedData.id },
+                success: function (data) {
+                    $("#txtUsuario").val(data[0].nombre);
+                    $("#txtCargo").val(data[0].cargo);
+                },
+                error: function () {
+                    toastr.error('Sucedió un error al cargar los detalles del empleado');
+                }
+            });
+        });
+    }
+
+    function selectValue(inputId, value, listId) {
+        $('#' + inputId).val(value);
+        $('#' + listId).empty();
+    }
+
+    var defaultReader, readerAutoClosed = false;
+    var openButton;
+    var barcodeDataText;
+    var hidden, visibilityChange;
+
+    function setup() {
+        openButton = document.getElementById("openButton");
+        barcodeDataText = document.getElementById("txtCodigoBarra");
+
+        if (typeof document.webkitHidden !== "undefined") {
+            hidden = "webkitHidden";
+            visibilityChange = "webkitvisibilitychange";
+        }
+        else if (typeof document.hidden !== "undefined") {
+            hidden = "hidden";
+            visibilityChange = "visibilitychange";
+        }
+
+        if (hidden && typeof document.addEventListener !== "undefined" &&
+            typeof document[hidden] !== "undefined") {
+            document.addEventListener(visibilityChange, handleVisibilityChange, false);
+        }
+    }
+
+    function onBarcodeReaderComplete(result) {
+        if (result.status === 0) {
+            updateUI(true, true);
+
+            barcodeReader.setBuffered("Symbology", "Code39", "Enable", "true", onSetBufferedComplete);
+            barcodeReader.setBuffered("Symbology", "Code128", "EnableCode128", "true", onSetBufferedComplete);
+            barcodeReader.setBuffered("Symbology", "EANUPC", "EnableEAN13", "true", onSetBufferedComplete);
+            barcodeReader.setBuffered("Symbology", "QRCode", "Enable", "true", onSetBufferedComplete);
+            defaultReader.commitBuffer(onCommitComplete);
+
+            defaultReader.addEventListener("barcodedataready", onBarcodeDataReady, false);
+            window.addEventListener("beforeunload", onBeforeUnload);
+        }
+        else {
+            defaultReader = null;
+        }
+    }
+
+    function onSetBufferedComplete(result) {
+        if (result.status !== 0) {
+        }
+    }
+
+    function onCommitComplete(resultArray) {
+        if (resultArray.length > 0) {
+            for (var i = 0; i < resultArray.length; i++) {
+                var result = resultArray[i];
+                if (result.status !== 0) {
+                }
+            }
+        }
+    }
+
+    function onBarcodeDataReady(data, type, time) {
+        barcodeDataText.value = data;
+    }
+
+    function updateUI(readerOpened, clearData) {
+        openButton.disabled = readerOpened;
+        if (clearData) {
+            barcodeDataText.value = "";
+        }
+    }
+
+    function handleVisibilityChange() {
+        if (document[hidden]) {
+            closeBarcodeReader(true);
+        }
+        else {
+            if (readerAutoClosed) {
+                openBarcodeReader();
+            }
+        }
+    }
+
+    function openBarcodeReader() {
+        if (!defaultReader) {
+            defaultReader = new BarcodeReader(null, onBarcodeReaderComplete);
+        }
+    }
+
+    function closeBarcodeReader(isAutoClose) {
+        if (defaultReader) {
+            readerAutoClosed = isAutoClose;
+            defaultReader.close(function (result) {
+                if (result.status === 0) {
+                    defaultReader = null;
+                    updateUI(false, false);
+                    window.removeEventListener("beforeunload", onBeforeUnload);
+                }
+            });
+        }
+    }
+
+    function openButtonClicked() {
+        openBarcodeReader();
+    }
+
+    function closeButtonClicked() {
+        closeBarcodeReader(false);
+    }
+
+    function onBeforeUnload(e) {
+        var message = "Cierre BarcodeReader antes de abandonar esta página.";
+        (e || window.event).returnValue = message;
+        return message;
+    }
+
+</script>

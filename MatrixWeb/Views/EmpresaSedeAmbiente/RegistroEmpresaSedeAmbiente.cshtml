@@ -1,0 +1,224 @@
+﻿
+
+@model General.EmpresaSedeAmbiente
+@{
+    /**/
+
+    ViewBag.Title = "Registro EmpresaSedeAmbiente";
+    Layout = null;
+}
+<div class="card card-block bg-success">
+    <div class="text-white py-1 px-1">
+        <h6 class="card-title text-white mb-0">@Model.empresasede.NombreSede</h6>
+    </div>
+</div>
+<form id="frmRegistroEmpresaSedeAmbiente" name="frmRegistroEmpresaSedeAmbiente" method="POST">
+    <input type="hidden" id="txtRegIdEmpresaSedeAmbiente" name="txtRegIdEmpresaSedeAmbiente" value="@Model.IdEmpresaSedeAmbiente" />
+    <div class="card card-block">
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="form-label" for="txtCodigoAmbiente">Codigo</label>
+                    <input type="text" class="form-control" name="txtCodigoAmbiente" id="txtCodigoAmbiente" value="@Model.CodigoAmbiente" data-validation="[L>=1]" data-validation-message="Ingrese la CodigoAmbiente">
+                </div>
+
+            </div>
+
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label class="form-label" for="txtNombreAmbiente">Nombre</label>
+                    <input type="text" class="form-control" name="txtNombreAmbiente" id="txtNombreAmbiente" value="@Model.NombreAmbiente" data-validation="[L>=1]" data-validation-message="Ingrese la NombreAmbiente">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="form-label" for="optActivo">Activo</label>
+                    <select class="form-control" id="optActivo" name="optActivo">
+                        @if (Model.Activo == true)
+                        {
+                            <option value="1" selected="">Si</option>
+                            <option value="0">No</option>
+                        }
+                        else
+                        {
+                            <option value="1">Si</option>
+                            <option value="0" selected="">No</option>
+                        }
+                    </select>
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="form-label" for="txtDescripcionAmbiente">Descripcion</label>
+                    <textarea rows="3" class="form-control" name="txtDescripcionAmbiente" id="txtDescripcionAmbiente">@Model.DescripcionAmbiente</textarea>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="card card-block">
+        <div class="pull-xs-right">
+            @{
+                string disabled = "";
+                if (Model.IdEmpresaSedeAmbiente == 0) { disabled = "disabled"; }
+            }
+            <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Actualizar tabla de registros" onclick="ActualizarTablaEmpresaSedeAmbiente()"> Actualizar<i class="mdi mdi-refresh-circle"></i></button>
+            <button type="button" data-toggle="tooltip" class="btn btn-primary label" title="Nuevo registro" onclick="VerEditarEmpresaSedeAmbiente(0)"> Nuevo<i id="iBtnNuevoEmpresaSedeAmbiente" class="ti-file"></i></button>
+            <button type="submit" data-toggle="tooltip" class="btn btn-blue label" title="Grabar registro"> Guardar<i class="ti-save"></i></button>
+            <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Eliminar registro seleccionado" @disabled id="btnVerModalEliminarEmpresaSedeAmbiente" onclick="VerModalEliminarEmpresaSedeAmbiente()"> Eliminar<i class="ti-trash"></i></button>
+            <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Regresar al formulario anterior" onclick="CerrarModalEmpresaSedeAmbiente()"> Regresar<i class="ti-back-left"></i></button>
+        </div>
+    </div>
+</form>
+<div class="modal fade" id="ModalEliminarEmpresaSedeAmbiente">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <a href="#" class="close" onclick="CerrarEliminarEmpresaSedeAmbiente()"><i class="fas fa-times"></i></a>
+                <h4 class="modal-title">Eliminar</h4>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro de eliminar el registro seleccionado?
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Eliminar registro seleccionado" onclick="EliminarEmpresaSedeAmbiente()"> Eliminar <i class="ti-trash"></i></button>
+                <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Regresar al formulario anterior" onclick="CerrarEliminarEmpresaSedeAmbiente()"> Regresar<i class="ti-back-left"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+function CerrarModalEmpresaSedeAmbiente() {
+            $("#ModalEmpresaSedeAmbiente").modal("hide");
+			$("#divEditarEmpresaSedeAmbiente").empty();
+			ActualizarTablaEmpresaSedeAmbiente();
+        }
+	function CerrarEliminarEmpresaSedeAmbiente() {
+            $("#ModalEliminarEmpresaSedeAmbiente").modal("hide");
+        }
+        function EliminarEmpresaSedeAmbiente () {
+            $.ajax({
+                url: "@Url.Action("EliminarEmpresaSedeAmbiente")",
+                method: 'POST',
+                data: { IdEmpresaSedeAmbiente: '@Model.IdEmpresaSedeAmbiente' },
+                success: function (mensaje) {
+                    $("#modalEliminarEmpresaSedeAmbiente").modal('hide');
+                    if (mensaje.CodigoMensaje == 0) {
+  					   $('#btnVerEditarEmpresaSedeAmbiente').prop('disabled', true);
+                        $('#btnVerModalEliminarEmpresaSedeAmbiente').prop('disabled', true);
+                        toastr.success(mensaje.DescripcionMensaje);
+						ActualizarTablaEmpresaSedeAmbiente();
+						VerEditarEmpresaSedeAmbiente(0);
+						CerrarEliminarEmpresaSedeAmbiente();
+                    }
+                    else {
+                        toastr.error(mensaje.DescripcionMensaje);
+						console.log(mensaje.DescripcionMensajeSistema);
+                    }
+                },
+                error: function (mensaje) {
+					console.log(mensaje);
+                    toastr.error('Sucedió un error en la interface [EliminarEmpresaSedeAmbiente], verifique consola');
+                }
+            });
+        }
+		function VerModalEliminarEmpresaSedeAmbiente () {
+           $("#ModalEliminarEmpresaSedeAmbiente").modal("show");
+        }
+
+									function ListarComboEmpresaSede() {
+										$.ajax({
+											 url: "@Url.Action("ListarComboEmpresaSede", "EmpresaSede")",
+											method: 'POST',
+											success: function (lista) {
+												if (lista.mensaje.CodigoMensaje == 0) {
+													$("#cmbEmpresaSede").empty();
+													$("#cmbEmpresaSede").append("<option value=0>Seleccione</option>");
+													$.each(lista.lista, function (i, item) {
+														if (item.IdEmpresaSede == "@Model.empresasede.IdEmpresaSede") {
+															$("#cmbEmpresaSede").append("<option value=" + item.IdEmpresaSede + " selected='selected'>" + item.NombreEmpresaSede + "</option>");
+														}
+														else {
+															$("#cmbEmpresaSede").append("<option value=" + item.IdEmpresaSede + ">" + item.NombreEmpresaSede + "</option>");
+														}
+													});
+												}
+												 else
+												{
+													console.log(listaempresasedeambiente.mensaje.DescripcionMensajeSistema);
+													toastr.error(listaempresasedeambiente.mensaje.DescripcionMensaje);
+												}
+											},
+											 error: function (mensaje) {
+													console.log(mensaje);
+													toastr.error('Sucedió un error en la llamada ListarComboEmpresaSede, verifique consola');
+												}
+										});
+									}
+
+	  $(function () {
+
+            $("#frmRegistroEmpresaSedeAmbiente").validate({
+                submit: {
+                    settings: {
+                        inputContainer: '.field',
+                        errorClass: 'LabelError', errorListClass: 'ListaError'
+                    },
+                    callback: {
+                        onBeforeSubmit: function (node) {
+                        },
+                        onSubmit: function (node, formData) {
+                            var CodigoAmbiente = $("#txtCodigoAmbiente").val();                            
+                            var fileData = new FormData();
+                            for (var key in formData) {                              
+                                if (key == "txtCodigoAmbiente") {
+                                    fileData.append(key, CodigoAmbiente);
+                                }
+                                else {
+                                    fileData.append(key, formData[key]);
+                                }
+                            }   
+                            fileData.append('IdEmpresaSede','@Model.empresasede.IdEmpresaSede');
+                            $.ajax({
+                                url: "@Url.Action("GuardarRegistroEmpresaSedeAmbiente","EmpresaSedeAmbiente")",
+                                method: 'POST',
+                                data: fileData,
+								contentType: false,
+								processData: false,
+                                success: function (empresasedeambiente) {
+                                    if (empresasedeambiente.mensaje.CodigoMensaje == 0) {
+                                        toastr.success(empresasedeambiente.mensaje.DescripcionMensaje);
+										VerEditarEmpresaSedeAmbiente(0);
+										ActualizarTablaEmpresaSedeAmbiente();
+                                    }
+                                    else {
+                                        toastr.error(empresasedeambiente.mensaje.DescripcionMensaje);
+										console.log(empresasedeambiente.mensaje.DescripcionMensajeSistema);
+                                    }
+                                },
+                                error: function (mensaje) {
+									console.log(mensaje);
+                                    toastr.error('Sucedió un error en la interface [GuardarRegistroEmpresaSedeAmbiente], verifique consola');
+                                },
+								  complete: function (respuesta) {
+									ValidarSesionActual(respuesta);
+								}
+                            });
+                        }
+                    }
+                }
+            });
+        });
+</script>
+
+
+
+
+
+
+
+

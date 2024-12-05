@@ -1,0 +1,189 @@
+﻿@using Microsoft.AspNetCore.Http
+@using System.Configuration
+@model RecursoHumano.ListaEmpleadoPerfil
+@{
+    ViewBag.Title = "ListaReserva";
+    Layout = "~/Views/Shared/Inicial.cshtml";
+    Context.Session.SetString("ModuloActual", "Seguridad");
+    Context.Session.SetString("PaginaActual", "Roles");
+    Context.Session.SetString("SubPaginaActual", "");
+    if (ViewBag.conpermiso == 0)
+    {
+        <div style="font-weight:bold;color:red;">Usted no tiene permiso para ver este recurso</div>
+    }
+    else
+    {
+
+        <div class="row">
+            @foreach (var item in Model.lista)
+            {
+
+
+
+
+                <div class="col-md-4">
+                    <div class="card-box">
+                        <div class="card-head">
+                            <header>SELECCIONE UN ROL</header>
+                        </div>
+                        <div class="card-body" style="height:150px;">
+                            <div class="row">
+                                <div class="col-md-3" style="padding:0px;">
+
+                                    <div class="sidebar-userpic">
+                                        <img class="img-responsive" id="imgFotoPrincipalUsuario" src="@ConfigurationManager.AppSettings["HostImagenes"]@Context.Session.GetString("RutaFotoUsuario").ToString()" alt="">
+                                    </div>
+
+                                </div>
+                                <div class="col-md-9" style="padding:0px;">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <span style="font-size: 12px;font-weight:bold;">ESTADO: </span>
+                                        </div>
+                                        <div class="col-md-9">
+                                            @if (item.Activo == true)
+                                            {
+                                                <label>Activo</label>
+                                            }
+                                            else
+                                            {
+                                                <label style="color:red;font-weight:bold;">Inactivo</label>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <span style="font-size: 12px;font-weight:bold;">AREA: </span>
+                                        </div>
+                                        <div class="col-md-9">
+                                            @item.area.NombreArea
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        @{
+                                            string cargo = @item.cargo.NombreCargo;
+                                            string situacion = "CARGO: ";
+                                            if (@item.empleado.catalogotipoempleado.IdCatalogo == 9)
+                                            {
+                                                cargo = @item.empleado.catalogotipoempleado.Detalle;
+                                                situacion = "SITUACION: ";
+                                            }
+                                        }
+                                        <div class="col-md-3">
+                                            <span style="font-size: 12px;font-weight:bold;">@situacion </span>
+                                        </div>
+                                        <div class="col-md-9">
+                                           
+                                            @cargo
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer" style="text-align:center;height:50px;">
+                            @{
+                                string TipoActualizacion = "Activar Rol";
+                                string Color = "green";
+                                int NuevoActivo = 1;
+                                @if (item.Activo)
+                                {
+
+                                    TipoActualizacion = "Descativar Rol";
+                                    Color = "red";
+                                    NuevoActivo = 0;
+                                }
+                            }
+                            @if (item.Activo == true)
+                            {
+                                if (item.IdEmpleadoPerfil != Convert.ToInt32(Context.Session.GetString("IdEmpleadoPerfil")))
+                                {
+                                    <button onclick="CambiarRol(@item.IdEmpleadoPerfil)" class="btn btn-blue label" title="Cambiar de rol" style="padding:10px;">Cambiar de Rol</button>
+                                    if (item.cargo.catalogotipocargo.IdCatalogo != 32 && item.cargo.catalogotipocargo.IdCatalogo != 33 && item.cargo.catalogotipocargo.IdCatalogo != 34)
+                                    {
+                                        <button onclick="ActualizacionRol(@item.IdEmpleadoPerfil,@NuevoActivo)" class="btn ui @Color label" title="@TipoActualizacion" style="padding:10px;">@TipoActualizacion</button>
+                                    }
+                                }
+                                else
+                                {
+                                    <label>Rol Actual</label>
+                                }
+                            }
+                            else
+                            {
+
+                                <label style="color:red;">Rol Inactivo</label>
+                                if (item.cargo.catalogotipocargo.IdCatalogo != 32 && item.cargo.catalogotipocargo.IdCatalogo != 33 && item.cargo.catalogotipocargo.IdCatalogo != 34)
+                                {
+                                    <button onclick="ActualizacionRol(@item.IdEmpleadoPerfil,@NuevoActivo)" class="btn ui @Color label" title="@TipoActualizacion" style="padding:10px;">@TipoActualizacion</button>
+                                }
+                            }
+
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @section scripts{
+        <script>
+            function ActualizacionRol(IdEmpleadoPerfil, Activo) {
+
+                if (IdEmpleadoPerfil == null) { IdEmpleadoPerfil = 0; }
+
+                $.ajax({
+                    url: "@Url.Action("ActualizarEstadoEmpleadoPerfil","EmpleadoPerfil")",
+                    method: 'POST',
+                    data: { IdEmpleadoPerfil: IdEmpleadoPerfil, Activo: Activo },
+                    success: function (mensaje) {
+                        if (mensaje.CodigoMensaje == 0) {
+                            toastr.success(mensaje.DescripcionMensaje);
+                            window.location.replace('@Url.Action("Roles", "EmpleadoPerfil")');
+                        }
+                        else {
+                            toastr.error(mensaje.DescripcionMensaje);
+                        }
+                    },
+                    error: function (mensaje) {
+                        console.log(mensaje);
+                        toastr.error('Sucedió un error en la llamada CambiarRol, verifique consola');
+                    }
+                });
+            }
+            function CambiarRol(IdEmpleadoPerfil) {
+
+                if (IdEmpleadoPerfil == null) { IdEmpleadoPerfil = 0; }
+
+                $.ajax({
+                    url: "@Url.Action("AutenticarPerfil","Usuario")",
+                    method: 'POST',
+                    data: { IdEmpleadoPerfil: IdEmpleadoPerfil },
+                    success: function (respuesta) {
+                        if (respuesta.mensaje.CodigoMensaje == 0) {
+                            toastr.success("Espere un momento por favor, estamos cambiendo su rol...");
+                            window.location.replace('@Url.Action("ActualizarMenu", "Usuario")');
+                        }
+                        else {
+                            toastr.error(respuesta.mensaje.DescripcionMensaje);
+                        }
+                    },
+                    error: function (mensaje) {
+                        console.log(mensaje);
+                        toastr.error('Sucedió un error en la llamada CambiarRol, verifique consola');
+                    }
+                });
+            }
+            $(function () {
+
+            });
+        </script>
+    }
+    }
+}
+
+
+
+
+
+

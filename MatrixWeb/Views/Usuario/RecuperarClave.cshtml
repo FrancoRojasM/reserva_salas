@@ -1,0 +1,141 @@
+﻿@using System.Configuration
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div class="auth-fluid">
+    <!--Auth fluid left content -->
+    <div class="auth-fluid-form-box">
+        <div class="align-items-center d-flex h-100">
+            <div class="p-3">
+
+                <!-- Logo -->
+                <div class="auth-brand text-center text-lg-start  mb-0">
+                    <div class="auth-brand mb-2">
+                        <a href="#" class="logo logo-dark text-center">
+                            <span class="logo-lg">
+                                <img src="@ConfigurationManager.AppSettings["HostImagenes"]LogoInstitucion.png" alt="" height="50">
+                            </span>
+                        </a>
+
+                        <a href="#" class="logo logo-light text-center">
+                            <span class="logo-lg">
+                                <img src="@ConfigurationManager.AppSettings["HostImagenes"]LogoInstitucion.png" alt="" height="50">
+                            </span>
+                        </a>
+                    </div>
+                </div>
+                <h4 style="text-align:center;" class="mt-0"></h4>
+                <!-- title-->
+                <h4 class="mt-4">Recuperar Contraseña</h4>
+                <p class="text-muted mb-4">Ingresa tu dirección electrónica y te enviaremos un correo electrónico con las instruciones para recuperar tu contraseña.</p>
+
+                <!-- form -->
+
+                <form id="frmRecuperarClave" name="frmRecuperarClave" method="POST">
+                    <div class="mb-3">
+                        <label for="emailaddress" class="form-label">Correo Electrónico</label>
+                        <input class="form-control" type="email" name="emailaddress" id="emailaddress" required placeholder="Escribe acá tu Correo Electrónico">
+                    </div>
+
+                    <div class="text-center d-grid">
+                        <button type="submit" id="btnRecuperar" class="btn btn-success waves-effect waves-light" title="Recuperar">
+                            Recuperar Contraseña
+                            <span id="spRecuperar" class="" role="status" aria-hidden="true"></span>
+                        </button>
+
+                    </div>
+
+                </form>
+                <!-- end form-->
+                <!-- Footer-->
+                <footer class="footer footer-alt">
+                    <p class="text-muted">Regresar a <a href="@Url.Action("Login", "Usuario")" class="text-muted ms-1"><b>Inicio de Sesión</b></a></p>
+                </footer>
+
+            </div> <!-- end .card-body -->
+        </div> <!-- end .align-items-center.d-flex.h-100-->
+    </div>
+    <!-- end auth-fluid-form-box-->
+    <!-- Auth fluid right content -->
+    <div class="auth-fluid-right text-center">
+        <div class="auth-user-testimonial">
+            <h2 class="mb-3 text-white">I love the color!</h2>
+            <p class="lead">
+                <i class="mdi mdi-format-quote-open"></i> I've been using your theme from the previous developer for our web app, once I knew new version is out, I immediately bought with no hesitation. Great themes, good documentation with lots of customization available and sample app that really fit our need. <i class="mdi mdi-format-quote-close"></i>
+            </p>
+            <h5 class="text-white">
+                - Fadlisaad (Ubold Admin User)
+            </h5>
+        </div> <!-- end auth-user-testimonial-->
+    </div>
+    <!-- end Auth fluid right content -->
+</div>
+<!-- end auth-fluid-->
+<!-- Authentication js -->
+@section scripts {
+    <script>
+        $(function () {
+
+            $("#frmRecuperarClave").parsley().on("field:validated", function () {
+                event.preventDefault(); // Evitar la acción predeterminada
+                var e = 0 === $(".parsley-error").length;
+                $(".alert-info").toggleClass("d-none", !e);
+                $(".alert-warning").toggleClass("d-none", e);
+            }).on("form:submit", function (node, formData) {
+                var fileData = new FormData();
+                var formulario = node.$element;
+
+                // Obtén todos los controles del formulario
+                var controls = formulario.find(":input");
+
+                // Recorre cada control
+                controls.each(function () {
+                    var control = $(this);
+                    var nombreControl = control.attr("name");
+                    var valorControl = control.val();
+                    if (nombreControl == 'emailaddress') {
+                        Email = control.val();
+                    }
+                    // Agrega el control y su valor a FormData
+                    fileData.append(nombreControl, valorControl);
+                });
+                $.ajax({
+                    beforeSend: function (respuesta) {
+                        $("#btnRecuperar").addClass("disabled");
+                        //  $("#spRecuperar").removeClass("mdi mdi-content-save");
+                        $("#spRecuperar").addClass("spinner-grow spinner-grow-sm me-1");
+                    },
+                    url: "@Url.Action("EnviarClaveUsuarioPorEmail", "Usuario")",
+                    method: 'POST',
+                    data: fileData,
+                    contentType: false,
+                    processData: false,
+                    success: function (mensaje) {
+                        if (mensaje.CodigoMensaje == 0) {
+                            //toastr.success(mensaje.DescripcionMensaje);
+                            var form = $('<form action="@Url.Action("ConfirmacionEnvioClaveUsuario", "Usuario")" method="post"></form>');
+                            form.append('<input type="hidden" name="Email" value="' + Email + '" />');                            
+                            form.appendTo('body').submit();
+                        }
+                        else {
+                            toastr.error(mensaje.DescripcionMensaje);
+                            console.log(mensaje.DescripcionMensajeSistema);
+                        }
+                    },
+                    complete: function (respuesta) {
+                        $("#btnRecuperar").removeClass("disabled");
+                        $("#spRecuperar").removeClass("spinner-grow spinner-grow-sm me-1");
+                        // $("#spRecuperar").addClass("mdi mdi-content-save");
+                    },
+                    error: function (mensaje) {
+                        toastr.error('Sucedió un error en la interface [AutenticarUsuario], verifique consola');
+                    }
+                });
+            });
+        });
+    </script>
+}

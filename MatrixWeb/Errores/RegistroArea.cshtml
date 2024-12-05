@@ -1,0 +1,189 @@
+﻿@model General.Area
+@{
+    ViewBag.Title = "Registro Area";
+    Layout = null;
+}
+@if (Model.mensaje.CodigoMensaje > 0)
+{
+    <span>ERROR</span>
+    <span>@Model.mensaje.DescripcionMensaje</span>
+    <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Regresar al formulario anterior" onclick="NombreFuncionCerrarModal()"><i class="ti-back-left"></i></button>
+}
+else
+{
+    <form id="frmRegistroArea" name="frmRegistroArea" method="POST">
+        <input type="hidden" id="txtRegIdArea" name="txtRegIdArea" value="@Model.IdArea" />
+        <input type="hidden" id="txtIdEmpresa" name="txtIdEmpresa" value="@Model.empresa.IdEmpresa" />
+
+        <div class="card card-topline-aqua">
+            <div class="card-head" style="text-align:center">
+                <h5 class="bold">@Model.empresa.NombreEmpresa</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label" for="cmbAreaPadre">Dependencia</label>
+                            <select class="form-control" id="cmbAreaPadre" name="cmbAreaPadre"></select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label" for="cmbCatalogoTipoArea">Tipo</label>
+                            <select class="form-control" id="cmbCatalogoTipoArea" name="cmbCatalogoTipoArea" data-validation="[V>0]" data-validation-message="Seleccione el Tipo de Area"></select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label" for="txtNombreArea">Nombre</label>
+                            <input type="text" class="form-control" name="txtNombreArea" id="txtNombreArea" value="@Model.NombreArea" data-validation="[L>=1]" data-validation-message="Ingrese la Nombre del Area">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label" for="txtAbreviatura">Abreviatura</label>
+                            <input type="text" class="form-control" name="txtAbreviatura" id="txtAbreviatura" value="@Model.Abreviatura" data-validation="[L>=1]" data-validation-message="Ingrese la Abreviatura">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label" for="txtSigla">Sigla</label>
+                            <input type="text" class="form-control" name="txtSigla" id="txtSigla" value="@Model.Sigla" data-validation="[L>=1]" data-validation-message="Ingrese la Sigla">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+
+                        <div class="form-group">
+                            <label class="form-label" for="optActivoArea">Activo</label>
+                            <select id="optActivoArea" name="optActivoArea" class="form-control">
+                                @if (Model.Activo == true)
+                                {
+                                    <option value="1" selected="">Si</option>
+                                    <option value="0">No</option>
+                                }
+                                else
+                                {
+                                    <option value="1">Si</option>
+                                    <option value="0" selected="">No</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer" style="text-align:right;">
+                <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Actualizar tabla de registros" onclick="ActualizarTablaArea()"> Refrescar <i  class="mdi mdi-refresh-circle"></i></button>
+                <button type="button" data-toggle="tooltip" class="btn btn-primary label" title="Nuevo registro" onclick="VerEditarArea(0)"> Nuevo <i  id="iBtnNuevoArea" class="ti-file"></i></button>
+                <button type="submit" data-toggle="tooltip" class="btn btn-blue label" title="Grabar registro"> Guardar<i  class="ti-save"></i></button>
+                <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Regresar al formulario anterior" onclick="CerrarModalArea()"> Regresar <i  class="ti-back-left"></i></button>
+
+            </div>
+        </div>
+    </form>
+
+
+    <script>
+
+        function CerrarModalArea() {
+            $("#ModalArea").modal("hide");
+            $("#divEditarArea").empty();
+            ActualizarTablaArea();
+        }
+
+        function ListarComboAreaPadre() {
+            $.ajax({
+                url: "@Url.Action("ListarComboAreaPadre", "Area")",
+                method: 'POST',
+                data:{IdEmpresa:'@Model.empresa.IdEmpresa'},
+                success: function (data) {
+                    $("#cmbAreaPadre").empty();
+                    $.each(data, function (i, item) {
+                        if (item.IdArea == "@Model.IdAreaPadre") {
+                            $("#cmbAreaPadre").append("<option value=" + item.IdArea + " selected='selected'>" + item.NombreArea + "</option>");
+                        }
+                        else {
+                            $("#cmbAreaPadre").append("<option value=" + item.IdArea + ">" + item.NombreArea + "</option>");
+                        }
+                    });
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la llamada ListarComboAreaPadre, verifique consola');
+                }
+            });
+        }
+
+        function ListarCatalogoTipoArea() {
+            $.ajax({
+                url: "@Url.Action("ListarCatalogoTipoArea", "CatalogoGeneral")",
+                method: 'POST',
+                success: function (data) {
+                    $("#cmbCatalogoTipoArea").empty();
+                    $("#cmbCatalogoTipoArea").append("<option value=0>Seleccione</option>");
+                    $.each(data, function (i, item) {
+                        if (item.IdCatalogo == "@Model.catalogotipoarea.IdCatalogo") {
+                            $("#cmbCatalogoTipoArea").append("<option value=" + item.IdCatalogo + " selected='selected'>" + item.Descripcion + "</option>");
+                        }
+                        else {
+                            $("#cmbCatalogoTipoArea").append("<option value=" + item.IdCatalogo + ">" + item.Descripcion + "</option>");
+                        }
+                    });
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la interface [ListarCatalogoTipoArea], verifique consola');
+                },
+                complete: function (respuesta) {
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+
+        $(function () {
+
+            //$('#cmbAreaPadre').select2({ dropdownParent: $('#ModalArea')});
+            ListarComboAreaPadre();
+            ListarCatalogoTipoArea();
+            $("#frmRegistroArea").validate({
+                submit: {
+                    settings: {
+                        inputContainer: '.field',
+                        errorClass: 'LabelError', errorListClass: 'ListaError'
+                    },
+                    callback: {
+                        onBeforeSubmit: function (node) {
+                        },
+                        onSubmit: function (node, formData) {
+                            $.ajax({
+                                url: "@Url.Action("GuardarRegistroArea")",
+                                method: 'POST',
+                                data: formData,
+                                success: function (area) {
+                                    if (area.mensaje.CodigoMensaje == 0) {
+                                        toastr.success(area.mensaje.DescripcionMensaje);
+                                        $("#txtRegIdArea").val(area.IdArea);
+                                        ActualizarTablaArea();
+                                    }
+                                    else {
+                                        toastr.error(area.mensaje.DescripcionMensaje);
+                                        console.log(area.mensaje.DescripcionMensajeSistema);
+                                    }
+                                },
+                                error: function (mensaje) {
+                                    console.log(mensaje);
+                                    toastr.error('Sucedió un error en la interface [GuardarRegistroArea], verifique consola');
+                                },
+                                complete: function (respuesta) {
+                                    ValidarSesionActual(respuesta);
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

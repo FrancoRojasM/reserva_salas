@@ -1,0 +1,117 @@
+﻿
+
+@model General.EmpresaSede
+@{
+    ViewBag.Title = "Registro EmpresaSede";
+    Layout = null;
+}
+@if (Model.mensaje.CodigoMensaje > 0)
+{
+    <span>ERROR</span>
+    <span>@Model.mensaje.DescripcionMensaje</span>
+    <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Regresar al formulario anterior" onclick="NombreFuncionCerrarModal()"><i class="ti-back-left"></i></button>
+}
+else
+{
+    <form id="frmRegistroEmpresaSede" name="frmRegistroEmpresaSede" method="POST">
+        <input type="hidden" id="txtRegIdEmpresaSede" name="txtRegIdEmpresaSede" value="@Model.IdEmpresaSede" />
+        <div class="card card-topline-aqua">
+            <div class="card-head" style="text-align:center;">
+                <h5 class="bold">@Model.empresa.NombreEmpresa</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label" for="txtNombreSede">Nombre de la sede</label>
+                            <input type="text" class="form-control" autocomplete="off" name="txtNombreSede" id="txtNombreSede" value="@Model.NombreSede" data-validation="[L>=1]" data-validation-message="Ingrese la NombreSede">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label" for="txtDireccionSede">Dirección</label>
+                            <input type="text" class="form-control" autocomplete="off" name="txtDireccionSede" id="txtDireccionSede" value="@Model.DireccionSede" data-validation="[L>=1]" data-validation-message="Ingrese la dirección">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="form-label" for="optActivo">Activo</label>
+                            <select class="form-control" id="optActivo" name="optActivo">
+                                @if (Model.Activo == true)
+                                {
+                                    <option value="1" selected="">Si</option>
+                                    <option value="0">No</option>
+                                }
+                                else
+                                {
+                                    <option value="1">Si</option>
+                                    <option value="0" selected="">No</option>
+                                }
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer" style="text-align:end;">
+                <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Actualizar tabla de registros" onclick="ActualizarTablaEmpresaSede()"> Refrescar<i  class="mdi mdi-refresh-circle"></i></button>
+                <button type="button" data-toggle="tooltip" class="btn btn-primary label" title="Nuevo registro" onclick="VerEditarEmpresaSede(0)"> Nuevo<i  id="iBtnNuevoEmpresaSede" class="ti-file"></i></button>
+                <button type="submit" data-toggle="tooltip" class="btn btn-blue label" title="Grabar registro"> Guardar<i  class="ti-save"></i></button>                
+                <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Regresar al formulario anterior" onclick="CerrarModalEmpresaSede()"> Regresar<i  class="ti-back-left"></i></button>
+            </div>
+        </div>
+    </form>
+
+    <script>
+
+
+
+                    $(function () {
+                        $("#frmRegistroEmpresaSede").validate({
+                            submit: {
+                                settings: {
+                                    inputContainer: '.field',
+                                    errorClass: 'LabelError', errorListClass: 'ListaError'
+                                },
+                                callback: {
+                                    onBeforeSubmit: function (node) {
+                                    },
+                                    onSubmit: function (node, formData)
+                                    {
+                                        var fileData = new FormData();
+                                        for (var key in formData) {
+                                            fileData.append(key, formData[key]);
+                                        }
+                                        fileData.append('IdEmpresa', @Model.empresa.IdEmpresa);
+                                        $.ajax({
+                                            url: "@Url.Action("GuardarRegistroEmpresaSede","EmpresaSede")",
+                                            method: 'POST',
+                                            data: fileData,
+                                            contentType: false,
+                                            processData: false,
+                                            success: function (empresasede) {
+                                                if (empresasede.mensaje.CodigoMensaje == 0) {
+                                                    toastr.success(empresasede.mensaje.DescripcionMensaje);
+                                                    VerEditarEmpresaSede(0);
+                                                    ActualizarTablaEmpresaSede();
+                                                }
+                                                else {
+                                                    toastr.error(empresasede.mensaje.DescripcionMensaje);
+                                                    console.log(empresasede.mensaje.DescripcionMensajeSistema);
+                                                }
+                                            },
+                                            error: function (mensaje) {
+                                                console.log(mensaje);
+                                                toastr.error('Sucedió un error en la interface [GuardarRegistroEmpresaSede], verifique consola');
+                                            },
+                                            complete: function (respuesta) {
+                                                ValidarSesionActual(respuesta);
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                        });
+                    });
+    </script>
+}

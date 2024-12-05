@@ -1,0 +1,19 @@
+﻿################################################################################
+# Este archivo .gitignore ha sido creado automáticamente por Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/
+/MatrixLogic/obj/
+/MatrixModel/obj/
+/MatrixService/obj/
+/MatrixWeb/obj/
+/MatrixLogic/bin/
+/MatrixModel/bin/
+/MatrixService/bin/
+/MatrixWeb/bin/
+/MatrixWeb/wwwroot/assets/libs/jquery-ui-1.13.2/node_modules
+/MatrixWeb/Properties/PublishProfiles/FolderProfile1.pubxml.user
+/MatrixWeb/Properties/PublishProfiles/FolderProfile.pubxml
+/MatrixWeb/Properties/PublishProfiles/FolderProfile.pubxml.user
+/MatrixWeb/Properties/PublishProfiles/FolderProfile.pubxml
+/MatrixWeb/Properties/PublishProfiles/FolderProfile.pubxml.user

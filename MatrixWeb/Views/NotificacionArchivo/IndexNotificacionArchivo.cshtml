@@ -1,0 +1,173 @@
+﻿@model Casilla.Notificacion
+@using Microsoft.AspNetCore.Http
+@{
+    ViewBag.Title = "ListaNotificacionArchivo";
+    Layout = null;
+}
+
+
+<div class="card border-info border mb-3" style="box-shadow:none">
+    <div class="card-body px-1 py-1">
+        <div id="divEditarNotificacionArchivo">
+        </div>
+    </div>
+</div>
+<div class="card" style="box-shadow:none">
+    <div class="card-header">
+        <ul class="nav nav-pills card-header-pills">
+            <li class="nav-item">
+                <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Actualizar tabla de archivos" onclick="ActualizarTablaNotificacionArchivo()"> Refrescar Tabla &nbsp;<i class="fas fa-sync"></i></button>
+            </li>
+        </ul>
+    </div>
+    <div class="card-body px-1 py-1">
+        <div class="row">
+            <div class="col-12">
+                <table id="dtbNotificacionArchivo" class="table table-striped table-hover table-bordered" cellspacing="0" style="width:100%"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function DescargarNotificacionArchivoXls() {
+        //  window.open('@Url.Action("DescargarNotificacionArchivoXls", "NotificacionArchivo")' + "?FechaInicial=" + $("#txtFechaInicial").val() + "&FechaFinal=" + $("#txtFechaFinal").val() + "&NumeroDocumento=" + $("#txtNumeroDocumentoB").val(), '_blank');
+        window.open('@Url.Action("DescargarNotificacionArchivoXls", "NotificacionArchivo")', '_blank');
+    }
+    function DescargarNotificacionArchivoPdf() {
+        window.open('@Url.Action("DescargarNotificacionArchivoPdf", "NotificacionArchivo")', '_blank');
+    }
+    function CerrarEliminarNotificacionArchivo() {
+        $("#ModalEliminarNotificacionArchivo").modal("hide");
+        $("#txtEliminarIdNotificacionArchivo").val(0);
+    }
+    function EliminarNotificacionArchivo() {
+        var IdNotificacionArchivo = $("#txtEliminarIdNotificacionArchivo").val();
+        $.ajax({
+            url: "@Url.Action("EliminarNotificacionArchivo")",
+            method: 'POST',
+            data: { IdNotificacionArchivo: IdNotificacionArchivo },
+            success: function (mensaje) {
+                $("#modalEliminarNotificacionArchivo").modal('hide');
+                if (mensaje.CodigoMensaje == 0) {
+                    $("#txtRegIdNotificacionArchivo").val(0);
+                    toastr.success(mensaje.DescripcionMensaje);
+                    ActualizarTablaNotificacionArchivo();
+                    CerrarEliminarNotificacionArchivo();
+                }
+                else {
+                    toastr.error(mensaje.DescripcionMensaje);
+                    console.log(mensaje.DescripcionMensajeSistema);
+                }
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la interface [EliminarNotificacionArchivo], verifique consola');
+            }
+        });
+    }
+    function VerModalEliminarNotificacionArchivo(IdNotificacionArchivo) {
+        $("#ModalEliminarNotificacionArchivo").modal("show");
+        $("#txtEliminarIdNotificacionArchivo").val(IdNotificacionArchivo);
+    }   
+    function VerEditarNotificacionArchivo(tipo) {
+        var IdNotificacionArchivo = 0;
+        if (tipo == 1) {
+            var data = ListaNotificacionArchivo.dtNotificacionArchivo.rows('.selected').data();
+            if (data.length == 1) {
+                IdNotificacionArchivo = data[0].IdNotificacionArchivo;
+            }
+        }
+        $.ajax({
+            url: "@Url.Action("RegistroNotificacionArchivo", "NotificacionArchivo")",
+            type: "POST",
+            async: true,
+            data: { IdNotificacion: @ViewBag.IdNotificacion, IdNotificacionArchivo: IdNotificacionArchivo },
+            success: function (vistaParcial) {
+                $("#divEditarNotificacionArchivo").html(vistaParcial);
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la llamada, verifique consola');
+            }
+        });
+    }
+    function ActualizarTablaNotificacionArchivo() {
+        ListaNotificacionArchivo.refresh();
+    }
+    $(function () {
+        VerEditarNotificacionArchivo(0);
+        ListaNotificacionArchivo = {
+            dtNotificacionArchivo: null,
+            init: function () {
+                this.dtNotificacionArchivo = $('#dtbNotificacionArchivo').DataTable({
+                    language: {
+                        url: '/assets/libs/datatables.net/js/es-ES.json',
+                    },
+                    responsive: true,
+                    rowId: 'IdNotificacionArchivo',
+                    language: {
+                            url: '/assets/libs/datatables.net/js/es-ES.json',
+                        },
+                        "ordering": false,
+                    "lengthMenu": [[10, 25, 50, 100, 100000], [10, 25, 50, 100, 'Todo']],
+                    select: {
+                        style: 'single',
+info: false
+                    },
+                    "serverSide": true,
+                    "ajax": {
+                        "url": "@Url.Action("ListarNotificacionArchivo", "NotificacionArchivo")",
+                        "error": function (respuesta, error, thrown) {
+                            ValidarSesionActual(respuesta);
+                        },
+                        "type": "POST"
+                        , "data": function (d) {
+                            d.IdNotificacion = @ViewBag.IdNotificacion;
+                        }
+                    },
+                    "columns": [
+                        { "title": "Tipo de Documento", "data": "CatalogoTipoDocumento", "className": "dt-head-center dt-body-left", "width": "40%" },
+                        { "title": "Numero de Documento", "data": "NumeroDocumento", "className": "dt-head-center dt-body-left", "width": "45%" },
+                       
+                        {
+                            "title": "Archivo",
+                            "data": function (row, type, val, meta) {
+                                if (row.RutaArchivo == '') { return ''; }
+                                return '<button type="button" class="btn btn-secondary btn-sm waves-effect waves-light" title="Descargar" onclick="DescargarArchivoInicial(\'' + row.RutaArchivo + '\')" ><i class="far fa-file"></i></button>';
+                            },
+                            "width": "5%", "className": "dt-head-center dt-body-center"
+                        },
+                        { "title": "Fecha Hora Lectura", "data": "FechaHoraLecturaArchivo", "className": "dt-head-center dt-body-left", "width": "5%" },
+                        
+                        {
+                            "title": "Eliminar",
+                            "data": function (row, type, val, meta) {
+                                var NotificacionEnviada = '@Model.NotificacionEnviada';
+                                if (NotificacionEnviada == 'false') {
+                                    return '<button type="button" class="btn btn-danger btn-sm waves-effect waves-light" title="Eliminar" onclick="VerModalEliminarNotificacionArchivo(' + row.IdNotificacionArchivo + ')" ><i class="far fa-trash-alt"></i></button>';
+                                }
+                                else { 
+                                    return '';
+                                }
+   
+    },
+                            "width": "5%", "className": "dt-head-center dt-body-center"
+                        }
+                    ]
+                });
+            },
+            refresh: function () {
+                this.dtNotificacionArchivo.ajax.reload(null, false);
+            }
+        }
+        ListaNotificacionArchivo.init();
+        ListaNotificacionArchivo.dtNotificacionArchivo.on('select', function (e, dt, type, indexes) {
+            var count = ListaNotificacionArchivo.dtNotificacionArchivo.rows({ selected: true }).count();
+            if (count > 0) {
+                VerEditarNotificacionArchivo(1);
+            }
+        })
+    });
+</script>

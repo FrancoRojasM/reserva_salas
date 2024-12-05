@@ -1,0 +1,152 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <title>@MatrixUtilitarios.DatosGlobales.NombreSoftware</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <meta name="CMP" content="CMP" />
+    <meta name="author" content="CMP" />
+
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="~/assets/images/favicon.ico">
+
+    <!-- Theme Config Js -->
+    <script src="~/assets/js/head.js"></script>
+
+    <!-- Jquery Toast css -->
+    <link href="~/assets/libs/jquery-toast-plugin/jquery.toast.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- Bootstrap css -->
+    <link href="~/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" id="app-style" />
+
+    <!-- App css -->
+    <link href="~/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+
+
+    <link href="~/assets/libs/toastr/toastr.css" rel="stylesheet" />
+
+    <!-- Icons css -->
+    <link href="~/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- Plugins css -->
+    <link href="~/assets/libs/mohithg-switchery/switchery.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/libs/multiselect/css/multi-select.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/libs/selectize/css/selectize.bootstrap3.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css" rel="stylesheet" type="text/css" />
+    @RenderSection("styles", required: false)
+    <style>
+        .toast-success {
+            background-color: #5246b1;
+        }
+
+        .toast-error {
+            background-color: #950606;
+        }
+
+        .current_captcha {
+            text-align: center;
+            font-size: 22px;
+            font-style: italic;
+            height: 27px !important;
+            color: white;
+        }
+
+        .captha_numbers {
+            text-align: center;
+            margin-bottom: 2px;
+        }
+
+            .captha_numbers a {
+                text-align: center;
+                font-size: 20px;
+                border: 1px solid #1abc9c;
+                -webkit-border-radius: 5px;
+                -moz-border-radius: 5px;
+                border-radius: 5px;
+                color: #1abc9c;
+                padding: 5px;
+                text-decoration: none;
+            }
+
+                .captha_numbers a:hover {
+                    background-color: #1abc9c;
+                    color: #ffffff;
+                }
+
+        .header {
+            background: transparent !important;
+        }
+    </style>
+
+</head>
+
+<body class="auth-fluid-pages pb-0">
+    @RenderBody()
+
+    <script src="~/assets/js/vendor.min.js"></script>
+    <script src="~/assets/js/app.min.js"></script>
+    <script src="~/assets/js/pages/authentication.init.js"></script>
+
+    <!-- Controles Avanzados -->
+    <script src="assets/libs/selectize/js/standalone/selectize.min.js"></script>
+    <script src="~/assets/libs/mohithg-switchery/switchery.min.js"></script>
+    <script src="~/assets/libs/multiselect/js/jquery.multi-select.js"></script>
+    <script src="~/assets/libs/select2/js/select2.min.js"></script>
+    <script src="~/assets/libs/jquery-mockjax/jquery.mockjax.min.js"></script>
+    <script src="~/assets/libs/devbridge-autocomplete/jquery.autocomplete.min.js"></script>
+    <script src="~/assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js"></script>
+    <script src="~/assets/libs/bootstrap-maxlength/bootstrap-maxlength.min.js"></script>
+    <script src="~/assets/libs/parsleyjs/parsley.min.js"></script>
+
+    <!-- Init js-->
+
+
+    <script src="~/assets/libs/html5-form-validation/jquery.validation.min.js"></script>
+    <!-- Tost-->
+
+    <script src="~/assets/libs/toastr/toastr.min.js"></script>
+
+    @RenderSection("scripts", required: false)
+    <script>
+        // ParsleyConfig definition if not already set
+        // Validation errors messages for Parsley
+        // Load this after Parsley
+
+        Parsley.addMessages('es', {
+            defaultMessage: "Este campo parece ser inválido.",
+            type: {
+                email: "Este campo debe ser un correo válido.",
+                url: "Este campo debe ser una URL válida.",
+                number: "Este campo debe ser un número válido.",
+                integer: "Este campo debe ser un número válido.",
+                digits: "Este campo debe ser un dígito válido.",
+                alphanum: "Este campo debe ser alfanumérico."
+            },
+            notblank: "Este campo no debe estar en blanco.",
+            required: "Este campo es obligatorio.",
+            pattern: "Este campo es incorrecto.",
+            min: "Este campo no debe ser menor que %s.",
+            max: "Este campo no debe ser mayor que %s.",
+            range: "Este campo debe estar entre %s y %s.",
+            minlength: "Este campo es muy corto. La longitud mínima es de %s caracteres.",
+            maxlength: "Este campo es muy largo. La longitud máxima es de %s caracteres.",
+            length: "La longitud de este campo debe estar entre %s y %s caracteres.",
+            mincheck: "Debe seleccionar al menos %s opciones.",
+            maxcheck: "Debe seleccionar %s opciones o menos.",
+            check: "Debe seleccionar entre %s y %s opciones.",
+            equalto: "Este campo debe ser idéntico."
+        });
+
+        Parsley.setLocale('es');
+    </script>
+
+
+    <!-- App js -->
+
+</body>
+</html>

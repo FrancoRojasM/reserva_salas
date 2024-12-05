@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Presupuesto\**" />
+    <EmbeddedResource Remove="Presupuesto\**" />
+    <None Remove="Presupuesto\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="RecursoHumano\EmpleadoEmpleado.cs" />
+  </ItemGroup>
+
+</Project>

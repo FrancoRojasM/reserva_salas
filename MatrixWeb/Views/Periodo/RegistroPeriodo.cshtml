@@ -1,0 +1,135 @@
+﻿@model General.Periodo
+@{
+    ViewBag.Title = "Registro Periodo";
+    Layout = null;
+}
+<form id="frmRegistroPeriodo" name="frmRegistroPeriodo" method="POST">
+    <div class="row">
+        <div class="col-12">
+            <div class="card" style="box-shadow:none">
+                <div class="card-header"><h5 class="my-0">Registro de Periodo</h5></div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="form-label" for="txtRegIdPeriodo">Año</label>
+                                <input type="number" class="form-control" name="txtRegIdPeriodo" id="txtRegIdPeriodo" value="@Model.IdPeriodo" data-validation="[V>=2000]" data-validation-message="Ingrese el periodo">
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label class="form-label" for="txtNombrePeriodo">Año del perú</label>
+                                <input type="text" class="form-control" name="txtNombrePeriodo" id="txtNombrePeriodo" value="@Model.NombrePeriodo" data-validation="[L>=1]" data-validation-message="Ingrese el nombre del periodo">
+                            </div>
+                        </div>
+
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label class="form-label" for="txtDecenio">Decenio</label>
+                                <input type="text" class="form-control" name="txtDecenio" id="txtDecenio" value="@Model.Decenio">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div class="form-group">
+                                <label class="form-label" for="txtDecenioNombrePeriodo">Descripción</label>
+                                <input type="text" class="form-control" name="txtDecenioNombrePeriodo" id="txtDecenioNombrePeriodo" value="@Model.DecenioNombrePeriodo">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="form-label" for="optActual">Actual</label>
+                                <select class="form-control" id="optActual" name="optActual">
+                                    @if (Model.Actual == true)
+                                    {
+                                        <option value="1" selected="">Si</option>
+                                        <option value="0">No</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="1">Si</option>
+                                        <option value="0" selected="">No</option>
+                                    }
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="button" style="float:right;margin-left:5px;" data-toggle="tooltip" class="btn btn-warning waves-effect waves-light" title="Actualizar tabla de registros" onclick="ActualizarTablaPeriodo()"> Actualizar &nbsp;<i class="fas fa-sync-alt"></i>></button>
+                    <button type="button" style="float:right;margin-left:5px;" data-toggle="tooltip" class="btn btn-success waves-effect waves-light" title="Nuevo registro" onclick="VerEditarPeriodo(0)"> Nuevo &nbsp;<i id="iBtnNuevoPeriodo" class="ti-file"></i></button>
+                    <button type="submit" style="float:right;margin-left:5px;" data-toggle="tooltip" class="btn btn-primary waves-effect waves-light" title="Grabar registro"> Guardar &nbsp;<i class="ti-save"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+
+    $(function () {
+        $("#frmRegistroPeriodo").validate({
+            submit: {
+                settings: {
+                    inputContainer: '.field',
+                    errorClass: 'LabelError', errorListClass: 'ListaError'
+                },
+                callback: {
+                    onBeforeSubmit: function (node) {
+                    },
+                    onSubmit: function (node, formData) {
+                        //var files = $("#txtRutaArchivo").get(0).files;
+                        var fileData = new FormData();
+                        for (var key in formData) {
+                            //if (key == "aca el nombre de un control que quiera cambiar el valor antes de ser enviado al servidor") {
+                            //    fileData.append(key, CodigoAmbiente);
+                            //}
+                            //else {
+                            fileData.append(key, formData[key]);
+                            //}
+                        }
+                        //fileData.append('Archivo', files[0]);
+                        //fileData.append();
+
+
+                        $.ajax({
+                            url: "@Url.Action("GuardarRegistroPeriodo", "Periodo")",
+                            method: 'POST',
+                            data: fileData,
+                            contentType: false,
+                            processData: false,
+                            success: function (periodo) {
+                                if (periodo.mensaje.CodigoMensaje == 0) {
+                                    toastr.success(periodo.mensaje.DescripcionMensaje);
+                                    VerEditarPeriodo(0);
+                                    ActualizarTablaPeriodo();
+                                }
+                                else {
+                                    toastr.error(periodo.mensaje.DescripcionMensaje);
+                                    console.log(periodo.mensaje.DescripcionMensajeSistema);
+                                }
+                            },
+                            error: function (mensaje) {
+                                console.log(mensaje);
+                                toastr.error('Sucedió un error en la interface [GuardarRegistroPeriodo], verifique consola');
+                            },
+                            complete: function (respuesta) {
+                                ValidarSesionActual(respuesta);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+
+
+
+
+
+
+

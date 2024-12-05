@@ -1,0 +1,31 @@
+{
+  "ExtendedData": {
+    "inputs": [
+      "https://ws3.pide.gob.pe/services/PcmCuo?wsdl"
+    ],
+    "collectionTypes": [
+      "System.Array",
+      "System.Collections.Generic.Dictionary`2"
+    ],
+    "namespaceMappings": [
+      "*, svrCUO"
+    ],
+    "sync": true,
+    "targetFramework": "net5.0",
+    "typeReuseMode": "All"
+  },
+  "ServiceEndpoints": {
+    "PcmCuoHttpsSoap11Endpoint": {
+      "Binding": {
+        "type": "BasicHttpBinding",
+        "allowCookies": true,
+        "security": {
+          "mode": "Transport"
+        }
+      },
+      "Address": {
+        "uri": "https://ws3.pide.gob.pe/services/PcmCuo"
+      }
+    }
+  }
+}

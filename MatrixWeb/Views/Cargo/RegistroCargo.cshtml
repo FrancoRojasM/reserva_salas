@@ -1,0 +1,140 @@
+﻿@model General.Cargo
+@{
+    ViewBag.Title = "Registro Cargo";
+    Layout = null;
+}
+<form id="frmRegistroCargo" name="frmRegistroCargo" method="POST">
+    <input type="hidden" id="txtRegIdCargo" name="txtRegIdCargo" value="@Model.IdCargo" />
+    <div class="row">
+        <div class="col-12">
+            <div class="card" style="box-shadow:none">
+                <div class="card-header"><h4 class="my-0">Registro de Cargo</h4></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label class="form-label" for="txtNombreCargo">Nombre</label>
+                                <input type="text" class="form-control" name="txtNombreCargo" id="txtNombreCargo" value="@Model.NombreCargo" data-validation="[L>=1]" data-validation-message="Ingrese la NombreCargo">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label" for="cmbCatalogoTipoCargo">Tipo de Cargo</label>
+                                <select class="form-control" id="cmbCatalogoTipoCargo" name="cmbCatalogoTipoCargo" data-validation="[V>0]" data-validation-message="Seleccione el Tipo de Cargo"></select>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="form-group">
+                                <label class="form-label" for="optActivo">Activo</label>
+                                <br />
+                                <select id="optActivo" name="optActivo" class="form-control">
+                                    @if (Model.Activo == true)
+                                    {
+                                        <option value="1" selected="">Si</option>
+                                        <option value="0">No</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="1">Si</option>
+                                        <option value="0" selected="">No</option>
+                                    }
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer" style="text-align:right;">
+                    <button type="button" data-toggle="tooltip" class="btn btn-warning waves-effect waves-light" title="Actualizar tabla de registros" onclick="ActualizarTablaCargo()"> Refrescar &nbsp;<i class="fas fa-sync"></i></button>
+                    <button type="button" data-toggle="tooltip" class="btn btn-success waves-effect waves-light" title="Nuevo registro" onclick="VerEditarCargo(0)"> Nuevo &nbsp;<i id="iBtnNuevoCargo" class="ti-file"></i></button>
+                    <button type="submit" data-toggle="tooltip" class="btn btn-primary waves-effect waves-light" title="Grabar registro"> Guardar &nbsp;<i class="ti-save"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    function ListarCatalogoTipoCargo() {
+        $.ajax({
+            url: "@Url.Action("ListarCatalogoTipoCargo", "CatalogoGeneral")",
+            method: 'POST',
+            success: function (data) {
+                $("#cmbCatalogoTipoCargo").empty();
+                $("#cmbCatalogoTipoCargo").append("<option value=0>Seleccione</option>");
+                $.each(data, function (i, item) {
+                    if (item.IdCatalogo == "@Model.catalogotipocargo.IdCatalogo") {
+                        $("#cmbCatalogoTipoCargo").append("<option value=" + item.IdCatalogo + " selected='selected'>" + item.Descripcion + "</option>");
+                    }
+                    else {
+                        $("#cmbCatalogoTipoCargo").append("<option value=" + item.IdCatalogo + ">" + item.Descripcion + "</option>");
+                    }
+                });
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la interface [ListarCatalogoTipoCargo], verifique consola');
+            }
+        });
+    }
+    $(function () {
+        ListarCatalogoTipoCargo();
+        $("#frmRegistroCargo").validate({
+            submit: {
+                settings: {
+                    inputContainer: '.field',
+                    errorClass: 'LabelError', errorListClass: 'ListaError'
+                },
+                callback: {
+                    onBeforeSubmit: function (node) {
+                    },
+                    onSubmit: function (node, formData) {
+                        /*
+                        var files = $("#txtRutaArchivo").get(0).files;
+                        var fileData = new FormData();
+                        for (var key in formData) {
+                            fileData.append(key, formData[key]);
+                        }
+                        fileData.append('Archivo', files[0]);
+                        */
+
+                        $.ajax({
+                            url: "@Url.Action("GuardarRegistroCargo")",
+                            method: 'POST',
+                            data: formData,//fileData,
+                            //contentType: false,
+                            //processData: false,
+                            success: function (cargo) {
+                                if (cargo.mensaje.CodigoMensaje == 0) {
+                                    toastr.success(cargo.mensaje.DescripcionMensaje);
+                                    $("#txtRegIdCargo").val(cargo.IdCargo);
+                                    ActualizarTablaCargo();
+                                }
+                                else {
+                                    toastr.error(cargo.mensaje.DescripcionMensaje);
+                                    console.log(cargo.mensaje.DescripcionMensajeSistema);
+                                }
+                            },
+                            error: function (mensaje) {
+                                console.log(mensaje);
+                                toastr.error('Sucedió un error en la interface [GuardarRegistroCargo], verifique consola');
+                            },
+                            complete: function (respuesta) {
+                                ValidarSesionActual(respuesta);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+

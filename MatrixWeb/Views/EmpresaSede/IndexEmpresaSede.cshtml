@@ -1,0 +1,275 @@
+﻿
+@{
+
+    ViewBag.Title = "ListaEmpresaSede";
+    Layout = null;
+
+}
+
+<div id="divEditarEmpresaSede">
+</div>
+<div class="card card-block">
+    <table id="dtbEmpresaSede" class="table table-striped table-hover table-bordered" cellspacing="0" style="width:100%"></table>
+</div>
+<div class="modal fade" id="ModalEmpresaSedeAmbiente" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+    <input type="hidden" class="form-control" name="txtIdPersonaEliminar" id="txtIdPersonaEliminar" value="">
+    <div class="modal-dialog modal-smx modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <label class="close" onclick="CerrarModalEmpresaSedeAmbiente()"><i class="fas fa-times"></i></label>
+                <h5 class="modal-title">Ambiente</h5>
+            </div>
+            <div class="modal-body">
+                <div id="divModalEmpresaSedeAmbiente"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ModalEmpresaSedeAlmacen" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+    <input type="hidden" class="form-control" name="txtIdPersonaEliminar" id="txtIdPersonaEliminar" value="">
+    <div class="modal-dialog modal-smx modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <label class="close" onclick="CerrarModalEmpresaSedeAlmacen()"><i class="fas fa-times"></i></label>
+                <h5 class="modal-title">Almacen</h5>
+            </div>
+            <div class="modal-body">
+                <div id="divModalEmpresaSedeAlmacen"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ModalEliminarEmpresaSede" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+    <input type="hidden" class="form-control" name="txtIdPersonaEliminar" id="txtIdPersonaEliminar" value="">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <label class="close" onclick="CerrarEliminarEmpresaSede()"><i class="fas fa-times"></i></label>
+                <h5 class="modal-title">Eliminar</h5>
+            </div>
+            <div class="modal-body">
+                <input hidden id="txtEliminarIdEmpresaSede" value="0" />
+                ¿Está seguro de eliminar el registro seleccionado?
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Eliminar registro seleccionado" onclick="EliminarEmpresaSede()"><i class="ti-trash"></i></button>
+                <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Regresar al formulario anterior" onclick="CerrarEliminarEmpresaSede()"><i class="ti-back-left"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function CerrarEliminarEmpresaSede() {
+        $("#ModalEliminarEmpresaSede").modal("hide");
+        $("#txtEliminarIdEmpresaSede").val(0);
+    }
+    function EliminarEmpresaSede() {
+        var IdEmpresaSede = $("#txtEliminarIdEmpresaSede").val();
+        $.ajax({
+            url: "@Url.Action("EliminarEmpresaSede")",
+            method: 'POST',
+            data: { IdEmpresaSede: IdEmpresaSede },
+            success: function (mensaje) {
+                $("#modalEliminarEmpresaSede").modal('hide');
+                if (mensaje.CodigoMensaje == 0) {
+                    toastr.success(mensaje.DescripcionMensaje);
+                    ActualizarTablaEmpresaSede();
+                    VerEditarEmpresaSede(0);
+                    CerrarEliminarEmpresaSede();
+                }
+                else {
+                    toastr.error(mensaje.DescripcionMensaje);
+                    console.log(mensaje.DescripcionMensajeSistema);
+                }
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la interface [EliminarEmpresaSede], verifique consola');
+            },
+            complete: function (respuesta) {
+                ValidarSesionActual(respuesta);
+            }
+        });
+    }
+    function VerModalEliminarEmpresaSede(IdEmpresaSede) {
+        $("#ModalEliminarEmpresaSede").modal("show");
+        $("#txtEliminarIdEmpresaSede").val(IdEmpresaSede);
+
+    }
+    function CerrarModalEmpresaSedeAlmacen() {
+        $("#divModalEmpresaSedeAlmacen").empty()
+        $("#ModalEmpresaSedeAlmacen").modal("hide");
+    }
+    function VerModalEmpresaSedeAlmacen(IdEmpresaSede) {
+        if (IdEmpresaSede == 0) {
+            toastr.error('Seleccione correctamente un centro de EmpresaSedeAlmacen');
+            return;
+        }
+
+        $.ajax({
+            url: "@Url.Action("IndexEmpresaSedeAlmacen", "Almacen")",
+            type: "POST",
+            async: true,
+            data: { IdEmpresaSede: IdEmpresaSede },
+            success: function (vistaParcial) {
+                $("#divModalEmpresaSedeAlmacen").html(vistaParcial);
+                $("#ModalEmpresaSedeAlmacen").modal("show");
+            },
+            error: function (mensaje) {
+                console.log(mensaje.responseText);
+                toastr.error('Sucedió un error en la llamada, verifique consola');
+            },
+            complete: function (respuesta) {
+                $('#iBtnVerModalEmpresaSedeAlmacen').removeClass("fa fa-spinner fa-spin fa-fw").addClass("icon-menu");
+                ValidarSesionActual(respuesta);
+            }
+        });
+
+    }
+           function VerModalEmpresaSedeAmbiente(IdEmpresaSede) {
+            if (IdEmpresaSede == 0) {
+                toastr.error('Seleccione correctamente un centro de EmpresaSedeAmbiente');
+                return;
+            }
+
+            $.ajax({
+                url: "@Url.Action("IndexEmpresaSedeAmbiente", "EmpresaSedeAmbiente")",
+                 type: "POST",
+                async: true,
+                data: { IdEmpresaSede: IdEmpresaSede },
+                success: function (vistaParcial) {
+                    $("#divModalEmpresaSedeAmbiente").html(vistaParcial);
+                    $("#ModalEmpresaSedeAmbiente").modal("show");
+                },
+                error: function (mensaje) {
+                    console.log(mensaje.responseText);
+                    toastr.error('Sucedió un error en la llamada, verifique consola');
+                },
+                complete: function (respuesta) {
+                    $('#iBtnVerModalEmpresaSedeAmbiente').removeClass("fa fa-spinner fa-spin fa-fw").addClass("icon-menu");
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+		function VerEditarEmpresaSede(tipo) {
+			var IdEmpresaSede = 0;
+			 if(tipo==1)
+			 {
+				var data = ListaEmpresaSede.dtEmpresaSede.rows('.selected').data();
+				if (data.length ==1) {
+					IdEmpresaSede = data[0].IdEmpresaSede;
+				}
+			}
+			 $.ajax({
+                beforeSend: function () {
+                    $('#iBtnNuevoIdEmpresaSede').removeClass("ti-file").addClass("fa fa-spinner fa-spin fa-fw");
+                },
+                url: "@Url.Action("RegistroEmpresaSede", "EmpresaSede")",
+                type: "POST",
+				async: true,
+                data: {IdEmpresa:@ViewBag.IdEmpresa, IdEmpresaSede: IdEmpresaSede},
+                success: function (vistaParcial) {
+                    $("#divEditarEmpresaSede").html(vistaParcial);
+                },
+				error: function (mensaje) {
+					console.log(mensaje);
+                    toastr.error('Sucedió un error en la llamada, verifique consola');
+                },
+                complete: function (respuesta) {
+                    $('#iBtnNuevoIdEmpresaSede').removeClass("fa fa-spinner fa-spin fa-fw").addClass("ti-file");
+					ValidarSesionActual(respuesta);
+                }
+            });
+        }
+
+		 function ActualizarTablaEmpresaSede() {
+            ListaEmpresaSede.refresh();
+        }
+    $(function () {
+        VerEditarEmpresaSede(0);
+        ListaEmpresaSede = {
+            dtEmpresaSede: null,
+            init: function () {
+                this.dtEmpresaSede = $('#dtbEmpresaSede').DataTable({
+                    responsive: true,
+                    rowId: 'IdEmpresaSede',
+                    language: {
+                            url: '/assets/libs/datatables.net/js/es-ES.json',
+                        },
+                        "ordering": false,
+                    "lengthMenu": [[10, 25, 50, 100, 100000], [10, 25, 50, 100, 'Todo']],
+                    select: {
+                        style: 'single',
+info: false
+                    },
+                    "serverSide": true,
+                    "ajax": {
+                        "url": "@Url.Action("ListarEmpresaSede", "EmpresaSede")",
+                        "data": function (d) {
+                            d.IdEmpresa = @ViewBag.IdEmpresa;
+                            },
+                        "error": function (respuesta, error, thrown) {
+                            ValidarSesionActual(respuesta);
+                        },
+                        "type": "POST"
+                    },
+                    "columns": [
+
+                        { "title": "Nombre de la sede", "data": "NombreSede", "className": "dt-head-center dt-body-left", "width": "45%" },
+                        { "title": "Dirección", "data": "DireccionSede", "className": "dt-head-center dt-body-left", "width": "45%" },
+                        { "title": "Activo", "data": "Activo", "className": "dt-head-center dt-body-center", "width": "10%" },
+                        {
+                            "title": "Almacén",
+                            "data": function (row, type, val, meta) {
+                                return '<button type="button" data-toggle="tooltip" class="btn btn-warning label" title="ver Almacenes" onclick="VerModalEmpresaSedeAlmacen(' + row.IdEmpresaSede + ')" ><i id="iBtnEmpresaSedeAlmacen' + row.IdEmpresaSede + '" class="fas fa-bars"></i></button>';
+
+                            },
+                            "width": "10%", "className": "dt-head-center dt-body-center"
+                        },
+                        {
+                            "title": "Ambiente",
+                            "data": function (row, type, val, meta) {
+                                return '<button type="button" data-toggle="tooltip" class="btn btn-warning label" title="ver EmpresaSedeAmbiente" onclick="VerModalEmpresaSedeAmbiente(' + row.IdEmpresaSede + ')" ><i id="iBtnEmpresaSedeAmbiente' + row.IdEmpresaSede + '" class="fas fa-bars"></i></button>';
+
+                            },
+                            "width": "10%", "className": "dt-head-center dt-body-center"
+                        },
+                        {
+                            "title": "Eliminar",
+                            "data": function (row, type, val, meta) {
+                                return '<button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Eliminar" onclick="VerModalEliminarEmpresaSede(' + row.IdEmpresaSede + ')" ><i class="fa fa-trash"></i></button>';
+                            },
+                            "width": "10%", "className": "dt-head-center dt-body-center"
+                        }
+
+                    ]
+                });
+            },
+            refresh: function () {
+                this.dtEmpresaSede.ajax.reload(null, false);
+            }
+        }
+        ListaEmpresaSede.init();
+        ListaEmpresaSede.dtEmpresaSede.on('select', function (e, dt, type, indexes) {
+            var count = ListaEmpresaSede.dtEmpresaSede.rows({ selected: true }).count();
+            if (count > 0) {
+                VerEditarEmpresaSede(1);
+            }
+        });
+        ListaEmpresaSede.dtEmpresaSede.on('deselect', function (e, dt, type, indexes) {
+            var count = ListaEmpresaSede.dtEmpresaSede.rows({ selected: true }).count();
+            if (count == 0) {
+                $('#btnVerModalEliminarEmpresaSede').prop('disabled', true);
+            }
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+

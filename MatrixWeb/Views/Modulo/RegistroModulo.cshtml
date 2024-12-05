@@ -1,0 +1,175 @@
+﻿@model Sistema.Modulo
+@{
+    ViewBag.Title = "Registro Modulo";
+    Layout = null;
+}
+
+<form id="frmRegistroModulo" name="frmRegistroModulo" method="POST">
+    <div class="row">
+        <div class="col-12">
+            <div class="card" style="box-shadow:none">
+                <div class="card-header"><h5 class="my-0">Registro de Modulo</h5></div>
+                <div class="card-body">
+                    <input type="hidden" id="txtRegIdModulo" name="txtRegIdModulo" value="@Model.IdModulo" />
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="cmbCatalogoTipoModulo">Interface</label>
+                                <select class="select2 form-control form-select" id="cmbCatalogoTipoModulo" name="cmbCatalogoTipoModulo" data-validation="[NOTEMPTY]" data-validation-message="Seleccione el Tipo del Modulo"></select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+
+                            <div class="form-group">
+                                <label class="form-label" for="txtNombreModulo">Nombre</label>
+                                <input type="text" class="form-control" name="txtNombreModulo" id="txtNombreModulo" value="@Model.NombreModulo" data-validation="[L>=1]" data-validation-message="Ingrese el Nombre del Modulo">
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <div class="form-group">
+                                <label class="form-label" for="txtDetalleModulo">Detalle</label>
+                                <input type="text" class="form-control" name="txtDetalleModulo" id="txtDetalleModulo" value="@Model.DetalleModulo">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col-md-4">
+
+                            <div class="form-group">
+                                <label class="form-label" for="txtRutaImagenModulo">Icono</label>
+                                <input type="text" class="form-control" name="txtRutaImagenModulo" id="txtRutaImagenModulo" value="@Model.RutaImagenModulo" data-validation="[L>=1]" data-validation-message="Ingrese la Imagen del Modulo">
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="form-group">
+                                <label class="form-label" for="txtOrdenModulo">Orden</label>
+                                <input type="number" class="form-control" name="txtOrdenModulo" id="txtOrdenModulo" value="@Model.OrdenModulo" data-validation="[L>=1]" data-validation-message="Ingrese el Nro. de Orden del Modulo">
+                            </div>
+
+                        </div>
+                        <div class="col-md-1">
+
+                            <div class="form-group">
+                                <label class="form-label" for="optActivo">Activo</label>
+                                <br />
+                                <select id="optActivo" name="optActivo" class="form-control form-select">
+                                    @if (Model.Activo == true)
+                                    {
+                                        <option value="1" selected="">Si</option>
+                                        <option value="0">No</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="1">Si</option>
+                                        <option value="0" selected="">No</option>
+                                    }
+                                </select>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+                <div class="card-footer" style="text-align:right;">
+                    <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Actualizar tabla de registros" onclick="ActualizarTablaModulo()"> Refrescar<i class="ti-reload"></i></button>
+                    <button type="button" data-toggle="tooltip" class="btn btn-primary label" title="Nuevo registro" onclick="VerEditarModulo(0)"> Nuevo<i id="iBtnNuevoModulo" class="ti-file"></i></button>
+                    <button type="submit" data-toggle="tooltip" class="btn btn-blue label" title="Grabar registro"> Guardar<i class="ti-save"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<script>
+
+    function ListarCatalogoTipoModulo() {
+        $.ajax({
+            url: "@Url.Action("ListarCatalogoTipoModulo", "CatalogoSistema")",
+            method: 'POST',
+            async: false,
+            success: function (data) {
+                $("#cmbCatalogoTipoModulo").empty();
+                $("#cmbCatalogoTipoModulo").append("<option value=''>Seleccione</option>");
+                $.each(data, function (i, item) {
+                    if (item.IdCatalogo == "@Model.catalogotipomodulo.IdCatalogo") {
+                        $("#cmbCatalogoTipoModulo").append("<option value='" + item.IdCatalogo + "' selected='selected'>" + item.Descripcion + "</option>");
+                    }
+                    else {
+                        $("#cmbCatalogoTipoModulo").append("<option value='" + item.IdCatalogo + "'>" + item.Descripcion + "</option>");
+                    }
+                });
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la llamada ListarCatalogoTipoModulo, verifique consola');
+            },
+            complete: function (respuesta) {
+                ValidarSesionActual(respuesta);
+            }
+        });
+    }
+
+    $(function () {
+
+        ListarCatalogoTipoModulo();
+
+
+        $("#frmRegistroModulo").validate({
+            submit: {
+                settings: {
+                    inputContainer: '.field',
+                    errorClass: 'LabelError', errorListClass: 'ListaError'
+                },
+                callback: {
+                    onBeforeSubmit: function (node) {
+                    },
+                    onSubmit: function (node, formData) {
+
+                        $.ajax({
+                            beforeSend: function () {
+                                $('.preloader').fadeIn();
+                            },
+                            url: "@Url.Action("GuardarRegistroModulo")",
+                            method: 'POST',
+                            async: false,
+                            data: formData,//fileData,
+                            //contentType: false,
+                            //processData: false,
+                            success: function (modulo) {
+                                if (modulo.mensaje.CodigoMensaje == 0) {
+                                    toastr.success(modulo.mensaje.DescripcionMensaje);
+                                    $("#txtRegIdModulo").val(modulo.IdModulo);
+                                    ActualizarTablaModulo();
+                                }
+                                else {
+                                    toastr.error(modulo.mensaje.DescripcionMensaje);
+                                }
+                            },
+                            error: function (mensaje) {
+                                console.log(mensaje);
+                                toastr.error('Sucedió un error en la llamada GuardarRegistroModulo, verifique consola');
+                            },
+                            complete: function (respuesta) {
+                                $('.preloader').fadeOut();
+                                ValidarSesionActual(respuesta);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+
+
+
+
+

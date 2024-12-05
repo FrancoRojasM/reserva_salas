@@ -1,0 +1,330 @@
+﻿
+
+@model General.Persona
+@{
+    ViewBag.Title = "Registro Persona";
+    Layout = null;
+}
+<form id="frmRegistroPersona" name="frmRegistroPersona" method="POST">
+    <input type="hidden" id="txtRegIdPersona" name="txtRegIdPersona" value="@Model.IdPersona" />
+    <div class="card">
+        <div class="card-body">
+            <select hidden class="form-control" id="cmbCatalogoTipoPersona" name="cmbCatalogoTipoPersona" data-validation="[V>0]" data-validation-message="Seleccione el Tipo Persona"></select>
+            <input hidden type="text" class="form-control" name="txtNombreCompleto" id="txtNombreCompleto" value="@Model.NombreCompleto" data-validation="[L>=1]" data-validation-message="Ingrese el Nombre Completo">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-label" for="txtNombres">Nombres</label>
+                        <input type="text" class="form-control" name="txtNombres" id="txtNombres" value="@Model.Nombres">
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="form-group">
+                        <label class="form-label" for="txtApellidoPaterno">Apellido paterno</label>
+                        <input type="text" class="form-control" name="txtApellidoPaterno" id="txtApellidoPaterno" value="@Model.ApellidoPaterno">
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="form-group">
+                        <label class="form-label" for="txtApellidoMaterno">Apellido materno</label>
+                        <input type="text" class="form-control" name="txtApellidoMaterno" id="txtApellidoMaterno" value="@Model.ApellidoMaterno">
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="form-group">
+                        <label class="form-label" for="cmbCatalogoTipoDocumentoPersonal">Tipo de documento</label>
+                        <select class="form-select" id="cmbCatalogoTipoDocumentoPersonal" name="cmbCatalogoTipoDocumentoPersonal" data-validation="[V>0]" data-validation-message="Seleccione el Tipo Documento"></select>
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="form-group">
+                        <label class="form-label" for="txtNumeroDocumento">N° de documento</label>
+                        <input readonly type="text" class="form-control" name="txtNumeroDocumento" id="txtNumeroDocumento" value="@Model.NumeroDocumento" data-validation="[L>=1]" data-validation-message="Ingrese el Numero Documento">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-label" for="cmbDepartamento">Departamento</label>
+                        <select class="form-select consulta" id="cmbDepartamento" name="cmbDepartamento" data-validation="[V>0]" data-validation-message="Seleccione el Departamento">
+                            <option value=0>Todos</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-label" for="cmbProvincia">Provincia</label>
+                        <select class="form-select consulta" id="cmbProvincia" name="cmbProvincia" data-validation="[V>0]" data-validation-message="Seleccione la Provincia">
+                            <option value=0>Todos</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-label" for="cmbDistrito">Distrito</label>
+                        <select class=" form-select consulta" id="cmbDistrito" name="cmbDistrito" data-validation="[V>0]" data-validation-message="Seleccione el Distrito">
+                            <option value=0>Todos</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-label" for="txtDireccion">Direccion</label>
+                        <input type="text" class="form-control" name="txtDireccion" id="txtDireccion" value="@Model.Direccion" data-validation="[L>=1]" data-validation-message="Ingrese la Direccion">
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="form-group">
+                        <label class="form-label" for="txtCelular">Celular</label>
+                        <input type="text" class="form-control" name="txtCelular" id="txtCelular" value="@Model.Celular">
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="form-group">
+                        <label class="form-label" for="txtAnexo">Telefono/Anexo</label>
+                        <input type="text" class="form-control" name="txtAnexo" id="txtAnexo" value="@Model.TelefonoFijo">
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="form-group">
+                        <label class="form-label" for="txtFechaNacimiento">Fecha de nacimiento</label>
+                        <input  type="text" data-provide="datepicker" data-date-format="dd/mm/yyyy" class="form-control" name="txtFechaNacimiento" id="txtFechaNacimiento" value="@String.Format("{0:dd/MM/yyyy}",Model.FechaNacimiento)">
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="form-group">
+                        <label class="form-label" for="optSexo">Sexo</label>                       
+                        <select id="optSexo" name="optSexo" class="form-select">
+                            @if (Model.Sexo == true)
+                            {
+                                <option value="1" selected="">FEMENINO</option>
+                                <option value="0">MASCULINO</option>
+                            }
+                            else
+                            {
+                                <option value="1">FEMENINO</option>
+                                <option value="0" selected="">MASCULINO</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer" style="text-align:right;">
+            <button type="submit" data-toggle="tooltip" class="btn btn-primary waves-effect waves-light" title="Grabar registro"> Guardar mis datos <i class="ti-save"></i></button>
+        </div>
+    </div>
+</form>
+
+<script>
+    function ListarComboDepartamento() {
+        var id = $("#cmbDepartamento").val();
+        $.ajax({
+            url: "@Url.Action("ListarComboDepartamento","Ubigeo")",
+            method: 'POST',
+            async: false,
+        success: function (data) {
+            $("#cmbDepartamento").empty();
+            $("#cmbProvincia").empty();
+            $("#cmbDistrito").empty();
+            $("#cmbDepartamento").append("<option value=0>Seleccione</option>");
+            $("#cmbDistrito").append("<option value=0>Seleccione</option>");
+            $("#cmbProvincia").append("<option value=0>Seleccione</option>");
+            $.each(data, function (i, item) {
+                $("#cmbDepartamento").append("<option value='" + item.CodigoDepartamento + "'>" + item.Departamento + "</option>");
+            });
+        },
+        complete: function (respuesta) {
+            ValidarSesionActual(respuesta);
+            $('.preloader').fadeOut();
+        }
+    });
+    }
+    function ListarComboProvincia() {
+        var id = $("#cmbDepartamento").val();
+
+        $("#cmbProvincia").empty();
+        $("#cmbDistrito").empty();
+        $("#cmbProvincia").append("<option value=0>Seleccione</option>");
+        $("#cmbDistrito").append("<option value=0>Seleccione</option>");
+
+        if (id != 0) {
+            $.ajax({
+                url: "@Url.Action("ListarComboProvincia","Ubigeo")",
+                method: 'POST',
+            async: false,
+            data: { CodigoDepartamento: id },
+            success: function (data) {
+                $.each(data, function (i, item) {
+                    $("#cmbProvincia").append("<option value='" + item.CodigoProvincia + "'>" + item.Provincia + "</option>");
+                });
+            },
+            complete: function (respuesta) {
+                ValidarSesionActual(respuesta);
+                $('.preloader').fadeOut();
+            }
+        });
+    }
+    }
+    function ListarComboDistrito() {
+        var id = $("#cmbDepartamento").val();
+        var id1 = $("#cmbProvincia").val();
+        $("#cmbDistrito").empty();
+        $("#cmbDistrito").append("<option value=0>Seleccione</option>");
+        if (id1 != 0) {
+            $.ajax({
+                url: "@Url.Action("ListarComboDistrito","Ubigeo")",
+                method: 'POST',
+            async: false,
+            data: { CodigoDepartamento: id, CodigoProvincia: id1 },
+            success: function (data) {
+
+                $.each(data, function (i, item) {
+                    $("#cmbDistrito").append("<option value='" + item.IdUbigeo + "'>" + item.Distrito + "</option>");
+                });
+            },
+            complete: function (respuesta) {
+                ValidarSesionActual(respuesta);
+                $('.preloader').fadeOut();
+            }
+        });
+    }
+    }
+
+    function ListarCatalogoTipoPersona() {
+        $.ajax({
+            url: "@Url.Action("ListarCatalogoTipoPersona", "CatalogoGeneral")",
+            method: 'POST',
+            success: function (data) {
+                $("#cmbCatalogoTipoPersona").empty();
+                $("#cmbCatalogoTipoPersona").append("<option value=0>Seleccione</option>");
+                $.each(data, function (i, item) {
+                    if (item.IdCatalogo == "@Model.catalogotipopersona.IdCatalogo") {
+                        $("#cmbCatalogoTipoPersona").append("<option value=" + item.IdCatalogo + " selected='selected'>" + item.Descripcion + "</option>");
+                    }
+                    else {
+                        $("#cmbCatalogoTipoPersona").append("<option value=" + item.IdCatalogo + ">" + item.Descripcion + "</option>");
+                    }
+                });
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la interface [ListarCatalogoTipoPersona], verifique consola');
+            },
+            complete: function (respuesta) {
+                ValidarSesionActual(respuesta);
+            }
+        });
+    }
+
+      function ListarCatalogoTipoDocumentoPersonal() {
+        $.ajax({
+            url: "@Url.Action("ListarCatalogoTipoDocumentoPersonal", "CatalogoGeneral")",
+            method: 'POST',
+            success: function (data) {
+                $("#cmbCatalogoTipoDocumentoPersonal").empty();
+                $("#cmbCatalogoTipoDocumentoPersonal").append("<option value=0>Seleccione</option>");
+                $.each(data, function (i, item) {
+                    if (item.IdCatalogo == "@Model.catalogotipodocumentopersonal.IdCatalogo") {
+                        $("#cmbCatalogoTipoDocumentoPersonal").append("<option value=" + item.IdCatalogo + " selected='selected'>" + item.Descripcion + "</option>");
+                    }
+                    else {
+                        $("#cmbCatalogoTipoDocumentoPersonal").append("<option value=" + item.IdCatalogo + ">" + item.Descripcion + "</option>");
+                    }
+                });
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la interface [ListarCatalogoTipoDocumentoPersonal], verifique consola');
+            },
+            complete: function (respuesta) {
+                ValidarSesionActual(respuesta);
+            }
+        });
+    }
+
+
+
+    $(function () {
+
+        ListarCatalogoTipoPersona();
+        ListarCatalogoTipoDocumentoPersonal();
+
+        ListarComboDepartamento();
+        $("#cmbDepartamento").val(@Model.ubigeo.CodigoDepartamento);
+        ListarComboProvincia();
+        $("#cmbProvincia").val(@Model.ubigeo.CodigoProvincia);
+        ListarComboDistrito();
+        $("#cmbDistrito").val(@Model.ubigeo.IdUbigeo);
+        $("#cmbDepartamento").change(function () {
+            ListarComboProvincia();
+        });
+        $("#cmbProvincia").change(function () {
+            ListarComboDistrito();
+        });
+
+         if ("@Model.catalogotipodocumentopersonal.IdCatalogo" == "15") {
+            $("#txtNumeroDocumento").prop("disabled", true);
+        }
+        else {
+            $("#txtNumeroDocumento").prop("disabled", false);
+        }
+
+        $("#cmbCatalogoTipoDocumentoPersonal").change(function () {
+            if ($("#cmbCatalogoTipoDocumentoPersonal").val() == "15") {
+                $("#txtNumeroDocumento").prop("disabled", true);
+            }
+            else {
+                $("#txtNumeroDocumento").prop("disabled", false);
+            }
+        });
+
+        $("#frmRegistroPersona").validate({
+            submit: {
+                settings: {
+                    inputContainer: '.field',
+                    errorClass: 'LabelError', errorListClass: 'ListaError'
+                },
+                callback: {
+                  
+                    onSubmit: function (node, formData) {
+                                                
+                        var fileData = new FormData();
+                        for (var control in formData) {
+                            var valor = $("#" + control).val();
+                            fileData.append(control, valor);
+                            valor = "";
+                        }
+                        
+                        $.ajax({
+                            url: "@Url.Action("GuardarRegistroPersona")",
+                            method: 'POST',
+                            data: fileData,
+                            contentType: false,
+                            processData: false,
+                            success: function (persona) {
+                                if (persona.mensaje.CodigoMensaje == 0) {
+                                    toastr.success(persona.mensaje.DescripcionMensaje);
+                                }
+                                else {
+                                    toastr.error(persona.mensaje.DescripcionMensaje);
+                                    console.log(persona.mensaje.DescripcionMensajeSistema);
+                                }
+                            },
+                            error: function (mensaje) {
+                                console.log(mensaje);
+                                toastr.error('Sucedió un error en la interface [GuardarRegistroPersona], verifique consola');
+                            },
+                            complete: function (respuesta) {
+                                ValidarSesionActual(respuesta);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    });
+</script>

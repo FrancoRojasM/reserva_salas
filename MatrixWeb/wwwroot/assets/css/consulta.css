@@ -1,0 +1,280 @@
+﻿html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+    flex: 1;
+}
+
+header, footer {
+    background-color: #343a40;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+    header img {
+        width: 50px;
+        height: auto;
+        margin-right: 10px;
+    }
+
+    header h2 {
+        margin: 0;
+        font-size: 24px;
+        color: white;
+    }
+
+    header p {
+        margin: 0;
+        font-size: 16px;
+    }
+
+footer {
+    margin-top: auto;
+    padding: 15px;
+    text-align: center;
+}
+
+.container {
+    max-width: 1000px;
+    margin-top: 40px;
+    flex: 1;
+}
+
+.formulario-consulta {
+    margin-top: 20px;
+}
+
+.form-actions .btn {
+    padding: 10px 30px;
+    font-size: 16px;
+}
+
+@media (max-width: 768px) {
+    .form-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+        .form-actions .btn {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+}
+
+.tarjeta-sancion {
+    background-color: #fff;
+    border-radius: 8px;
+    border-left: 6px solid #630460;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 100%;
+    position: relative;
+    overflow: hidden;
+    transition: background-color 0.4s ease-in-out;
+    line-height: 1.8;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+    .tarjeta-sancion:hover {
+        background-color: transparent;
+    }
+
+    .tarjeta-sancion .card-body {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .tarjeta-sancion .info {
+        flex: 1;
+    }
+
+    .tarjeta-sancion h5 {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .tarjeta-sancion .campo {
+        font-weight: bold;
+        color: #555;
+    }
+
+    .tarjeta-sancion .valor {
+        font-weight: normal;
+        color: #333;
+    }
+
+    .tarjeta-sancion p {
+        margin: 0;
+        line-height: 1.8;
+    }
+
+    .tarjeta-sancion .btn {
+        background-color: #f44336;
+        color: white;
+        font-weight: bold;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        position: relative;
+        z-index: 2;
+    }
+
+        .tarjeta-sancion .btn:hover {
+            background-color: #d32f2f;
+        }
+
+    .tarjeta-sancion .btn-separador {
+        border-left: 2px solid #f44336;
+        padding-left: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+
+.campo-resultado {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+    .campo-resultado p {
+        width: 48%;
+    }
+
+.tarjeta-sancion::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0;
+    background-color: #fff1ff;
+    z-index: -1;
+    transition: width 0.4s ease-in-out;
+}
+
+.tarjeta-sancion:hover::before {
+    width: 100%;
+}
+
+.modal-title {
+    color: #ffffff;
+}
+
+.modal-header {
+    background-color: #630460;
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.modal-body label {
+    font-weight: bold;
+}
+
+.modal-body input, .modal-body textarea {
+    margin-bottom: 10px;
+}
+
+@media (max-width: 576px) {
+    .tarjeta-sancion .campo-resultado p {
+        width: 100%;
+    }
+
+    .tarjeta-sancion .btn-separador {
+        padding-left: 0;
+        margin-top: 10px;
+    }
+
+    .tarjeta-sancion .btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .modal-dialog {
+        max-width: 100%;
+        margin: 0;
+    }
+
+    .modal-content {
+        padding: 10px;
+    }
+
+    .modal-body input, .modal-body textarea {
+        font-size: 14px;
+    }
+
+    .container {
+        width: 100%;
+        padding: 0 10px;
+    }
+}
+
+.logo {
+    width: 50px;
+    height: auto;
+}
+
+@media (max-width: 768px) {
+    .logo {
+        width: 60px;
+    }
+
+    .tarjeta-sancion {
+        width: 90%;
+        max-width: 90%;
+    }
+
+    header {
+        flex-direction: column;
+    }
+
+        header h2 {
+            font-size: 18px;
+        }
+
+        header p {
+            font-size: 14px;
+        }
+}
+
+@media (min-width: 769px) {
+    .logo {
+        width: 60px;
+    }
+
+    header h2 {
+        font-size: 24px;
+    }
+
+    header p {
+        font-size: 16px;
+    }
+}
+
+.text-center {
+    margin-top: 0;
+}

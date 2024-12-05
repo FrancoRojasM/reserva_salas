@@ -1,0 +1,133 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    ViewBag.Title = "ListaClave";
+    Layout = "~/Views/Shared/Inicial.cshtml";
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box">
+                    <div class="page-title-right">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item">Seguridad</li>
+
+                            <li class="breadcrumb-item active">Cambiar clave</li>
+                        </ol>
+                    </div>
+                    <h4 class="page-title">Cambiar clave</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    if (ViewBag.conpermiso == 0)
+    {
+        <div style="font-weight:bold;color:red;">Usted no tiene permiso para ver este recurso</div>
+    }
+    else
+    {
+        <form id="frmRegistroUsuario" name="frmRegistroUsuario" method="POST">
+            <div class="row">
+                <div class="col-4">
+                    <div class="card border-info border mb-3">
+                        <div class="card-header"><h4 class="my-0">Actualización de Clave</h4></div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-1">
+                                        <div class="form-group">
+                                            <label class="form-label" for="txtClaveAnterior">Clave actual</label>
+                                            <input type="password" autocomplete="off" class="form-control" name="txtClaveAnterior" id="txtClaveAnterior" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-1">
+                                        <div class="form-group">
+                                            <label class="form-label" for="txtClave">Nueva clave</label>
+                                            <input type="password" autocomplete="off" class="form-control" name="txtClave" id="txtClave" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-1">
+                                        <div class="form-group">
+                                            <label class="form-label" for="txtReClave">Confirmar tu nueva clave</label>
+                                            <input type="password" autocomplete="off" class="form-control" name="txtReClave" id="txtReClave" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer" style="text-align:end;">
+                            <button type="submit" id="btnGuardarClave" class="btn btn-success waves-effect waves-light" title="Grabar registro">
+                                Guardar
+                                <span id="spGuardarClave" class="mdi mdi-content-save" role="status" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        @section scripts {
+        <script>
+            $(function () {
+
+
+                $("#frmRegistroUsuario").parsley().on("field:validated", function () {
+                    event.preventDefault(); // Evitar la acción predeterminada
+                    var e = 0 === $(".parsley-error").length;
+                    $(".alert-info").toggleClass("d-none", !e);
+                    $(".alert-warning").toggleClass("d-none", e);
+                }).on("form:submit", function (node, formData) {
+                    var fileData = new FormData();
+                    var formulario = node.$element;
+                    // Obtén todos los controles del formulario
+                    var controls = formulario.find(":input");
+                    // Recorre cada control
+                    controls.each(function () {
+                        var control = $(this);
+                        var nombreControl = control.attr("name");
+                        var valorControl = control.val();
+                        // Agrega el control y su valor a FormData
+                        fileData.append(nombreControl, valorControl);
+                    });
+                    $.ajax({
+                        beforeSend: function (node) {
+                            $("#btnGuardarClave").addClass("disabled");
+                            $("#spGuardarClave").removeClass("mdi mdi-content-save");
+                            $("#spGuardarClave").addClass("spinner-grow spinner-grow-sm me-1");
+                        },
+                        url: "@Url.Action("CambiarClaveUsuario", "Usuario")",
+                            method: 'POST',
+                            data: fileData,
+                            contentType: false,
+                            processData: false,
+                            success: function (mensaje) {
+                                if (mensaje.CodigoMensaje == 0) {
+                                    toastr.success(mensaje.DescripcionMensaje);
+                                    formulario.trigger("reset");
+                                }
+                                else {
+                                    toastr.error(mensaje.DescripcionMensaje);
+                                }
+                            },
+                            complete: function (respuesta) {
+                                $("#btnGuardarClave").removeClass("disabled");
+                                $("#spGuardarClave").removeClass("spinner-grow spinner-grow-sm me-1");
+                                $("#spGuardarClave").addClass("mdi mdi-content-save");
+                            },
+                            error: function (mensaje) {
+                                toastr.error('Sucedió un error en la interfaz [GuardarClave], verifique la consola');
+                            }
+                        });
+                    });
+                });
+            </script>
+        }
+    }
+}

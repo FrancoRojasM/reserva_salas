@@ -1,0 +1,92 @@
+﻿@using System.Globalization;
+@using Casilla;
+@using System.Configuration;
+
+@model Casilla.Notificacion
+@{
+    ViewBag.Title = "Registro NotificacionArchivo";
+    Layout = null;
+}
+<div class="mt-4">
+    <h5 class="font-18">@Model.NombreNumeroNotificacion - @Model.AsuntoNotificacion</h5>
+
+    <hr />
+
+    <div class="d-flex align-items-start mb-3 mt-1">
+
+        <div class="w-100">
+            <small class="float-end">@String.Format("{0:dddd dd MMMM, HH:mm:ss tt}",Model.FechaHoraNotificacionEnviada)</small>
+            @{
+                TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
+            }
+            <h6 class="m-0 font-14">@ti.ToTitleCase(Model.administradonotificado.persona.NombreCompleto)</h6>
+        </div>
+    </div>
+    @Html.Raw(Model.MensajeNotificacionHtml)
+    <hr />
+    @{
+        ListaNotificacionArchivo lista = new ListaNotificacionArchivo();
+        lista = ViewBag.ListaNotificacionArchivo;
+    }
+    @if (lista.lista.Count > 0)
+    {
+        <h5 class="mb-3">Archivos</h5>
+
+        <div class="row">
+            @foreach (NotificacionArchivo item in lista.lista)
+            {
+                <div class="col-xl-4">
+                    <div class="card mb-1 shadow-none border">
+                        <div class="p-2">
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                                    <div class="avatar-sm">
+                                        <span class="avatar-title bg-secondary rounded">
+                                            @item.ExtensionArchivo.ToLower()
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col ps-0">
+                                    <a href="#" onclick="DescargarMiArchivo('@item.IdNotificacionArchivo')" class="text-muted fw-bold">@item.RutaArchivo</a>
+                                    <p class="mb-0">@(item.PesoArchivo.ToString("N0")) KB</p>
+                                </div>
+                                <div class="col-auto">
+                                    <!-- Button -->
+                                    <a href="#" onclick="DescargarMiArchivo('@item.IdNotificacionArchivo')" class="btn btn-link btn-lg text-muted">
+                                        <i class="dripicons-download"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- end col -->
+            }
+        </div>
+        <!-- end row-->
+    }
+    <div class="mt-5">
+        <a href="#" onclick="Filtrar(0)" class="btn btn-secondary me-2"><i class="mdi mdi-reply me-1"></i> Regresar</a>
+    </div>
+
+</div>
+<!-- end .mt-4 -->
+<script>
+    function DescargarMiArchivo(IdNotificacionArchivo) {
+        $.ajax({
+            url: "@Url.Action("MiArchivoAdjuntoNotificado", "NotificacionArchivo")",
+            type: "POST",
+            async: true,
+            data: { IdNotificacionArchivo: IdNotificacionArchivo },
+            success: function (notificacionarchivo) {
+                DescargarArchivoInicial(notificacionarchivo.RutaArchivo)
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la llamada, verifique consola');
+            }
+        });
+    }
+    $(function () {
+      
+    });
+</script>

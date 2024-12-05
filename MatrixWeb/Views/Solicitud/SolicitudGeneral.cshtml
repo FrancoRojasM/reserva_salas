@@ -1,0 +1,292 @@
+﻿@using System.Configuration
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+<html lang="es">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+    <link href="~/assets/css/consulta.css" rel="stylesheet" type="text/css" />
+
+</head>
+<body style="background-image: url('@Url.Content("~/assets/images/WEB-_FondoWeb.png")');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat; height:100vh">
+    <header class="bg-dark text-white text-center py-3 d-flex align-items-center justify-content-center flex-column flex-md-row" style="background: linear-gradient(to bottom left, #681e5b, #000000);
+">
+        @*         <img src="@ConfigurationManager.AppSettings["HostImagenes"]WEB-_logocolor.png" alt="Logo CMP" class="logo mb-2 mb-md-0">
+ *@        <img src="@Url.Content("~/assets/images/WEB-_logocolor.png")" style="width:150px" alt="Logo CMP" class="logo mb-2 mb-md-0">
+
+        <div class="text-center text-md-left ml-md-3">
+            <h2>Colegio Médico del Perú</h2>
+            @*             <p>Consulta de Sanciones a Médicos</p>
+ *@        </div>
+    </header>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-12 mb-4">
+                <div class="card">
+                    <h3 class="card-title text-center mt-3">Eventos Externos</h3>
+                    <p class="card-text text-center">Eventos Externos</p>
+                    <a href="https://www.ejemplo1.com" class="btn btn-dark">Solicitar</a>
+                </div>
+            </div>
+            <div class="col-md-6 col-12 mb-4">
+                <div class="card">
+                    <h3 class="card-title text-center mt-3">Eventos Internos</h3>
+                    <p class="card-text text-center">Eventos Internos</p>
+                    <a href="@Url.Action("EventosInternos", "Solicitud")" class="btn btn-dark">Solicitar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <footer class="bg-dark text-white text-center py-3 mt-5" style="background:#5c1b51 !important">
+        <p>© 2024 Colegio Médico del Perú. Todos los derechos reservados.</p>
+    </footer>
+
+    @section scripts {
+        <script src="~/assets/libs/moment/moment.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            $(document).ready(function () {
+                // $('#toggleBusquedaAvanzada').click(function (event) {
+                //     event.preventDefault();
+                //     var camposAvanzados = $('#camposAvanzados');
+                //     camposAvanzados.toggle();
+                //     $(this).text(camposAvanzados.is(':visible') ? '- Ocultar Búsqueda Avanzada' : '+ Búsqueda Avanzada');
+                // });
+
+                $('#tipoDocumento').change(function () {
+                    var tipoDocumento = $(this).val();
+                    if (tipoDocumento) {
+                        $('#nroDocumento').prop('disabled', false);
+                    } else {
+                        $('#nroDocumento').prop('disabled', true).val('');
+                    }
+                });
+
+                $('#departamento').change(function () {
+                    var departamento = $(this).val();
+                    if (departamento) {
+                        $.ajax({
+                            url: '@Url.Action("ListarComboProvincia", "Ubigeo")',
+                            type: 'POST',
+                            data: { CodigoDepartamento: departamento },
+                            success: function (data) {
+                                var provinciaSelect = $('#provincia');
+                                provinciaSelect.empty();
+                                provinciaSelect.append('<option value="">Todos</option>');
+                                $.each(data, function (index, value) {
+                                    provinciaSelect.append('<option value="' + value.CodigoProvincia + '">' + value.Provincia + '</option>');
+                                });
+                                $('#distrito').empty().append('<option value="">Todos</option>');
+                            }
+                        });
+                    } else {
+                        $('#provincia').empty().append('<option value="">Todos</option>');
+                        $('#distrito').empty().append('<option value="">Todos</option>');
+                    }
+                });
+
+                $('#provincia').change(function () {
+                    var departamento = $(this).val();
+                    var provincia = $(this).val();
+                    if (provincia) {
+                        $.ajax({
+                            url: '@Url.Action("ListarComboDistrito", "Ubigeo")',
+                            type: 'POST',
+                            data: { CodigoDepartamento: departamento, CodigoProvincia: provincia },
+                            success: function (data) {
+                                var distritoSelect = $('#distrito');
+                                distritoSelect.empty();
+                                distritoSelect.append('<option value="">Todos</option>');
+                                $.each(data, function (index, value) {
+                                    distritoSelect.append('<option value="' + value.IdUbigeo + '">' + value.Distrito + '</option>');
+                                });
+                            }
+                        });
+                    } else {
+                        $('#distrito').empty().append('<option value="">Todos</option>');
+                    }
+                });
+
+                var paginaActual = 1;
+                var dimensionPagina = 10;
+
+                $('#formConsultaSanciones').submit(function (e) {
+                    e.preventDefault();
+                    buscarSanciones(1);
+                    $('#resultadosSanciones').show();
+                });
+
+                function buscarSanciones(pagina) {
+                    $.ajax({
+                        url: '@Url.Action("BuscarSanciones", "Sancion")',
+                        type: 'POST',
+                        data: {
+                            TipoDocumento: $('#tipoDocumento').val(),
+                            NroDocumento: $('#nroDocumento').val(),
+                            NombreCompleto: $('#nombres').val(),
+                            ConsejoRegional: $('#consejoRegional').val(),
+                            TipoSancion: $('#tipoSancion').val(),
+                            Departamento: $('#departamento').val(),
+                            Provincia: $('#provincia').val(),
+                            Distrito: $('#distrito').val(),
+                            pagina: pagina,
+                            dimensionPagina: 10
+                        },
+                        success: function (data) {
+                            $('#contenedorTarjetas').empty();
+                            $('#cantidadRegistros').text(`${data.TotalRegistros} ${data.TotalRegistros === 1 ? 'Registro Encontrado' : 'Registros Encontrados'}`);
+                            $.each(data.sanciones, function (index, sancion) {
+                                var tarjeta = `
+                                <div class="tarjeta-sancion">
+                                    <div class="card-body">
+                                        <div class="info">
+                                            <h5>DATOS DE LA PERSONA</h5>
+                                            <p><span class="campo">Nombre y apellidos:</span> <span class="valor">${sancion.NombreCompleto}</span></p>
+                                            <br>
+                                            <h5>DATOS DE LA SANCIÓN</h5>
+                                            <div class="campo-resultado">
+                                                <p><span class="campo">Consejo Regional:</span> <span class="valor">${sancion.ConsejoRegional}</span></p>
+                                                <p><span class="campo">Nro° de colegiatura:</span> <span class="valor">${sancion.CMP}</span></p>
+                                            </div>
+                                            <div class="campo-resultado">
+                                                <p><span class="campo">Número de resolución:</span> <span class="valor">${sancion.NumeroResolucion}</span></p>
+                                                <p><span class="campo">Fecha de resolución:</span> <span class="valor">${moment(sancion.FechaResolucion).format('DD/MM/YYYY')}</span></p>
+                                            </div>
+                                            <div class="campo-resultado">
+                                                <p><span class="campo">Estado de la sanción:</span> <span class="valor">${sancion.EstadoSancion}</span></p>
+                                            </div>
+                                        </div>
+                                        <div class="btn-separador">
+                                            <button class="btn btnVerMas" data-id="${sancion.Id}">Ver más</button>
+                                        </div>
+                                    </div>
+                                </div>`;
+                                $('#contenedorTarjetas').append(tarjeta);
+                            });
+
+                            generarPaginacion(data.totalPaginas, data.paginaActual);
+                        }
+                    });
+                }
+
+                function generarPaginacion(totalPaginas, paginaActual) {
+                    var paginacion = $('#paginacionSanciones ul');
+                    paginacion.empty();
+
+                    for (var i = 1; i <= totalPaginas; i++) {
+                        var claseActiva = (i === paginaActual) ? 'active' : '';
+                        paginacion.append(`
+                            <li class="page-item ${claseActiva}">
+                                <a class="page-link" href="#" data-pagina="${i}">${i}</a>
+                            </li>
+                        `);
+                    }
+
+                    if (totalPaginas > 1) {
+                        $('#paginacionSanciones').show();
+                    } else {
+                        $('#paginacionSanciones').hide();
+                    }
+
+                    $('.page-link').click(function (e) {
+                        e.preventDefault();
+                        var pagina = $(this).data('pagina');
+                        buscarSanciones(pagina);
+                    });
+                }
+
+                $('#btnDescargarExcel').click(function () {
+                    var queryParams = $.param({
+                        TipoDocumento: $('#tipoDocumento').val(),
+                        NroDocumento: $('#nroDocumento').val(),
+                        NombreCompleto: $('#nombres').val(),
+                        ConsejoRegional: $('#consejoRegional').val(),
+                        TipoSancion: $('#tipoSancion').val(),
+                        Departamento: $('#departamento').val(),
+                        Provincia: $('#provincia').val(),
+                        Distrito: $('#distrito').val()
+                    });
+                    window.location.href = '/Sancion/DescargarReporteExcelExterno?' + queryParams;
+                });
+
+
+                $('#btnLimpiar').click(function () {
+                    $('#formConsultaSanciones')[0].reset();
+                    $('#nroDocumento').prop('disabled', true);
+                    $('#resultadosSanciones').hide();
+                    $('#contenedorTarjetas').empty();
+                });
+
+                $('#contenedorTarjetas').on('click', '.btnVerMas', function () {
+                    var sancionId = $(this).data('id');
+
+                    $.ajax({
+                        url: '@Url.Action("ObtenerDetalleSancion", "Sancion")',
+                        type: 'POST',
+                        data: { id: sancionId },
+                        success: function (data) {
+                            $('#detalleNombreCompleto').val(data.NombreCompleto);
+                            $('#detalleTipoSancion').val(data.TipoSancion);
+                            $('#detalleConsejoRegional').val(data.ConsejoRegional);
+                            $('#detalleCMP').val(data.CMP);
+                            $('#detalleNumeroResolucion').val(data.NumeroResolucion);
+                            $('#detalleFechaResolucion').val(moment(data.FechaResolucion).format('DD/MM/YYYY'));
+                            $('#detalleFechaRegistroInscripcion').val(moment(data.FechaRegistroInscripcion).format('DD/MM/YYYY'));
+                            $('#detalleFechaNotificacionProfesional').val(moment(data.FechaNotificacionMedico).format('DD/MM/YYYY'));
+                            $('#detalleFechaVencimientoSancion').val(moment(data.FechaVencimientoSancion).format('DD/MM/YYYY'));
+                            $('#detalleFechaCumplimientoMulta').val(moment(data.FechaCumplimientoMulta).format('DD/MM/YYYY'));
+                            $('#detalleEstadoSancion').val(data.EstadoSancion);
+                            $('#detalleSancionImpuesta').val(data.SancionImpuesta);
+                            $('#detalleNormaVulnerada').val(data.IndicacionNormaVulnerada);
+
+                            $('#modalDetalleSancion').modal('show');
+                        }
+                    });
+                });
+
+                $('#btnImprimir').click(function () {
+                    var modalContent = document.getElementById('modalDetalleSancion');
+
+                    html2canvas(modalContent, {
+                        scale: 4,
+                        useCORS: true,
+                        allowTaint: true
+                    }).then(function (canvas) {
+                        var imgData = canvas.toDataURL('image/png');
+
+                        var printWindow = window.open('', '_blank', 'width=1200,height=800');
+                        printWindow.document.write('<html><head><title>Imprimir Sanción</title>');
+                        printWindow.document.write('<style>body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100%; }</style>');
+                        printWindow.document.write('<style>img { max-width: 180%; max-height: 140%; object-fit: contain; }</style>');
+                        printWindow.document.write('</head><body>');
+                        printWindow.document.write('<img id="imagenCaptura" src="' + imgData + '">');
+                        printWindow.document.write('</body></html>');
+                        printWindow.document.close();
+
+                        printWindow.onload = function () {
+                            printWindow.focus();
+                            printWindow.print();
+                            printWindow.onafterprint = function () {
+                                printWindow.close();
+                            };
+                        };
+                    }).catch(function (error) {
+                        console.log("Error al capturar el contenido del modal:", error);
+                    });
+                });
+
+            });
+        </script>
+    }
+</body>
+</html>

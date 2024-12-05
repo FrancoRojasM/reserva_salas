@@ -1,0 +1,217 @@
+﻿@model Sistema.Software
+@{
+    ViewBag.Title = "Registro Software";
+    Layout = null;
+}
+<form id="frmRegistroSoftware" name="frmRegistroSoftware" method="POST">
+    <div class="row">
+        <div class="col-12">
+            <div class="card" style="box-shadow:none">
+                <div class="card-header"><h5 class="my-0">Registro de Software</h5></div>
+                <div class="card-body">
+                    <input type="hidden" id="txtRegIdSoftware" name="txtRegIdSoftware"
+                           value="@Model.IdSoftware" />
+                    <div class="row">
+                        <div class="col-md-6 mb-1">
+
+                            <div class="form-group">
+                                <label class="form-label" for="txtNombreLargoSoftware">Nombre largo del software</label>
+                                <input type="text" class="form-control" name="txtNombreLargoSoftware" id="txtNombreLargoSoftware" value="@Model.NombreLargoSoftware" data-validation="[L>=1]" data-validation-message="Ingrese la NombreLargoSoftware">
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-1">
+                            <div class="form-group">
+                                <label class="form-label" for="txtNombreCortoSoftware">Nombre corto del software</label>
+                                <input type="text" class="form-control" name="txtNombreCortoSoftware" id="txtNombreCortoSoftware" value="@Model.NombreCortoSoftware" data-validation="[L>=1]" data-validation-message="Ingrese la NombreCortoSoftware">
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 mb-1">
+                            <div class="form-group">
+                                <label class="form-label" for="txtNumeroVersionSoftware">Version de software</label>
+                                <input type="text" class="form-control" name="txtNumeroVersionSoftware" id="txtNumeroVersionSoftware" value="@Model.NumeroVersionSoftware" data-validation="[L>=1]" data-validation-message="Ingrese la NumeroVersionSoftware">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-1">
+                            <div class="form-group">
+                                <input type="hidden" id="txtNombreRutaImagenSoftware" name="txtNombreRutaImagenSoftware" value="@Model.RutaImagenSoftware" />
+                                <label class="form-label" for="txtRutaImagenSoftware">Imagen del software</label>
+                                <input type="file" name="txtRutaImagenSoftware" id="txtRutaImagenSoftware" data-default-file="@(System.Configuration.ConfigurationManager.AppSettings["HostImagenes"] + Model.RutaImagenSoftware)" />
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-1">
+                            <div class="form-group">
+                                <input type="hidden" id="txtNombreRutaImagenLogoSoftware" name="txtNombreRutaImagenLogoSoftware" value="@Model.RutaImagenLogoSoftware" />
+                                <label class="form-label" for="txtRutaImagenLogoSoftware">Logo del software</label>
+                                <input type="file" name="txtRutaImagenLogoSoftware" id="txtRutaImagenLogoSoftware" data-default-file="@(System.Configuration.ConfigurationManager.AppSettings["HostImagenes"] + Model.RutaImagenLogoSoftware)" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8 mb-1">
+                            <div class="form-group">
+                                <label class="form-label" for="txtNombreLargoEmpresa">Nombre largo de la empresa</label>
+                                <input type="text" class="form-control" name="txtNombreLargoEmpresa" id="txtNombreLargoEmpresa" value="@Model.NombreLargoEmpresa" data-validation="[L>=1]" data-validation-message="Ingrese la NombreLargoEmpresa">
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-1">
+                            <div class="form-group">
+                                <label class="form-label" for="txtNombreCortoEmpresa">Nombre corto de la empresa</label>
+                                <input type="text" class="form-control" name="txtNombreCortoEmpresa" id="txtNombreCortoEmpresa" value="@Model.NombreCortoEmpresa" data-validation="[L>=1]" data-validation-message="Ingrese la NombreCortoEmpresa">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="card-footer" style="text-align:right;">
+                    @{
+                        string disabled = "";
+                        if (Model.IdSoftware == 0) { disabled = "disabled"; }
+                    }
+                    <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Actualizar tabla de registros" onclick="ActualizarTablaSoftware()"> Actualizar<i class="ti-reload"></i></button>
+                    <button type="button" data-toggle="tooltip" class="btn btn-primary label" title="Nuevo registro" onclick="VerEditarSoftware(0)"> Nuevo<i id="iBtnNuevoSoftware" class="ti-file"></i></button>
+                    <button type="submit" data-toggle="tooltip" class="btn btn-blue label" title="Grabar registro"> Guardar<i class="ti-save"></i></button>
+                    <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Eliminar registro seleccionado" @disabled id="btnVerModalEliminarSoftware" onclick="VerModalEliminarSoftware()"> Eliminar<i class="ti-trash"></i></button>
+                    @* <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Regresar al formulario anterior" onclick="CerrarModalSoftware()"> Regresar<i class="ti-back-left"></i></button> *@
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<div class="modal fade" id="ModalEliminarSoftware">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Eliminar</h4>
+                <a href="#" class="close" onclick="CerrarEliminarSoftware()"><i class="fas fa-times"></i></a>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro de eliminar el registro seleccionado?
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Eliminar registro seleccionado" onclick="EliminarSoftware()"> Eliminar <i class="ti-trash"></i></button>
+                <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Regresar al formulario anterior" onclick="CerrarEliminarSoftware()"> Regresar<i class="ti-back-left"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    function CerrarModalSoftware() {
+        $("#ModalSoftware").modal("hide");
+        $("#divEditarSoftware").empty();
+        ActualizarTablaSoftware();
+    }
+    function CerrarEliminarSoftware() {
+        $("#ModalEliminarSoftware").modal("hide");
+    }
+    function EliminarSoftware() {
+        $.ajax({
+            url: "@Url.Action("EliminarSoftware")",
+            method: 'POST',
+            data: { IdSoftware: '@Model.IdSoftware' },
+            success: function (mensaje) {
+                $("#modalEliminarSoftware").modal('hide');
+                if (mensaje.CodigoMensaje == 0) {
+                    $('#btnVerEditarSoftware').prop('disabled', true);
+                    $('#btnVerModalEliminarSoftware').prop('disabled', true);
+                    toastr.success(mensaje.DescripcionMensaje);
+                    ActualizarTablaSoftware();
+                    VerEditarSoftware(0);
+                    CerrarEliminarSoftware();
+                }
+                else {
+                    toastr.error(mensaje.DescripcionMensaje);
+                    console.log(mensaje.DescripcionMensajeSistema);
+                }
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la interface [EliminarSoftware], verifique consola');
+            }
+        });
+    }
+    function VerModalEliminarSoftware() {
+        $("#ModalEliminarSoftware").modal("show");
+    }
+
+    $(function () {
+
+        $('#txtRutaImagenSoftware').dropify();
+        var drEventRutaImagenSoftware = $('.dropify').dropify();
+        drEventRutaImagenSoftware.on('dropify.afterClear', function (event, element) {
+            $('#txtNombreRutaImagenSoftware').val('');
+        });
+
+        $('#txtRutaImagenLogoSoftware').dropify();
+        var drEventRutaImagenLogoSoftware = $('.dropify').dropify();
+        drEventRutaImagenLogoSoftware.on('dropify.afterClear', function (event, element) {
+            $('#txtNombreRutaImagenLogoSoftware').val('');
+        });
+
+        $("#frmRegistroSoftware").validate({
+            submit: {
+                settings: {
+                    inputContainer: '.field',
+                    errorClass: 'LabelError', errorListClass: 'ListaError'
+                },
+                callback: {
+                    onBeforeSubmit: function (node) {
+                    },
+                    onSubmit: function (node, formData) {
+                        var NumeroVersionSoftware = $("#txtNumeroVersionSoftware").val();
+                        var ArchivoImagen = $("#txtRutaImagenSoftware").get(0).files;
+                        var ArchivoLogo = $("#txtRutaImagenLogoSoftware").get(0).files;
+                        var fileData = new FormData();
+                        for (var key in formData) {
+                            if (key == "txtNumeroVersionSoftware") {
+                                fileData.append(key, NumeroVersionSoftware);
+                            }
+                            else {
+                                fileData.append(key, formData[key]);
+                            }
+
+                        }
+                        fileData.append('ArchivoImagen', ArchivoImagen[0]);
+                        fileData.append('ArchivoLogo', ArchivoLogo[0]);
+                        $.ajax({
+                            url: "@Url.Action("GuardarRegistroSoftware", "Software")",
+                            method: 'POST',
+                            data: fileData,
+                            contentType: false,
+                            processData: false,
+                            success: function (software) {
+                                if (software.mensaje.CodigoMensaje == 0) {
+                                    toastr.success(software.mensaje.DescripcionMensaje);
+                                    VerEditarSoftware(0);
+                                    ActualizarTablaSoftware();
+                                }
+                                else {
+                                    toastr.error(software.mensaje.DescripcionMensaje);
+                                    console.log(software.mensaje.DescripcionMensajeSistema);
+                                }
+                            },
+                            error: function (mensaje) {
+                                console.log(mensaje);
+                                toastr.error('Sucedió un error en la interface [GuardarRegistroSoftware], verifique consola');
+                            },
+                            complete: function (respuesta) {
+                                ValidarSesionActual(respuesta);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+
+
+
+
+
+
+

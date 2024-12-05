@@ -1,0 +1,185 @@
+﻿ 	@using Microsoft.AspNetCore.Http
+@{
+    ViewBag.Title = "ListaAdministrado";
+    Layout = "~/Views/Shared/Inicial.cshtml";
+
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item">Casilla</li>
+                        <li class="breadcrumb-item">Administrado</li>
+                        <li class="breadcrumb-item active">Administrado</li>
+                    </ol>
+                </div>
+                <h4 class="page-title">Administrado</h4>
+            </div>
+        </div>
+    </div>
+
+    if (ViewBag.conpermiso == 0)
+    {
+        <div style="font-weight:bold;color:red;">Usted no tiene permiso para ver este recurso</div>
+    }
+    else
+    {
+
+        <div class="card border-info border mb-3">
+            <div class="card-body">
+                <div id="divEditarAdministrado">
+                </div>
+               
+            </div>
+        </div>
+        <div class="modal fade" id="ModalEliminarAdministrado" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Eliminar</h4>
+                        <button type="button" class="btn-close" onclick="CerrarEliminarAdministrado()" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <input hidden id="txtEliminarIdAdministrado" value="0" />
+                    </div>
+                    <div class="modal-body">
+                        ¿Está seguro de eliminar el registro seleccionado?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-toggle="tooltip" class="btn btn-danger waves-effect waves-light" title="Eliminar registro seleccionado" onclick="EliminarAdministrado()"> Eliminar <i class="ti-trash"></i></button>
+                        <button type="button" data-toggle="tooltip" class="btn btn-warning waves-effect waves-light" title="Regresar al formulario anterior" onclick="CerrarEliminarAdministrado()"> Regresar<i class="ti-back-left"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @section scripts {
+        <script>
+            function DescargarAdministradoXls() {
+                //  window.open('@Url.Action("DescargarAdministradoXls", "Administrado")' + "?FechaInicial=" + $("#txtFechaInicial").val() + "&FechaFinal=" + $("#txtFechaFinal").val() + "&NumeroDocumento=" + $("#txtNumeroDocumentoB").val(), '_blank');
+                window.open('@Url.Action("DescargarAdministradoXls", "Administrado")', '_blank');
+            }
+            function DescargarAdministradoPdf() {
+                window.open('@Url.Action("DescargarAdministradoPdf", "Administrado")', '_blank');
+            }
+            function CerrarEliminarAdministrado() {
+                $("#ModalEliminarAdministrado").modal("hide");
+                $("#txtEliminarIdAdministrado").val(0);
+            }
+            function EliminarAdministrado() {
+                var IdAdministrado = $("#txtEliminarIdAdministrado").val();
+                $.ajax({
+                    url: "@Url.Action("EliminarAdministrado")",
+                    method: 'POST',
+                    data: { IdAdministrado: IdAdministrado },
+                    success: function (mensaje) {
+                        $("#modalEliminarAdministrado").modal('hide');
+                        if (mensaje.CodigoMensaje == 0) {
+                            $("#txtRegIdAdministrado").val(0);
+                            toastr.success(mensaje.DescripcionMensaje);
+                            ActualizarTablaAdministrado();
+                            CerrarEliminarAdministrado();
+                        }
+                        else {
+                            toastr.error(mensaje.DescripcionMensaje);
+                            console.log(mensaje.DescripcionMensajeSistema);
+                        }
+                    },
+                    error: function (mensaje) {
+                        console.log(mensaje);
+                        toastr.error('Sucedió un error en la interface [EliminarAdministrado], verifique consola');
+                    }
+                });
+            }
+            function VerModalEliminarAdministrado(IdAdministrado) {
+                $("#ModalEliminarAdministrado").modal("show");
+                $("#txtEliminarIdAdministrado").val(IdAdministrado);
+            }
+            function VerEditarAdministrado(data) {
+                var IdAdministrado = '@ViewBag.IdAdministrado';
+                console.log(IdAdministrado);
+                // if (tipo == 1) {
+                //     var data = ListaAdministrado.dtAdministrado.rows('.selected').data();
+                //     if (data.length == 1) {
+                //         IdAdministrado = data[0].IdAdministrado;
+                //     }
+                // }
+                $.ajax({
+                    url: "@Url.Action("RegistroAdministradoValidarDatos", "Administrado")",
+                    type: "POST",
+                    async: true,
+                    data: { IdAdministrado: IdAdministrado },
+                    success: function (vistaParcial) {
+                        $("#divEditarAdministrado").html(vistaParcial);
+                    },
+                    error: function (mensaje) {
+                        console.log(mensaje);
+                        toastr.error('Sucedió un error en la llamada, verifique consola');
+                    }
+                });
+            }
+            function ActualizarTablaAdministrado() {
+                ListaAdministrado.refresh();
+            }
+            $(function () {
+                VerEditarAdministrado('@ViewBag.IdAdministrado');
+                ListaAdministrado = {
+                    dtAdministrado: null,
+                    init: function () {
+                        this.dtAdministrado = $('#dtbAdministrado').DataTable({
+                            language: {
+                                url: '/assets/libs/datatables.net/js/es-ES.json',
+                            },
+                            responsive: true,
+                            rowId: 'IdAdministrado',
+                        language: {
+                            url: '/assets/libs/datatables.net/js/es-ES.json',
+                        },
+                        "ordering": false,
+                            "lengthMenu": [[10, 25, 50, 100, 100000], [10, 25, 50, 100, 'Todo']],
+                            select: {
+                            style: 'single',
+                            info: false
+                        },
+                            "serverSide": true,
+                            "ajax": {
+                                "url": "@Url.Action("ListarAdministrado", "Administrado")",
+                                "error": function (respuesta, error, thrown) {
+                                    ValidarSesionActual(respuesta);
+                                },
+                                "type": "POST"
+                            },
+                            "columns": [
+                                { "title": "Persona", "data": "Persona", "className": "dt-head-center dt-body-left", "width": "10%" },
+                                { "title": "Usuario", "data": "Usuario", "className": "dt-head-center dt-body-left", "width": "10%" },
+                                { "title": "EmailNotificacion", "data": "EmailNotificacion", "className": "dt-head-center dt-body-left", "width": "10%" },
+                                { "title": "NumeroCelularNotificacion", "data": "NumeroCelularNotificacion", "className": "dt-head-center dt-body-left", "width": "10%" },
+                                { "title": "AsientoElectronico", "data": "AsientoElectronico", "className": "dt-head-center dt-body-left", "width": "10%" },
+                                { "title": "PartidaElectronica", "data": "PartidaElectronica", "className": "dt-head-center dt-body-left", "width": "10%" },
+                                { "title": "Activo", "data": "Activo", "className": "dt-head-center dt-body-left", "width": "10%" },
+
+
+                                {
+                                    "title": "Eliminar",
+                                    "data": function (row, type, val, meta) {
+                                        return '<button type="button" class="btn btn-danger btn-sm waves-effect waves-light" title="Eliminar" onclick="VerModalEliminarAdministrado(' + row.IdAdministrado + ')" ><i class="far fa-trash-alt"></i></button>';
+                                    },
+                                    "width": "5%", "className": "dt-head-center dt-body-center"
+                                }
+                            ]
+                        });
+                    },
+                    refresh: function () {
+                        this.dtAdministrado.ajax.reload(null, false);
+                    }
+                }
+            //     ListaAdministrado.init();
+            //     ListaAdministrado.dtAdministrado.on('select', function (e, dt, type, indexes) {
+            //         var count = ListaAdministrado.dtAdministrado.rows({ selected: true }).count();
+            //         if (count > 0) {
+            //             VerEditarAdministrado(1);
+            //         }
+            //     })
+             });
+        </script>
+        }
+    }
+}

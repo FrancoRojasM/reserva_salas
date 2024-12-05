@@ -1,0 +1,230 @@
+﻿@model Sistema.Opcion
+@{
+    ViewBag.Title = "Registro Opcion";
+    Layout = null;
+}
+
+<form id="frmRegistroOpcion" name="frmRegistroOpcion" method="POST">
+    <div class="row">
+        <div class="col-12">
+            <div class="card" style="box-shadow:none">
+                <div class="card-header"><h5 class="my-0">Registro de Opción</h5></div>
+                <div class="card-body">
+
+                    <input type="hidden" id="txtRegIdOpcion" name="txtRegIdOpcion" value="@Model.IdOpcion" />
+                    <div class="row mb-2">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label" for="cmbModulo">Modulo</label>
+                                <select class="select2 form-control form-select" id="cmbModulo" name="cmbModulo" data-validation="[V>0]" data-validation-message="Seleccione un modulo"></select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label" for="cmbOpcionPadre">Opción Menú</label>
+                                <select class="select2 form-control form-select" id="cmbOpcionPadre" name="cmbOpcionPadre"></select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label" for="txtNombreOpcion">Nombre</label>
+                                <input type="text" class="form-control" name="txtNombreOpcion" id="txtNombreOpcion" value="@Model.NombreOpcion" data-validation="[L>=1]" data-validation-message="Ingrese el nombre de la opción">
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label" for="cmbCatalogoTipoOpcion">Tipo</label>
+                                <select class="form-control" id="cmbCatalogoTipoOpcion" name="cmbCatalogoTipoOpcion" data-validation="[V>0]" data-validation-message="Seleccione un tipo de opción"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label" for="txtRutaImagenOpcion">Icono</label>
+                                <input type="text" class="form-control" name="txtRutaImagenOpcion" id="txtRutaImagenOpcion" value="@Model.RutaImagenOpcion">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="txtDetalleOpcion">Detalle</label>
+                                <input type="text" class="form-control" name="txtDetalleOpcion" id="txtDetalleOpcion" value="@Model.DetalleOpcion">
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="form-group">
+                                <label class="form-label" for="txtOrdenOpcion">Orden</label>
+                                <input type="number" class="form-control" name="txtOrdenOpcion" id="txtOrdenOpcion" value="@Model.OrdenOpcion" data-validation="[L>=1]" data-validation-message="Ingrese el orden de la opción">
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="form-group">
+                                <label class="form-label" for="optActivo">Activo</label>
+                                <br />
+                                <select id="optActivo" name="optActivo" class="form-control form-select">
+                                    @if (Model.Activo == true)
+                                    {
+                                        <option value="1" selected="">Si</option>
+                                        <option value="0">No</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="1">Si</option>
+                                        <option value="0" selected="">No</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer" style="text-align:right;">
+                    <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Actualizar tabla de registros" onclick="ActualizarTablaOpcion()"> Refrescar &nbsp; <i class="fas fa-sync"></i></button>
+                    <button type="button" data-toggle="tooltip" class="btn btn-primary label" title="Nuevo registro" onclick="VerEditarOpcion(0)"> Nuevo &nbsp;<i id="iBtnNuevoOpcion" class="ti-file"></i></button>
+                    <button type="submit" data-toggle="tooltip" class="btn btn-blue label" title="Grabar registro"> Guardar &nbsp; <i class="ti-save"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+<script>
+
+
+    function ListarComboModulo() {
+        $.ajax({
+            url: "@Url.Action("ListarComboModulo", "Modulo")",
+            method: 'POST',
+            async: false,
+            success: function (data) {
+                $("#cmbModulo").empty();
+                $("#cmbModulo").append("<option value=0>Seleccione</option>");
+                $.each(data, function (i, item) {
+                    if (item.IdModulo == "@Model.modulo.IdModulo") {
+                        $("#cmbModulo").append("<option value=" + item.IdModulo + " selected='selected'>" + item.NombreModulo + "</option>");
+                    }
+                    else {
+                        $("#cmbModulo").append("<option value=" + item.IdModulo + ">" + item.NombreModulo + "</option>");
+                    }
+                });
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la llamada ListarComboModulo, verifique consola');
+            },
+            complete: function (respuesta) {
+                ValidarSesionActual(respuesta);
+            }
+        });
+    }
+
+    function ListarComboOpcionPadre() {
+        var IdModulo = $('#cmbModulo').val();
+        $.ajax({
+            url: "@Url.Action("ListarComboOpcionPadre", "Opcion")",
+            method: 'POST',
+            async: false,
+            data: { IdModulo: IdModulo },
+            success: function (data) {
+                $("#cmbOpcionPadre").empty();
+                $.each(data, function (i, item) {
+                    if (item.IdOpcion == "@Model.IdOpcionPadre") {
+                        $("#cmbOpcionPadre").append("<option value=" + item.IdOpcion + " selected='selected'>" + item.NombreOpcion + "</option>");
+                    }
+                    else {
+                        $("#cmbOpcionPadre").append("<option value=" + item.IdOpcion + ">" + item.NombreOpcion + "</option>");
+                    }
+                });
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la llamada ListarComboOpcionPadre, verifique consola');
+            },
+            complete: function (respuesta) {
+                ValidarSesionActual(respuesta);
+            }
+        });
+    }
+
+    function ListarCatalogoTipoOpcion() {
+        $.ajax({
+            url: "@Url.Action("ListarCatalogoTipoOpcion", "CatalogoSistema")",
+            method: 'POST',
+            async: false,
+            success: function (data) {
+                $("#cmbCatalogoTipoOpcion").empty();
+                $("#cmbCatalogoTipoOpcion").append("<option value=0>Seleccione</option>");
+                $.each(data, function (i, item) {
+                    if (item.IdCatalogo == "@Model.catalogotipoopcion.IdCatalogo") {
+                        $("#cmbCatalogoTipoOpcion").append("<option value=" + item.IdCatalogo + " selected='selected'>" + item.Descripcion + "</option>");
+                    }
+                    else {
+                        $("#cmbCatalogoTipoOpcion").append("<option value=" + item.IdCatalogo + ">" + item.Descripcion + "</option>");
+                    }
+                });
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la llamada ListarCatalogoTipoOpcion, verifique consola');
+            },
+            complete: function (respuesta) {
+                ValidarSesionActual(respuesta);
+            }
+        });
+    }
+
+    $(function () {
+
+        ListarComboModulo();
+        //$('#cmbModulo').select2();
+        $('#cmbModulo').change(function () { ListarComboOpcionPadre(); });
+        //$('#cmbOpcionPadre').select2();
+        //$("#cmbCatalogoTipoOpcion").select2();
+        ListarComboOpcionPadre();
+        ListarCatalogoTipoOpcion();
+        $("#frmRegistroOpcion").validate({
+            submit: {
+                settings: {
+                    inputContainer: '.field',
+                    errorClass: 'LabelError', errorListClass: 'ListaError'
+                },
+                callback: {
+                    onBeforeSubmit: function (node) {
+                    },
+                    onSubmit: function (node, formData) {
+                        var fileData = new FormData();
+                        for (var key in formData) {
+                            fileData.append(key, formData[key]);
+                        }
+                        $.ajax({
+                            url: "@Url.Action("GuardarRegistroOpcion")",
+                            method: 'POST',
+                            data: fileData,
+                            contentType: false,
+                            processData: false,
+                            success: function (opcion) {
+                                if (opcion.mensaje.CodigoMensaje == 0) {
+                                    toastr.success(opcion.mensaje.DescripcionMensaje);
+                                    $("#txtRegIdOpcion").val(opcion.IdOpcion);
+                                    ActualizarTablaOpcion();
+                                }
+                                else {
+                                    toastr.error(opcion.mensaje.DescripcionMensaje);
+                                }
+                            },
+                            error: function (mensaje) {
+                                console.log(mensaje);
+                                toastr.error('Sucedió un error en la llamada GuardarRegistroOpcion, verifique consola');
+                            },
+                            complete: function (respuesta) {
+                                ValidarSesionActual(respuesta);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    });
+</script>

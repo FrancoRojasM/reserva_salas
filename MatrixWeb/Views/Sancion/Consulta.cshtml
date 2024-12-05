@@ -1,0 +1,452 @@
+﻿@using System.Configuration
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+<html lang="es">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+    <link href="~/assets/css/consulta.css" rel="stylesheet" type="text/css" />
+
+</head>
+<body>
+    <header class="bg-dark text-white text-center py-3 d-flex align-items-center justify-content-center flex-column flex-md-row">
+        <img src="@ConfigurationManager.AppSettings["HostImagenes"]LogoInstitucion.jpg" alt="Logo CMP" class="logo mb-2 mb-md-0">
+        <div class="text-center text-md-left ml-md-3">
+            <h2>Colegio Médico del Perú</h2>
+            <p>Consulta de Sanciones a Médicos</p>
+        </div>
+    </header>
+
+    <div class="container mt-5">
+        <div class="bg-white p-5 rounded shadow">
+            <h1 class="text-center mb-4">Consulta de Sanciones a Médicos</h1>
+            <form id="formConsultaSanciones" class="formulario-consulta">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="tipoDocumento">Tipo de documento</label>
+                            <select id="tipoDocumento" name="TipoDocumento" class="form-control">
+                                <option value="">Todos</option>
+                                @foreach (var tipo in ViewBag.TiposDocumento)
+                                {
+                                    <option value="@tipo.IdCatalogo">@tipo.Descripcion</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="nroDocumento">Nro° Documento</label>
+                            <input type="text" id="nroDocumento" name="NroDocumento" class="form-control" placeholder="Número de documento" disabled>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="nombres">Nombres</label>
+                            <input type="text" id="nombres" name="NombreCompleto" class="form-control" placeholder="Nombres de la persona">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="consejoRegional">Consejo Regional</label>
+                            <select id="consejoRegional" name="ConsejoRegional" class="form-control">
+                                <option value="">Todos</option>
+                                @foreach (var consejo in ViewBag.ConsejosRegionales)
+                                {
+                                    <option value="@consejo.Id">@consejo.BPLName</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="tipoSancion">Tipo de Sanción</label>
+                            <select id="tipoSancion" name="TipoSancion" class="form-control">
+                                <option value="">Todos</option>
+                                @foreach (var sancion in ViewBag.TiposSancion)
+                                {
+                                    <option value="@sancion.IdCatalogo">@sancion.Descripcion</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="camposAvanzados" class="row mt-3" style="display: none;">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="departamento">Departamento</label>
+                            <select id="departamento" name="Departamento" class="form-control">
+                                <option value="">Todos</option>
+                                @foreach (var departamento in ViewBag.Departamentos)
+                                {
+                                    <option value="@departamento.CodigoDepartamento">@departamento.Departamento</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="provincia">Provincia</label>
+                            <select id="provincia" name="Provincia" class="form-control">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="distrito">Distrito</label>
+                            <select id="distrito" name="Distrito" class="form-control">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions text-center mt-4">
+                    <button type="button" class="btn btn-secondary" id="btnLimpiar">LIMPIAR</button>
+                    <button type="submit" class="btn btn-danger" id="btnBuscar">BUSCAR</button>
+                </div>
+
+                @* <div class="links text-center mt-3">
+                    <a href="#" id="toggleBusquedaAvanzada" class="text-danger">+ Búsqueda Avanzada</a>
+                </div> *@
+            </form>
+        </div>
+    </div>
+
+    <div class="container mt-5" id="resultadosSanciones" style="display:none;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 id="cantidadRegistros">0 registros encontrados</h4>
+            <button type="button" class="btn btn-success" id="btnDescargarExcel">
+                <i class="fas fa-file-excel"></i> Descargar Excel
+            </button>
+        </div>
+        <div id="contenedorTarjetas" class="row">
+        </div>
+
+        <nav aria-label="Page navigation example" id="paginacionSanciones" style="display:none;">
+            <ul class="pagination justify-content-center">
+            </ul>
+        </nav>
+    </div>
+
+    <div class="modal fade" id="modalDetalleSancion" tabindex="-1" aria-labelledby="modalDetalleSancionLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalDetalleSancionLabel">CONSULTA DE SANCIONES A PROFESIONALES DE LA SALUD</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Nombre y apellidos</label>
+                            <input type="text" class="form-control" id="detalleNombreCompleto" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Tipo de sanción</label>
+                            <input type="text" class="form-control" id="detalleTipoSancion" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Consejo Regional</label>
+                            <input type="text" class="form-control" id="detalleConsejoRegional" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Nro° Colegiatura</label>
+                            <input type="text" class="form-control" id="detalleCMP" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Número de Resolución</label>
+                            <input type="text" class="form-control" id="detalleNumeroResolucion" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Fecha de Resolución</label>
+                            <input type="text" class="form-control" id="detalleFechaResolucion" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Fecha de Registro de Inscripción</label>
+                            <input type="text" class="form-control" id="detalleFechaRegistroInscripcion" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Fecha de Notificación al Profesional</label>
+                            <input type="text" class="form-control" id="detalleFechaNotificacionProfesional" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Fecha de Vencimiento de la Sanción</label>
+                            <input type="text" class="form-control" id="detalleFechaVencimientoSancion" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Fecha de Cumplimiento de Multa</label>
+                            <input type="text" class="form-control" id="detalleFechaCumplimientoMulta" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Estado de la Sanción</label>
+                            <input type="text" class="form-control" id="detalleEstadoSancion" readonly>
+                        </div>
+                        <div class="col-md-12">
+                            <label>Sanción Impuesta</label>
+                            <input type="text" class="form-control" id="detalleSancionImpuesta" readonly>
+                        </div>
+                        <div class="col-md-12">
+                            <label>Indicación Norma Vulnerada</label>
+                            <textarea class="form-control" id="detalleNormaVulnerada" rows="3" readonly></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CERRAR</button>
+                    <button type="button" class="btn btn-danger" id="btnImprimir">IMPRIMIR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <p>© 2024 Colegio Médico del Perú. Todos los derechos reservados.</p>
+    </footer>
+
+    @section scripts {
+        <script src="~/assets/libs/moment/moment.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            $(document).ready(function () {
+                // $('#toggleBusquedaAvanzada').click(function (event) {
+                //     event.preventDefault();
+                //     var camposAvanzados = $('#camposAvanzados');
+                //     camposAvanzados.toggle();
+                //     $(this).text(camposAvanzados.is(':visible') ? '- Ocultar Búsqueda Avanzada' : '+ Búsqueda Avanzada');
+                // });
+
+                $('#tipoDocumento').change(function () {
+                    var tipoDocumento = $(this).val();
+                    if (tipoDocumento) {
+                        $('#nroDocumento').prop('disabled', false);
+                    } else {
+                        $('#nroDocumento').prop('disabled', true).val('');
+                    }
+                });
+
+                $('#departamento').change(function () {
+                    var departamento = $(this).val();
+                    if (departamento) {
+                        $.ajax({
+                            url: '@Url.Action("ListarComboProvincia", "Ubigeo")',
+                            type: 'POST',
+                            data: { CodigoDepartamento: departamento },
+                            success: function (data) {
+                                var provinciaSelect = $('#provincia');
+                                provinciaSelect.empty();
+                                provinciaSelect.append('<option value="">Todos</option>');
+                                $.each(data, function (index, value) {
+                                    provinciaSelect.append('<option value="' + value.CodigoProvincia + '">' + value.Provincia + '</option>');
+                                });
+                                $('#distrito').empty().append('<option value="">Todos</option>');
+                            }
+                        });
+                    } else {
+                        $('#provincia').empty().append('<option value="">Todos</option>');
+                        $('#distrito').empty().append('<option value="">Todos</option>');
+                    }
+                });
+
+                $('#provincia').change(function () {
+                    var departamento = $(this).val();
+                    var provincia = $(this).val();
+                    if (provincia) {
+                        $.ajax({
+                            url: '@Url.Action("ListarComboDistrito", "Ubigeo")',
+                            type: 'POST',
+                            data: { CodigoDepartamento: departamento, CodigoProvincia: provincia },
+                            success: function (data) {
+                                var distritoSelect = $('#distrito');
+                                distritoSelect.empty();
+                                distritoSelect.append('<option value="">Todos</option>');
+                                $.each(data, function (index, value) {
+                                    distritoSelect.append('<option value="' + value.IdUbigeo + '">' + value.Distrito + '</option>');
+                                });
+                            }
+                        });
+                    } else {
+                        $('#distrito').empty().append('<option value="">Todos</option>');
+                    }
+                });
+
+                var paginaActual = 1;
+                var dimensionPagina = 10;
+
+                $('#formConsultaSanciones').submit(function (e) {
+                    e.preventDefault();
+                    buscarSanciones(1);
+                    $('#resultadosSanciones').show();
+                });
+
+                function buscarSanciones(pagina) {
+                    $.ajax({
+                        url: '@Url.Action("BuscarSanciones", "Sancion")',
+                        type: 'POST',
+                        data: {
+                            TipoDocumento: $('#tipoDocumento').val(),
+                            NroDocumento: $('#nroDocumento').val(),
+                            NombreCompleto: $('#nombres').val(),
+                            ConsejoRegional: $('#consejoRegional').val(),
+                            TipoSancion: $('#tipoSancion').val(),
+                            Departamento: $('#departamento').val(),
+                            Provincia: $('#provincia').val(),
+                            Distrito: $('#distrito').val(),
+                            pagina: pagina,
+                            dimensionPagina: 10
+                        },
+                        success: function (data) {
+                            $('#contenedorTarjetas').empty();
+                            $('#cantidadRegistros').text(`${data.TotalRegistros} ${data.TotalRegistros === 1 ? 'Registro Encontrado' : 'Registros Encontrados'}`);
+                            $.each(data.sanciones, function (index, sancion) {
+                                var tarjeta = `
+                                <div class="tarjeta-sancion">
+                                    <div class="card-body">
+                                        <div class="info">
+                                            <h5>DATOS DE LA PERSONA</h5>
+                                            <p><span class="campo">Nombre y apellidos:</span> <span class="valor">${sancion.NombreCompleto}</span></p>
+                                            <br>
+                                            <h5>DATOS DE LA SANCIÓN</h5>
+                                            <div class="campo-resultado">
+                                                <p><span class="campo">Consejo Regional:</span> <span class="valor">${sancion.ConsejoRegional}</span></p>
+                                                <p><span class="campo">Nro° de colegiatura:</span> <span class="valor">${sancion.CMP}</span></p>
+                                            </div>
+                                            <div class="campo-resultado">
+                                                <p><span class="campo">Número de resolución:</span> <span class="valor">${sancion.NumeroResolucion}</span></p>
+                                                <p><span class="campo">Fecha de resolución:</span> <span class="valor">${moment(sancion.FechaResolucion).format('DD/MM/YYYY')}</span></p>
+                                            </div>
+                                            <div class="campo-resultado">
+                                                <p><span class="campo">Estado de la sanción:</span> <span class="valor">${sancion.EstadoSancion}</span></p>
+                                            </div>
+                                        </div>
+                                        <div class="btn-separador">
+                                            <button class="btn btnVerMas" data-id="${sancion.Id}">Ver más</button>
+                                        </div>
+                                    </div>
+                                </div>`;
+                                $('#contenedorTarjetas').append(tarjeta);
+                            });
+
+                            generarPaginacion(data.totalPaginas, data.paginaActual);
+                        }
+                    });
+                }
+
+                function generarPaginacion(totalPaginas, paginaActual) {
+                    var paginacion = $('#paginacionSanciones ul');
+                    paginacion.empty();
+
+                    for (var i = 1; i <= totalPaginas; i++) {
+                        var claseActiva = (i === paginaActual) ? 'active' : '';
+                        paginacion.append(`
+                            <li class="page-item ${claseActiva}">
+                                <a class="page-link" href="#" data-pagina="${i}">${i}</a>
+                            </li>
+                        `);
+                    }
+
+                    if (totalPaginas > 1) {
+                        $('#paginacionSanciones').show();
+                    } else {
+                        $('#paginacionSanciones').hide();
+                    }
+
+                    $('.page-link').click(function (e) {
+                        e.preventDefault();
+                        var pagina = $(this).data('pagina');
+                        buscarSanciones(pagina);
+                    });
+                }
+
+                $('#btnDescargarExcel').click(function () {
+                    var queryParams = $.param({
+                        TipoDocumento: $('#tipoDocumento').val(),
+                        NroDocumento: $('#nroDocumento').val(),
+                        NombreCompleto: $('#nombres').val(),
+                        ConsejoRegional: $('#consejoRegional').val(),
+                        TipoSancion: $('#tipoSancion').val(),
+                        Departamento: $('#departamento').val(),
+                        Provincia: $('#provincia').val(),
+                        Distrito: $('#distrito').val()
+                    });
+                    window.location.href = '/Sancion/DescargarReporteExcelExterno?' + queryParams;
+                });
+
+
+                $('#btnLimpiar').click(function () {
+                    $('#formConsultaSanciones')[0].reset();
+                    $('#nroDocumento').prop('disabled', true);
+                    $('#resultadosSanciones').hide();
+                    $('#contenedorTarjetas').empty();
+                });
+
+                $('#contenedorTarjetas').on('click', '.btnVerMas', function () {
+                    var sancionId = $(this).data('id');
+
+                    $.ajax({
+                        url: '@Url.Action("ObtenerDetalleSancion", "Sancion")',
+                        type: 'POST',
+                        data: { id: sancionId },
+                        success: function (data) {
+                            $('#detalleNombreCompleto').val(data.NombreCompleto);
+                            $('#detalleTipoSancion').val(data.TipoSancion);
+                            $('#detalleConsejoRegional').val(data.ConsejoRegional);
+                            $('#detalleCMP').val(data.CMP);
+                            $('#detalleNumeroResolucion').val(data.NumeroResolucion);
+                            $('#detalleFechaResolucion').val(moment(data.FechaResolucion).format('DD/MM/YYYY'));
+                            $('#detalleFechaRegistroInscripcion').val(moment(data.FechaRegistroInscripcion).format('DD/MM/YYYY'));
+                            $('#detalleFechaNotificacionProfesional').val(moment(data.FechaNotificacionMedico).format('DD/MM/YYYY'));
+                            $('#detalleFechaVencimientoSancion').val(moment(data.FechaVencimientoSancion).format('DD/MM/YYYY'));
+                            $('#detalleFechaCumplimientoMulta').val(moment(data.FechaCumplimientoMulta).format('DD/MM/YYYY'));
+                            $('#detalleEstadoSancion').val(data.EstadoSancion);
+                            $('#detalleSancionImpuesta').val(data.SancionImpuesta);
+                            $('#detalleNormaVulnerada').val(data.IndicacionNormaVulnerada);
+
+                            $('#modalDetalleSancion').modal('show');
+                        }
+                    });
+                });
+
+                $('#btnImprimir').click(function () {
+                    var modalContent = document.getElementById('modalDetalleSancion');
+
+                    html2canvas(modalContent, {
+                        scale: 4,
+                        useCORS: true,
+                        allowTaint: true
+                    }).then(function (canvas) {
+                        var imgData = canvas.toDataURL('image/png');
+
+                        var printWindow = window.open('', '_blank', 'width=1200,height=800');
+                        printWindow.document.write('<html><head><title>Imprimir Sanción</title>');
+                        printWindow.document.write('<style>body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100%; }</style>');
+                        printWindow.document.write('<style>img { max-width: 180%; max-height: 140%; object-fit: contain; }</style>');
+                        printWindow.document.write('</head><body>');
+                        printWindow.document.write('<img id="imagenCaptura" src="' + imgData + '">');
+                        printWindow.document.write('</body></html>');
+                        printWindow.document.close();
+
+                        printWindow.onload = function () {
+                            printWindow.focus();
+                            printWindow.print();
+                            printWindow.onafterprint = function () {
+                                printWindow.close();
+                            };
+                        };
+                    }).catch(function (error) {
+                        console.log("Error al capturar el contenido del modal:", error);
+                    });
+                });
+
+            });
+        </script>
+    }
+</body>
+</html>

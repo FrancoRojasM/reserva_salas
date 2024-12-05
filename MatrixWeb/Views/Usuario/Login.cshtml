@@ -1,0 +1,243 @@
+﻿@using System.Configuration
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .position-relative {
+        position: relative;
+    }
+
+    .parsley-errors-list {
+        position: absolute;
+        top: 100%;
+        left: 5px; /* Ajusta según sea necesario para el diseño específico */
+        color: red; /* Color del texto del mensaje de error */
+        font-size: 12px; /* Tamaño de fuente del mensaje de error */
+    }
+</style>
+<div class="auth-fluid">
+    <!--Auth fluid left content -->
+    <div class="auth-fluid-form-box">
+        <div class="align-items-center d-flex h-100">
+            <div class="p-3">
+                <!-- form -->
+                <form id="frmLogin" style="display:block;">
+                    <!-- Logo -->
+                    <div class="auth-brand text-center text-lg-start mb-0">
+                        <div class="auth-brand mb-2">
+                            <a href="#" class="logo logo-dark text-center">
+                                <span class="logo-lg">
+                                    <img src="@ConfigurationManager.AppSettings["HostImagenes"]LogoInstitucion.png" alt="" height="50">
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- title-->
+                    <h4 style="text-align:center;" class="mt-0"></h4>
+                    <h4 style="text-align:center;"  class="mt-4">Inicio de Sesión</h4>
+                    <p class="text-muted mb-2">Ingresa tu usuario y contraseña para acceder a tu cuenta.</p>
+                    <div class="mb-3 position-relative" >
+                        <label for="Usuario" class="form-label">Usuario</label>
+                        <input class="form-control" type="text" id="Usuario" name="Usuario" placeholder="Ingresa tu usuario" required>
+                    </div>
+                    <div class="mb-3">
+                        <a href="@Url.Action("RecuperarClave", "Usuario")" class="text-muted float-end"><small>Olvidaste tu contraseña?</small></a>
+                        <label for="Clave" class="form-label">Contraseña</label>
+
+                        <div class="input-group input-group-merge position-relative">
+                            <input type="password" id="Clave" name="Clave" class="form-control" required placeholder="Ingresa tu contraseña"/>
+                            <div class="input-group-text" data-password="false">
+                                <span class="password-eye"></span>
+                            </div>
+                           
+                        </div>
+                       
+                    </div>
+                    <div class="mb-3 position-relative">
+                        <label for="Sucursal" class="form-label">Sucursal</label>
+                        <select class="form-control" id="Sucursal" name="Sucursal" required>
+                            <option value="">Seleccione una sucursal</option>
+                            @foreach (var sucursal in ViewBag.Sucursales)
+                            {
+                                <option value="@sucursal.Id">@sucursal.BPLName</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3 position-relative">
+                        <label for="Ubicacion" class="form-label">Ubicacion (Opcional)</label>
+                        <div class="input-group">
+                            <div class="input-group input-group-merge">
+                                <div title="Leer Código" onclick="LeerCodigo()" class="input-group-text btn btn-primary" id="openButton">
+                                    <span id="iBtnCodigo" class="fas fa-barcode"></span>
+                                </div>
+                                <input class="form-control" type="text" id="Ubicacion" name="Ubicacion" pattern="/^[A-Za-z0-9\s]+ *- *[A-Za-z0-9.\s]+$/" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3" style="padding:0px!important;margin:0px!important;text-align:center;">
+                        <div style="padding-bottom: 10px;" id="divCaptcha"></div>
+                    </div>
+                    <div class="text-center d-grid">
+                       
+                        <button type="submit" id="btnAutenticar" class="btn btn-success waves-effect waves-light" title="Autenticar">
+                            Autenticar
+                            <span id="spAutenticar" class="" role="status" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <footer class="footer footer-alt">
+                        <!--<p class="text-muted">No tienes una cuenta? <a href="@Url.Action("NuevaCuentaCasilla", "Usuario")" class="text-muted ms-1"><b>Registrate</b></a></p>-->
+                    </footer>
+                </form>
+               
+                <!-- end form-->
+                <!-- Footer-->
+
+            </div> <!-- end .card-body -->
+        </div> <!-- end .align-items-center.d-flex.h-100-->
+    </div>
+    <!-- end auth-fluid-form-box-->
+    <!-- Auth fluid right content -->
+ @*    <div class="auth-fluid-right text-center">
+        <div class="auth-user-testimonial">
+            <h2 class="mb-3 text-white">I love the color!</h2>
+            <p class="lead">
+                <i class="mdi mdi-format-quote-open"></i> I've been using your theme from the previous developer for our web app, once I knew new version is out, I immediately bought with no hesitation. Great themes, good documentation with lots of customization available and sample app that really fit our need. <i class="mdi mdi-format-quote-close"></i>
+            </p>
+            <h5 class="text-white">
+                - Fadlisaad (Ubold Admin User)
+            </h5>
+        </div> <!-- end auth-user-testimonial-->
+    </div> *@
+    <!-- end Auth fluid right content -->
+</div>
+
+@section scripts {
+    <script>
+        function ObtenerCaptcha(tipo) {
+            $.ajax({
+                url: "@Url.Action("VistaCaptcha", "Usuario")",
+                type: "GET",
+                async: true,
+                success: function (vistaParcial) {
+                    $("#divCaptcha").html(vistaParcial);
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la llamada, verifique consola');
+                }
+            });
+        }
+
+        function LeerCodigo() {
+            var input = document.getElementById("Ubicacion");
+            input.value = "";
+            input.removeAttribute("readonly");
+            input.focus();
+
+            input.addEventListener('blur', function () {
+                if (input.value.trim() !== "") {
+                    input.setAttribute("readonly", "readonly");
+                }
+            });
+        }
+
+        $(function () {
+            ObtenerCaptcha();
+            $("#frmLogin").parsley().on("field:validated", function () {
+                event.preventDefault(); // Evitar la acción predeterminada
+                var campoEspecial = $('#Ubicacion').val();
+                if (campoEspecial && !campoEspecial.match(/^[A-Za-z0-9\s]+ *- *[A-Za-z0-9.\s]+$/)) {
+                    toastr.error('Formato incorrecto para la Ubicacion.');
+                }
+                var e = 0 === $(".parsley-error").length;
+                $(".alert-info").toggleClass("d-none", !e), $(".alert-warning").toggleClass("d-none", e)
+            }).on("form:submit", function (node,formData) {
+
+               
+                var fileData = new FormData();
+                var formulario = node.$element;            
+                // Obtén todos los controles del formulario
+                var controls = formulario.find(":input");
+                var sincaptcha = 0;
+                var Logueo = '';
+                var Clave = '';
+                var Sucursal = '';
+                var campoEspecial = '';
+                // Recorre cada control
+                controls.each(function () {
+                    var control = $(this);
+                    var nombreControl = control.attr("name");
+                    var valorControl = control.val();
+                    if (nombreControl == 'Usuario') {
+                        Logueo = valorControl;
+                    }
+                    if (nombreControl == 'Clave') {
+                        Clave = valorControl;
+                    }
+                    if (nombreControl == 'Sucursal') {
+                        Sucursal = valorControl;
+                    }
+                    if (nombreControl == 'Ubicacion' && valorControl) {
+                        campoEspecial = valorControl;
+                    }
+                    if (nombreControl == 'captcha') {
+                        lensincaptcha = valorControl;
+                        if (valorControl == '') {
+                            sincaptcha = 1;                                                   
+                        }
+                    }
+                    // Agrega el control y su valor a FormData
+                    fileData.append(nombreControl, valorControl);
+                });
+                if (sincaptcha == 1 || lensincaptcha.length!=4 ){
+                    if (sincaptcha == 1) {
+                        toastr.error('Debe digitar el número');
+                    }
+                    else {
+                        toastr.error('Debe digitar el número correctamente');
+                    }
+                    
+                }
+                else {
+                    $.ajax({
+                        beforeSend: function (respuesta) {
+                            $("#btnAutenticar").addClass("disabled");
+                            $("#spAutenticar").addClass("spinner-grow spinner-grow-sm me-1");
+                        },
+                        url: "@Url.Action("AutenticarUsuario", "Usuario")",
+                        method: 'POST',
+                        data: fileData,
+                        contentType: false,
+                        processData: false,
+                        success: function (mensaje) {
+                            if (mensaje.CodigoMensaje == 0) {
+
+                                var form = $('<form action="@Url.Action("Login2", "Usuario")" method="post"></form>');
+                                form.append('<input type="hidden" name="Logueo" value="' + Logueo + '" />');
+                                form.append('<input type="hidden" name="Clave" value="' + Clave + '" />');
+                                form.append('<input type="hidden" name="Sucursal" value="' + Sucursal + '" />');
+                                form.append('<input type="hidden" name="Ubicacion" value="' + Ubicacion + '" />');
+                                formulario.trigger("reset");
+                                form.appendTo('body').submit();
+                              
+                            }
+                            else {
+                                toastr.error(mensaje.DescripcionMensaje);
+                                console.log(mensaje.DescripcionMensajeSistema);
+                            }
+                        },
+                        complete: function (respuesta) {
+                            $("#btnAutenticar").removeClass("disabled");
+                            $("#spAutenticar").removeClass("spinner-grow spinner-grow-sm me-1");
+                        },
+                        error: function (mensaje) {
+                            toastr.error('Sucedió un error en la interface [AutenticarUsuario], verifique consola');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

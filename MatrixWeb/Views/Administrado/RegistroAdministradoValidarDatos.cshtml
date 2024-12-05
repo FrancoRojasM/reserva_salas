@@ -1,0 +1,361 @@
+﻿@model Casilla.Administrado
+@{
+	ViewBag.Title = "Registro Administrado";
+	Layout = null;
+}
+<form id="frmRegistroAdministrado" name="frmRegistroAdministrado" method="POST">
+	<div class="row">
+		<div class="col-12">
+			<div class="card">
+				@* <div class="card-header"><h4 class="my-0">Registro de Administrado</h4></div> *@
+				<div class="card-body">
+					<input type="hidden" id="txtRegIdAdministrado" name="txtRegIdAdministrado" value="@Model.IdAdministrado" />
+					<div class="row">
+						<div class="col-md-3">
+
+						</div>
+						<div class="col-md-6">
+							<div class="mb-1">
+								<div class="form-group">
+									<label class="form-label" for="txtPersona">Persona</label>
+									<input type="hidden" id="txtIdPersona" name="txtIdPersona" value="@Model.persona.IdPersona" />
+									<input readonly type="text" class="form-control" name="txtPersona" id="txtPersona" value="@Model.persona.NombreCompleto" data-validation="[NOTEMPTY]" data-validation-message="Seleccione una persona">
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2" hidden>
+							<div class="mb-1">
+								<div class="form-group">
+									<label class="form-label" for="cmbUsuario">Usuario</label>
+									<select class="form-control" id="cmbUsuario" name="cmbUsuario" data-toggle="select2" data-width="100%"></select>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3">
+
+						</div>
+						<div class="col-md-3">
+
+						</div>
+						<div class="col-md-3">
+							<div class="mb-1">
+								<div class="form-group">
+									<label class="form-label" for="txtEmailNotificacion">Email Notificacion</label>
+									
+									<div class="input-group">
+										<input type="text" class="form-control" name="txtEmailNotificacion" id="txtEmailNotificacion" value="@Model.EmailNotificacion" data-validation="[L>=1]" data-validation-message="Ingrese Email de Notificacion">
+                                        <button class="btn input-group-text btn-primary waves-effect waves-light" onclick="EnvioCorreoConfirmacion()" type="button">Enviar Código <i class="fe-mail"></i></button>
+									</div>
+
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="mb-1">
+								<div class="form-group">
+									<label class="form-label" for="txtCodigoCorreoConfirmacion">Codigo de Verificación</label>
+									<div class="input-group">
+										<input type="text" class="form-control" name="txtCodigoCorreoConfirmacion" id="txtCodigoCorreoConfirmacion" value="@Model.CodigoCorreoConfirmacion" @* data-validation="[L>=1]" data-validation-message="Ingrese la codigo de verificación" *@>
+										<input type="hidden" class="form-control" name="txtCodigoCorreoValidar" id="txtCodigoCorreoValidar" value="0">
+                                        <button id="btnCodigoCorreoConfirmacion" class="btn input-group-text btn-primary waves-effect waves-light" type="submit">Validar <i class="fe-mail"></i></button>
+									</div>
+								</div>
+
+								
+							</div>
+						</div>
+						<div class="col-md-3">
+
+						</div>
+						<div class="col-md-3">
+
+						</div>
+						<div class="col-md-3" >
+							<div class="mb-1">
+								<div class="form-group">
+									<label class="form-label" for="txtNumeroCelularNotificacion">Numero Celular Notificacion</label>								
+
+									<div class="input-group">
+										<input type="text" class="form-control" name="txtNumeroCelularNotificacion" id="txtNumeroCelularNotificacion" value="@Model.NumeroCelularNotificacion"  data-validation="[L>=1]" data-validation-message="Ingrese Telefono de Notificacion">
+                                        <button class="btn input-group-text btn-primary waves-effect waves-light" onclick="EnvioTelefonoConfirmacion()" type="button">Enviar Código <i class="fe-mail"></i></button>
+									</div>
+
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="mb-1">
+								<div class="form-group">
+									<label class="form-label" for="txtCodigoTelefonoConfirmacion">Codigo de Verificación</label>
+									<div class="input-group">
+										<input type="text" class="form-control" name="txtCodigoTelefonoConfirmacion" id="txtCodigoTelefonoConfirmacion" value="@Model.CodigoTelefonoConfirmacion" @* data-validation="[L>=1]" data-validation-message="Ingrese la codigo de verificación" *@>
+                                        <input type="hidden" class="form-control" name="txtCodigoTelefonoValidar" id="txtCodigoTelefonoValidar" value="0">
+										<button id="btnCodigoTelefonoConfirmacion" class="btn input-group-text btn-primary waves-effect waves-light" type="submit">Validar <i class="fe-phone-forwarded"></i></button>
+									</div>
+									
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3">
+
+						</div>
+						<div class="col-md-2" hidden>
+							<div class="mb-1">
+								<div class="form-group">
+									<label class="form-label" for="txtAsientoElectronico">AsientoElectronico</label>
+									<input type="text" class="form-control" name="txtAsientoElectronico" id="txtAsientoElectronico" value="@Model.AsientoElectronico">
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2" hidden>
+							<div class="mb-1">
+								<div class="form-group">
+									<label class="form-label" for="txtPartidaElectronica">PartidaElectronica</label>
+									<input type="text" class="form-control" name="txtPartidaElectronica" id="txtPartidaElectronica" value="@Model.PartidaElectronica">
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2" hidden>
+							<div class="mb-1">
+								<div class="form-group">
+									<label class="form-label" for="optActivo">Activo</label>
+
+									<select class="form-select" id="optActivo" name="optActivo">
+										@if (Model.Activo == true)
+										{
+											<option value="1" selected="">Si</option>
+											<option value="0">No</option>
+										}
+										else
+										{
+											<option value="1">Si</option>
+											<option value="0" selected="">No</option>
+										}
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				@* <div class="card-footer" style="text-align:end;">
+					<button class="btn btn-primary waves-effect waves-light" title="Nuevo registro" onclick="VerEditarAdministrado(0)">Nuevo<span id="spNuevaAdministrado" class="mdi mdi-file" role="status" aria-hidden="true"></span></button>
+					<button type="submit" id="btnGuardarAdministrado" class="btn btn-success waves-effect waves-light" title="Grabar registro">Guardar<span id="spGuardarAdministrado" class="mdi mdi-content-save" role="status" aria-hidden="true"></span></button>
+				</div> *@
+			</div>
+		</div>
+	</div>
+
+	 <div id="progressbar"></div>
+</form>
+
+<script>
+
+	function EnvioCorreoConfirmacion() {
+               var txtEmailNotificacion = $("#txtEmailNotificacion").val();
+                $.ajax({
+                    url: "@Url.Action("EnviarCodigoCorreoConfirmacion")",
+                    method: 'POST',
+                   data: { EmailNotificacion: txtEmailNotificacion },
+                    success: function (mensaje) {
+                       
+                        if (mensaje.CodigoMensaje == 0) {
+                            toastr.success(mensaje.DescripcionMensaje);
+					$("#btnCodigoCorreoConfirmacion").removeClass("disabled");
+					$("#txtCodigoCorreoValidar").val(1);
+                        }
+                        else {
+                            toastr.error(mensaje.DescripcionMensaje);
+                            console.log(mensaje.DescripcionMensajeSistema);
+                        }
+                    },
+                    error: function (mensaje) {
+                        console.log(mensaje);
+                        toastr.error('Sucedió un error en la interface [EliminarPeriodo], verifique consola');
+                    },
+					// complete: function (respuesta) {
+					// 		$("#btnCodigoCorreoConfirmacion").removeClass("disabled");							
+					// 		$("#txtCodigoCorreoValidar").val(1);
+
+
+							  
+					// }
+                });
+            }
+	function EnvioTelefonoConfirmacion() {
+              var txtNumeroCelularNotificacion = $("#txtNumeroCelularNotificacion").val();
+                $.ajax({
+                    url: "@Url.Action("EnviarCodigoTelefonoConfirmacion")",
+                    method: 'POST', 
+					  data: { NumeroCelularNotificacion: txtNumeroCelularNotificacion },
+                    success: function (mensaje) {
+                        //$("#modalEliminarPeriodo").modal('hide');
+                        if (mensaje.CodigoMensaje == 0) {
+                            toastr.success(mensaje.DescripcionMensaje);
+							$("#txtCodigoTelefonoValidar").val(1);
+							$("#btnCodigoTelefonoConfirmacion").removeClass("disabled");
+                        }
+                        else {
+                            toastr.error(mensaje.DescripcionMensaje);
+                            console.log(mensaje.DescripcionMensajeSistema);
+
+                        }
+                    },
+                    error: function (mensaje) {
+                        console.log(mensaje);
+                        toastr.error('Sucedió un error en la interface [EliminarPeriodo], verifique consola');
+                    },
+					// complete: function (respuesta) {
+					// 		$("#txtCodigoTelefonoValidar").val(1);
+					// 		$("#btnCodigoTelefonoConfirmacion").removeClass("disabled");
+					// }
+                });
+            }
+			
+	function ListarPersonaPorAutoComplete() {
+		$("#txtPersona").jqxInput({
+			placeHolder: "Escriba y seleccione una persona",
+			source: function (query, response) {
+				var dataAdapter = new $.jqx.dataAdapter
+					({
+						datatype: "json",
+						datafields: [{ name: 'IdPersona' }, { name: 'NombreCompleto' }],
+						url: "@Url.Action("ListarPersonaPorAutoComplete", "Persona")",
+						data: { NombreCompleto: query }
+					},
+						{
+							autoBind: true,
+							formatData: function (data) {
+								data.name_startsWith = query;
+								return data;
+							},
+							loadComplete: function (data) {
+								response($.map(data, function (item) {
+									return {
+										label: item.NombreCompleto,
+										value: item.IdPersona
+									}
+								}));
+							}
+						});
+			}, displayMember: "NombreCompleto", valueMember: "IdPersona", height: 35
+		});
+		$("#txtPersona").on('select', function (event) {
+			$("#txtIdPersona").val(0);
+			if (event.args) {
+				var item = event.args.item;
+				if (item) {
+					$("#txtIdPersona").val(item.value);
+				}
+				else {
+					$("#txtIdPersona").val(0);
+				}
+			}
+			else {
+				$("#txtIdPersona").val(0);
+			}
+		});
+	}
+
+	function ListarComboUsuario() {
+		$.ajax({
+			url: "@Url.Action("ListarComboUsuario", "Usuario")",
+			method: 'POST',
+			success: function (lista) {
+				if (lista.mensaje.CodigoMensaje == 0) {
+					$("#cmbUsuario").empty();
+					$("#cmbUsuario").append("<option value=0>Seleccione</option>");
+					$.each(lista.lista, function (i, item) {
+						if (item.IdUsuario == "@Model.usuario.IdUsuario") {
+							$("#cmbUsuario").append("<option value=" + item.IdUsuario + " selected='selected'>" + item.NombreUsuario + "</option>");
+						}
+						else {
+							$("#cmbUsuario").append("<option value=" + item.IdUsuario + ">" + item.NombreUsuario + "</option>");
+						}
+					});
+				}
+				else {
+					console.log(lista.mensaje.DescripcionMensajeSistema);
+					toastr.error(lista.mensaje.DescripcionMensaje);
+				}
+			},
+			error: function (mensaje) {
+				console.log(mensaje);
+				toastr.error('Sucedió un error en la llamada ListarComboUsuario, verifique consola');
+			}
+		});
+	}
+
+
+	$(function () {
+			$("#btnCodigoTelefonoConfirmacion").addClass("disabled");
+			$("#btnCodigoCorreoConfirmacion").addClass("disabled");
+
+
+			$("#txtEmailNotificacion").on('input', function() {
+				$("#btnCodigoCorreoConfirmacion").addClass("disabled");				
+				$("#txtCodigoCorreoValidar").val(0);
+			});
+			
+			$("#txtNumeroCelularNotificacion").on('input', function() {
+				$("#btnCodigoTelefonoConfirmacion").addClass("disabled");
+				$("#txtCodigoTelefonoValidar").val(0);
+			});
+			
+		//ListarPersonaPorAutoComplete();
+
+		// $("#nombreCombo").select2({ theme: 'bootstrap', dropdownParent: $('#NombreModal') });
+		$("#frmRegistroAdministrado").validate({
+			submit: {
+				settings: {
+					inputContainer: '.field',
+					errorClass: 'LabelError', errorListClass: 'ListaError'
+				},
+				callback: {
+					// onBeforeSubmit: function (node) {
+					// 	$("#btnGuardarAdministrado").addClass("disabled");
+					// 	$("#spGuardarAdministrado").removeClass("mdi mdi-content-save");
+					// 	$("#spGuardarAdministrado").addClass("spinner-grow spinner-grow-sm me-1");
+					// },
+					onSubmit: function (node, formData) {
+
+						var fileData = new FormData();
+						for (var control in formData) {
+							var valor = $("#" + control).val();
+							fileData.append(control, valor);
+							valor = "";
+						}
+
+
+						$.ajax({
+							url: "@Url.Action("GuardarRegistroAdministrado", "Administrado")",
+							method: 'POST',
+							data: fileData,
+							contentType: false,
+							processData: false,
+							success: function (administrado) {
+								if (administrado.mensaje.CodigoMensaje == 0) {
+									toastr.success(administrado.mensaje.DescripcionMensaje);
+									ActualizarTablaAdministrado();
+								}
+								else {
+									toastr.error(administrado.mensaje.DescripcionMensaje);
+									console.log(administrado.mensaje.DescripcionMensajeSistema);
+								}
+							},
+							error: function (mensaje) {
+								console.log(mensaje);
+								toastr.error('Sucedió un error en la interface [GuardarRegistroAdministrado], verifique consola');
+							},
+							// complete: function (respuesta) {
+							// 	$("#btnGuardarAdministrado").removeClass("disabled");
+							// 	$("#spGuardarAdministrado").removeClass("spinner-grow spinner-grow-sm me-1");
+							// 	$("#spGuardarAdministrado").addClass("mdi mdi-content-save");
+							// 	ValidarSesionActual(respuesta);
+							// }
+						});
+					}
+				}
+			}
+		});
+	});
+</script>

@@ -1,0 +1,232 @@
+﻿@model RecursoHumano.Empleado
+@{
+    ViewBag.Title = "Registro Empleado";
+    Layout = null;
+}
+<form id="frmRegistroEmpleado" name="frmRegistroEmpleado" method="POST">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header"><h4 class="my-0">Registro de Empleado</h4></div>
+                <div class="card-body">
+
+                    <input type="hidden" id="txtRegIdEmpleado" name="txtRegIdEmpleado" value="@Model.IdEmpleado" />
+                    <div class="row">
+                        @* <div class="col-md-2">
+                        <div class="mb-1">
+                        <div class="form-group">
+                        <label class="form-label" for="cmbEmpresaPadre">EmpresaPadre</label>
+                        <select class="form-control" id="cmbEmpresaPadre" name="cmbEmpresaPadre" data-toggle="select2" data-width="100%" data-validation="[V>0]" data-validation-message="Seleccione EmpresaPadre"></select>
+                        </div>
+                        </div>
+                        </div> *@
+                        <div class="col-md-6">
+                            <div class="mb-1">
+                                <div class="form-group">
+                                    <label class="form-label" for="txtPersona">Persona</label>
+                                    <select class="form-control" id="cmbPersona" name="cmbPersona" data-toggle="select2" data-width="100%" data-validation="[V>0]" data-validation-message="Seleccione una persona">
+                                        @if (Model.persona.IdPersona == 0)
+                                        {
+                                            <option></option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@Model.persona.IdPersona" selected="selected">@Model.persona.NombreCompleto</option>
+                                        }
+                                    </select>
+                                    @* <input type="hidden" id="txtIdPersona" name="txtIdPersona" value="@Model.persona.IdPersona" />
+                                    <input autocomplete="off" type="text" class="form-control" name="txtPersona" id="txtPersona" value="@Model.persona.NombreCompleto" data-validation="[NOTEMPTY]" data-validation-message="Seleccione una persona"> *@
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-2">
+                            <div class="mb-1">
+                                <div class="form-group">
+                                    <label class="form-label" for="cmbCatalogoTipoEmpleado">Tipo</label>
+                                    <select class="form-control" id="cmbCatalogoTipoEmpleado" name="cmbCatalogoTipoEmpleado" data-toggle="select2" data-width="100%" data-validation="[V>0]" data-validation-message="Seleccione el Tipo de Empleado"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="mb-1">
+                                <div class="form-group">
+                                    <label class="form-label" for="cmbCatalogoEstadoEmpleado">Estado</label>
+                                    <select class="form-control" id="cmbCatalogoEstadoEmpleado" name="cmbCatalogoEstadoEmpleado" data-toggle="select2" data-width="100%" data-validation="[V>0]" data-validation-message="Seleccione el Estado del Empleado"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="mb-1">
+                                <div class="form-group">
+                                    <label class="form-label" for="optActivo">Activo</label>
+                                    <select class="form-select" id="optActivo" name="optActivo">
+                                        @if (Model.Activo == true)
+                                        {
+                                            <option value="1" selected="">Si</option>
+                                            <option value="0">No</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="1">Si</option>
+                                            <option value="0" selected="">No</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer" style="text-align:end;">
+
+                    <button class="btn btn-primary waves-effect waves-light" title="Nuevo registro" onclick="VerEditarEmpleado(0)"> Nuevo <i class="ti-file"></i></button>
+                    <button type="submit" class="btn btn-success waves-effect waves-light" title="Grabar registro"> Guardar <i class="ti-save"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+
+    function ListarPersonaPorAutoComplete() {
+        $('#cmbPersona').select2({
+            placeholder: 'Selecciona una persona',
+            allowClear: true,
+            ajax: {
+                delay: 250,
+                method: 'POST',
+                url: "@Url.Action("ListarPersonaNaturalAutoComplete", "Persona")",
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        type: 'public'
+                    }
+                    return query;
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.items
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1
+        }).on("select2:select", function (e) {
+
+            $("#frmRegistroEmpleado").removeError("cmbPersona")
+        });;
+        // $('#cmbPersonaEmpresa').val(null).trigger('change');
+    }
+
+    function ListarCatalogoEstadoEmpleado() {
+        $.ajax({
+            url: "@Url.Action("ListarCatalogoEstadoEmpleado", "CatalogoRecursoHumano")",
+            method: 'POST',
+            success: function (data) {
+                $("#cmbCatalogoEstadoEmpleado").empty();
+                $("#cmbCatalogoEstadoEmpleado").append("<option value=0>Seleccione</option>");
+                $.each(data, function (i, item) {
+                    if (item.IdCatalogo == "@Model.catalogoestadoempleado.IdCatalogo") {
+                        $("#cmbCatalogoEstadoEmpleado").append("<option value=" + item.IdCatalogo + " selected='selected'>" + item.Descripcion + "</option>");
+                    }
+                    else {
+                        $("#cmbCatalogoEstadoEmpleado").append("<option value=" + item.IdCatalogo + ">" + item.Descripcion + "</option>");
+                    }
+                });
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la interface [ListarCatalogoEstadoEmpleado], verifique consola');
+            }
+        });
+    }
+
+    function ListarCatalogoTipoEmpleado() {
+        $.ajax({
+            url: "@Url.Action("ListarCatalogoTipoEmpleado", "CatalogoRecursoHumano")",
+            method: 'POST',
+            success: function (data) {
+                $("#cmbCatalogoTipoEmpleado").empty();
+                $("#cmbCatalogoTipoEmpleado").append("<option value=0>Seleccione</option>");
+                $.each(data, function (i, item) {
+                    if (item.IdCatalogo == "@Model.catalogotipoempleado.IdCatalogo") {
+                        $("#cmbCatalogoTipoEmpleado").append("<option value=" + item.IdCatalogo + " selected='selected'>" + item.Descripcion + "</option>");
+                    }
+                    else {
+                        $("#cmbCatalogoTipoEmpleado").append("<option value=" + item.IdCatalogo + ">" + item.Descripcion + "</option>");
+                    }
+                });
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la interface [ListarCatalogoTipoEmpleado], verifique consola');
+            }
+        });
+    }
+
+    $(function () {
+        ListarPersonaPorAutoComplete();
+
+        ListarCatalogoEstadoEmpleado();
+        $("#cmbCatalogoEstadoEmpleado").select2().on("select2:select", function (e) {
+            
+            $("#frmRegistroEmpleado").removeError("cmbCatalogoEstadoEmpleado")
+        });;
+
+        ListarCatalogoTipoEmpleado();
+        $("#cmbCatalogoTipoEmpleado").select2().on("select2:select", function (e) {
+            
+            $("#frmRegistroEmpleado").removeError("cmbCatalogoTipoEmpleado")
+        });
+        // $("#optActivo").select2();
+        // $("#nombreCombo").select2({ theme: 'bootstrap', dropdownParent: $('#NombreModal') });
+        $("#frmRegistroEmpleado").validate({
+            submit: {
+                settings: {
+                    inputContainer: '.field',
+                    errorClass: 'LabelError', errorListClass: 'ListaError'
+                },
+                callback: {
+                    onBeforeSubmit: function (node) {
+                    },
+                    onSubmit: function (node, formData) {
+                        //var files = $("#txtRutaArchivo").get(0).files;
+                        var fileData = new FormData();
+                        for (var control in formData) {
+                            var valor = $("#" + control).val();
+                            fileData.append(control, valor);
+                            valor = "";
+                        }
+                        //fileData.append('Archivo', files[0]);
+
+                        $.ajax({
+                            url: "@Url.Action("GuardarRegistroEmpleado", "Empleado")",
+                            method: 'POST',
+                            data: fileData,
+                            contentType: false,
+                            processData: false,
+                            success: function (empleado) {
+                                if (empleado.mensaje.CodigoMensaje == 0) {
+                                    toastr.success(empleado.mensaje.DescripcionMensaje);
+                                    ActualizarTablaEmpleado();
+                                }
+                                else {
+                                    toastr.error(empleado.mensaje.DescripcionMensaje);
+                                    console.log(empleado.mensaje.DescripcionMensajeSistema);
+                                }
+                            },
+                            error: function (mensaje) {
+                                console.log(mensaje);
+                                toastr.error('Sucedió un error en la interface [GuardarRegistroEmpleado], verifique consola');
+                            },
+                            complete: function (respuesta) {
+                                ValidarSesionActual(respuesta);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    });
+</script>

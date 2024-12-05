@@ -1,0 +1,401 @@
+﻿
+
+@model Sistema.OpcionFormulario
+@{
+    ViewBag.Title = "Registro OpcionFormulario";
+    Layout = null;
+}
+@if (Model.mensaje.CodigoMensaje > 0)
+{
+    <span>ERROR</span>
+    <span>@Model.mensaje.DescripcionMensaje</span>
+    <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Regresar al formulario anterior" onclick="NombreFuncionCerrarModal()"><i class="ti-back-left"></i></button>
+}
+else
+{
+    <form id="frmRegistroOpcionFormulario" name="frmRegistroOpcionFormulario" method="POST">
+        <input type="hidden" id="txtRegIdOpcionFormulario" name="txtRegIdOpcionFormulario" value="@Model.IdOpcionFormulario" />
+        <div class="card card-topline-aqua">
+            <div class="card-head" style="text-align:center;">
+                <h5 class="bold">@Model.opcion.NombreOpcion</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label" for="txtNombreFormulario">Nombre del formulario</label>
+                                    <input type="text" class="form-control" name="txtNombreFormulario" id="txtNombreFormulario" value="@Model.NombreFormulario" data-validation="[L>=1]" data-validation-message="Ingrese la NombreFormulario">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label" for="txtRutaFormulario">Ruta del formulario</label>
+                                    <input type="text" class="form-control" name="txtRutaFormulario" id="txtRutaFormulario" value="@Model.RutaFormulario">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label" for="txtControlador">Controlador</label>
+                                    <input type="text" class="form-control" name="txtControlador" id="txtControlador" value="@Model.Controlador" data-validation="[L>=1]" data-validation-message="Ingrese la Controlador">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label" for="txtAccion">Accion</label>
+                                    <input type="text" class="form-control" name="txtAccion" id="txtAccion" value="@Model.Accion" data-validation="[L>=1]" data-validation-message="Ingrese la Accion">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" for="optVer">Ver</label>
+                                    <br />
+                                    <select id="optVer" name="optVer" class="form-control form-select">
+                                        @if (Model.Ver == true)
+                                        {
+                                            <option value="1" selected="">Si</option>
+                                            <option value="0">No</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="1">Si</option>
+                                            <option value="0" selected="">No</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" for="optNuevo">Nuevo</label>
+                                    <br />
+                                    <select id="optNuevo" name="optNuevo" class="form-control form-select">
+                                        @if (Model.Nuevo == true)
+                                        {
+                                            <option value="1" selected="">Si</option>
+                                            <option value="0">No</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="1">Si</option>
+                                            <option value="0" selected="">No</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" for="optEditar">Editar</label>
+                                    <br />
+                                    <select id="optEditar" name="optEditar" class="form-control form-select">
+                                        @if (Model.Editar == true)
+                                        {
+                                            <option value="1" selected="">Si</option>
+                                            <option value="0">No</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="1">Si</option>
+                                            <option value="0" selected="">No</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" for="optGuardar">Guardar</label>
+                                    <br />
+                                    <select id="optGuardar" name="optGuardar" class="form-control form-select">
+                                        @if (Model.Guardar == true)
+                                        {
+                                            <option value="1" selected="">Si</option>
+                                            <option value="0">No</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="1">Si</option>
+                                            <option value="0" selected="">No</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" for="optEliminar">Eliminar</label>
+                                    <br />
+                                    <select id="optEliminar" name="optEliminar" class="form-control form-select">
+                                        @if (Model.Eliminar == true)
+                                        {
+                                            <option value="1" selected="">Si</option>
+                                            <option value="0">No</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="1">Si</option>
+                                            <option value="0" selected="">No</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" for="optImprimir">Imprimir</label>
+                                    <br />
+                                    <select id="optImprimir" name="optImprimir" class="form-control form-select">
+                                        @if (Model.Imprimir == true)
+                                        {
+                                            <option value="1" selected="">Si</option>
+                                            <option value="0">No</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="1">Si</option>
+                                            <option value="0" selected="">No</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" for="optExportar">Exportar</label>
+                                    <br />
+                                    <select id="optExportar" name="optExportar" class="form-control form-select">
+                                        @if (Model.Exportar == true)
+                                        {
+                                            <option value="1" selected="">Si</option>
+                                            <option value="0">No</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="1">Si</option>
+                                            <option value="0" selected="">No</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" for="optVistaPrevia">VistaPrevia</label>
+                                    <br />
+                                    <select id="optVistaPrevia" name="optVistaPrevia" class="form-control form-select">
+                                        @if (Model.VistaPrevia == true)
+                                        {
+                                            <option value="1" selected="">Si</option>
+                                            <option value="0">No</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="1">Si</option>
+                                            <option value="0" selected="">No</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" for="optConsultar">Consultar</label>
+                                    <br />
+                                    <select id="optConsultar" name="optConsultar" class="form-control form-select">
+                                        @if (Model.Consultar == true)
+                                        {
+                                            <option value="1" selected="">Si</option>
+                                            <option value="0">No</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="1">Si</option>
+                                            <option value="0" selected="">No</option>
+                                        }
+                                    </select>
+                                </div>
+
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" for="optActivoFromulario">Activo</label>
+                                    <br />
+                                    <select id="optActivoFromulario" name="optActivoFromulario" class="form-control form-select">
+                                        @if (Model.Activo == true)
+                                        {
+                                            <option value="1" selected="">Si</option>
+                                            <option value="0">No</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="1">Si</option>
+                                            <option value="0" selected="">No</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer" style="text-align:right;">
+                <button type="submit" data-toggle="tooltip" class="btn btn-blue label" title="Grabar registro"> Guardar<i   class="ti-save"></i></button>                
+                <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Regresar al formulario anterior" onclick="CerrarModalOpcionFormulario()"> Regresar<i   class="ti-back-left"></i></button>
+            </div>
+        </div>
+    </form>
+    <div class="modal fade" id="ModalEliminarOpcionFormulario">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <a href="#" class="close" onclick="CerrarEliminarOpcionFormulario()"><i class="fas fa-times"></i></a>
+                    <h4 class="modal-title">Eliminar OpcionFormulario</h4>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro de eliminar el registro seleccionado?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Eliminar registro seleccionado" onclick="EliminarOpcionFormulario()"><i class="ti-trash"></i></button>
+                    <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Regresar al formulario anterior" onclick="CerrarEliminarOpcionFormulario()"><i class="ti-back-left"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        function CerrarModalOpcionFormulario() {
+            $("#ModalOpcionFormulario").modal("hide");
+            $("#divModalOpcionFormulariol").empty();
+        }
+        function CerrarEliminarOpcionFormulario() {
+            $("#txtIdOpcionFormularioEliminar").val(0);
+            $("#ModalEliminarOpcionFormulario").modal("hide");
+        }
+        function EliminarOpcionFormulario() {
+            $.ajax({
+                beforeSend: function () {
+                    $('#btnNuevoOpcionFormulario').prop('disabled', true);
+                    $('#btnGrabarOpcionFormulario').prop('disabled', true);
+                    $('#btnVerModalEliminarOpcionFormulario').prop('disabled', true);
+                },
+                url: "@Url.Action("EliminarOpcionFormulario")",
+                method: 'POST',
+                data: { IdOpcion: '@Model.opcion.IdOpcion' },
+                success: function (mensaje) {
+                    $("#modalEliminarOpcionFormulario").modal('hide');
+                    if (mensaje.CodigoMensaje == 0) {
+                        $("#" + IdOpcionFormularioEliminar).remove();
+                        $('#btnVerEditarOpcionFormulario').prop('disabled', true);
+                        $('#btnVerModalEliminarOpcionFormulario').prop('disabled', true);
+                        toastr.success(mensaje.DescripcionMensaje);
+                        VerEditarOpcionFormulario(0);
+                        CerrarEliminarOpcionFormulario();
+                    }
+                    else {
+                        toastr.error(mensaje.DescripcionMensaje);
+                        console.log(mensaje.DescripcionMensajeSistema);
+                    }
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la interface [EliminarOpcionFormulario], verifique consola');
+                },
+                complete: function (respuesta) {
+                    $('#btnNuevoOpcionFormulario').prop('disabled', false);
+                    $('#btnGrabarOpcionFormulario').prop('disabled', false);
+                    $('#btnVerModalEliminarOpcionFormulario').prop('disabled', false);
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+        function VerModalEliminarOpcionFormulario() {
+           $("#ModalEliminarOpcionFormulario").modal("show");
+        }
+
+        function ListarComboOpcion() {
+            $.ajax({
+                url: "@Url.Action("ListarComboOpcion", "Opcion")",
+                method: 'POST',
+                success: function (data) {
+                    $("#cmbOpcion").empty();
+                    $("#cmbOpcion").append("<option value=0>Seleccione</option>");
+                    $.each(data, function (i, item) {
+                        if (item.IdOpcion == "@Model.opcion.IdOpcion") {
+                            $("#cmbOpcion").append("<option value=" + item.IdOpcion + " selected='selected'>" + item.NombreOpcion + "</option>");
+                        }
+                        else {
+                            $("#cmbOpcion").append("<option value=" + item.IdOpcion + ">" + item.NombreOpcion + "</option>");
+                        }
+                    });
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la interface [ListarComboOpcion], verifique consola');
+                },
+                complete: function (respuesta) {
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+
+        $(function () {
+
+            $("#frmRegistroOpcionFormulario").validate({
+                submit: {
+                    settings: {
+                        inputContainer: '.field',
+                        errorClass: 'LabelError', errorListClass: 'ListaError'
+                    },
+                    callback: {
+                        onBeforeSubmit: function (node) {
+                        },
+                        onSubmit: function (node, formData) {
+                            var fileData = new FormData();
+                            for (var key in formData) {
+                                fileData.append(key, formData[key]);
+                            }
+                            fileData.append('IdOpcion', '@Model.opcion.IdOpcion');
+                            $.ajax({
+                                url: "@Url.Action("GuardarRegistroOpcionFormulario")",
+                                method: 'POST',
+                                data: fileData,
+                                contentType: false,
+                                processData: false,
+                                success: function (opcionformulario) {                                  
+                                    if (opcionformulario.mensaje.CodigoMensaje == 0) {
+                                        toastr.success(opcionformulario.mensaje.DescripcionMensaje);
+                                        $("#txtRegIdOpcionFormulario").val(opcionformulario.IdOpcionFormulario);
+                                        CerrarModalOpcionFormulario();
+                                    }
+                                    else {
+                                        toastr.error(opcionformulario.mensaje.DescripcionMensaje);
+                                        console.log(opcionformulario.mensaje.DescripcionMensajeSistema);
+                                    }
+                                },
+                                error: function (mensaje) {
+                                    console.log(mensaje);
+                                    toastr.error('Sucedió un error en la interface [GuardarRegistroOpcionFormulario], verifique consola');
+                                },
+                                complete: function (respuesta) {
+                                    ValidarSesionActual(respuesta);
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

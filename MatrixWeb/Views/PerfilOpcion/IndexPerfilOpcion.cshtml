@@ -1,0 +1,140 @@
+﻿@{
+    ViewBag.Title = "ListaPerfilOpcion";
+    Layout = null;
+
+}
+
+<div id="divEditarPerfilOpcion">
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <table id="dtbPerfilOpcion" class="table table-striped table-hover table-bordered" cellspacing="0" style="width:100%"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+
+    function VerEditarPerfilOpcion(tipo) {
+        var IdPerfilOpcion = 0;
+        if (tipo == 1) {
+            var data = ListaPerfilOpcion.dtPerfilOpcion.rows('.selected').data();
+            if (data.length == 1) {
+                IdPerfilOpcion = data[0].IdPerfilOpcion;
+            }
+        }
+        $.ajax({
+            beforeSend: function () {
+                $('#iBtnNuevoIdPerfilOpcion').removeClass("ti-file").addClass("fa fa-spinner fa-spin fa-fw");
+            },
+            url: "@Url.Action("RegistroPerfilOpcion", "PerfilOpcion")",
+            type: "POST",
+            async: true,
+            data: { IdPerfil: @ViewBag.IdPerfil, IdPerfilOpcion: IdPerfilOpcion },
+            success: function (vistaParcial) {
+                $("#divEditarPerfilOpcion").html(vistaParcial);
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la llamada, verifique consola');
+            },
+            complete: function (respuesta) {
+                $('#iBtnNuevoIdPerfilOpcion').removeClass("fa fa-spinner fa-spin fa-fw").addClass("ti-file");
+                ValidarSesionActual(respuesta);
+            }
+        });
+    }
+
+    function ActualizarTablaPerfilOpcion() {
+        ListaPerfilOpcion.refresh();
+    }
+    $(function () {
+        ListaPerfilOpcion = {
+            dtPerfilOpcion: null,
+            init: function () {
+                this.dtPerfilOpcion = $('#dtbPerfilOpcion').DataTable({
+                    responsive: true,
+                    rowId: 'IdPerfilOpcion',
+                    "lengthMenu": [[10, 25, 50, 100, 100000], [10, 25, 50, 100, 'Todo']],
+                    language: {
+                        url: '/assets/libs/datatables.net/js/es-ES.json',
+                    },
+                    select: {
+                        style: 'single',
+                        info: false
+                    },
+                    "ordering": false,
+                    "serverSide": true,
+                    "ajax": {
+                        "url": "@Url.Action("ListarPerfilOpcion", "PerfilOpcion")",
+                        "error": function (respuesta, error, thrown) {
+                            ValidarSesionActual(respuesta);
+                        },
+                        "type": "POST",
+                        "data": function (d) {
+                            d.IdPerfil = @ViewBag.IdPerfil;
+                        }
+                    },
+                    "columns": [
+                        { "title": "IdPerfilOpcion", "data": "IdPerfilOpcion", "className": "dt-head-center dt-body-left", "width": "10%" },
+                        { "title": "Tipo", "data": "CatalogoTipoOpcion", "className": "dt-head-center dt-body-left", "width": "10%" },
+                        { "title": "Modulo", "data": "NombreModulo", "className": "dt-head-center dt-body-left", "width": "10%" },
+                        { "title": "Menu", "data": "NombreOpcionPadre", "className": "dt-head-center dt-body-left", "width": "10%" },
+                        { "title": "Opcion", "data": "NombreOpcion", "className": "dt-head-center dt-body-left", "width": "10%" },
+                        //{ "title": "Ver", "data": "Ver0", "className": "dt-head-center dt-body-left", "width": "10%" },
+                        {
+                            "title": "Ver", "data":
+                                function (row, type, val, meta) {
+                                    if (row.Ver0 == 'Si') {
+                                        return row.Ver;
+                                    } else {
+                                        return '';
+                                    }
+                                }, "className": "dt-head-center dt-body-center", "width": "8%"
+                        },
+                        { "title": "Nuevo", "data": function (row, type, val, meta) { if (row.Nuevo0 == 'Si') { return row.Nuevo; } else { return ''; } }, "className": "dt-head-center dt-body-center", "width": "8%" },
+                        { "title": "Editar", "data": function (row, type, val, meta) { if (row.Editar0 == 'Si') { return row.Editar; } else { return ''; } }, "className": "dt-head-center dt-body-center", "width": "8%" },
+                        { "title": "Guardar", "data": function (row, type, val, meta) { if (row.Guardar0 == 'Si') { return row.Guardar; } else { return ''; } }, "className": "dt-head-center dt-body-center", "width": "8%" },
+                        { "title": "Eliminar", "data": function (row, type, val, meta) { if (row.Eliminar0 == 'Si') { return row.Eliminar; } else { return ''; } }, "className": "dt-head-center dt-body-center", "width": "8%" },
+                        { "title": "Imprimir", "data": function (row, type, val, meta) { if (row.Imprimir0 == 'Si') { return row.Imprimir; } else { return ''; } }, "className": "dt-head-center dt-body-center", "width": "8%" },
+                        { "title": "Exportar", "data": function (row, type, val, meta) { if (row.Exportar0 == 'Si') { return row.Exportar; } else { return ''; } }, "className": "dt-head-center dt-body-center", "width": "8%" },
+                        { "title": "VistaPrevia", "data": function (row, type, val, meta) { if (row.VistaPrevia0 == 'Si') { return row.VistaPrevia; } else { return ''; } }, "className": "dt-head-center dt-body-center", "width": "8%" },
+                        { "title": "Consultar", "data": function (row, type, val, meta) { if (row.Consultar0 == 'Si') { return row.Consultar; } else { return ''; } }, "className": "dt-head-center dt-body-center", "width": "8%" }
+                    ]
+                });
+            },
+            refresh: function () {
+                this.dtPerfilOpcion.ajax.reload(null, false);
+            }
+        }
+        ListaPerfilOpcion.init();
+        ListaPerfilOpcion.dtPerfilOpcion.on('select', function (e, dt, type, indexes) {
+            var count = ListaPerfilOpcion.dtPerfilOpcion.rows({ selected: true }).count();
+            if (count > 0) {
+                $('#btnVerModalEliminarPerfilOpcion').prop('disabled', false);
+                VerEditarPerfilOpcion(1);
+            }
+        });
+        ListaPerfilOpcion.dtPerfilOpcion.on('deselect', function (e, dt, type, indexes) {
+            var count = ListaPerfilOpcion.dtPerfilOpcion.rows({ selected: true }).count();
+            if (count == 0) {
+                $('#btnVerModalEliminarPerfilOpcion').prop('disabled', true);
+
+            }
+        });
+        VerEditarPerfilOpcion(0);
+    });
+</script>
+
+
+
+
+
+
+
+
+

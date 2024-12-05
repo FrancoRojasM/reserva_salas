@@ -1,0 +1,130 @@
+﻿@model Utilitarios.Catalogo
+@{
+    ViewBag.Title = "Registro Catalogo";
+    Layout = null;
+}
+<form id="frmRegistroCatalogo" name="frmRegistroCatalogo" method="POST">
+    <div class="row">
+        <div class="col-12">
+            <div class="card " style="box-shadow:none">
+                <div class="card-body">
+                    <input type="hidden" id="txtRegIdCatalogo" name="txtRegIdCatalogo" value="@Model.IdCatalogo" />
+                    <input type="hidden" id="txtIdCatalogoPadre" name="txtIdCatalogoPadre" value="@Model.IdCatalogoPadre" />
+                    <div class=" row">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="form-label" for="txtOrdenItem">Orden</label>
+                                <input type="number" class="form-control" name="txtOrdenItem" id="txtOrdenItem" value="@Model.OrdenItem" data-validation="[L>=1]" data-validation-message="Ingrese el Orden">
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label class="form-label" for="txtDescripcion">Descripcion</label>
+                                <input type="text" class="form-control" name="txtDescripcion" id="txtDescripcion" autocomplete="off" value="@Model.Descripcion" data-validation="[L>=1]" data-validation-message="Ingrese la Descripcion">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label" for="txtDetalle">Detalle</label>
+                                <input type="text" class="form-control" name="txtDetalle" id="txtDetalle" value="@Model.Detalle">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="form-label" for="optActivo">Activo</label>
+
+                                <select class="form-control form-select" id="optActivo" name="optActivo">
+                                    @if (Model.Activo == 1)
+                                    {
+                                        <option value="1" selected="">Si</option>
+                                        <option value="0">No</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="1">Si</option>
+                                        <option value="0" selected="">No</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer" style="text-align:end;">
+                    <button type="button" data-toggle="tooltip" class="btn btn-warning waves-effect waves-light" title="Actualizar tabla de registros" onclick="ActualizarTablaCatalogo()"> Refrescar &nbsp;<i class="fas fa-sync"></i></button>
+                    <button type="button" data-toggle="tooltip" class="btn btn-success waves-effect waves-light" title="Nuevo registro" onclick="VerEditarCatalogo(0)"> Nuevo  &nbsp;<i id="iBtnNuevoCatalogo" class="ti-file"></i></button>
+                    <button type="submit" data-toggle="tooltip" class="btn btn-primary waves-effect waves-light" title="Grabar registro"> Guardar  &nbsp;<i class="ti-save"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+
+    function CerrarModalCatalogo() {
+        $("#ModalCatalogo").modal("hide");
+        $("#divEditarCatalogo").empty();
+        ActualizarTablaCatalogo();
+    }
+
+    $(function () {
+
+        $("#frmRegistroCatalogo").validate({
+            submit: {
+                settings: {
+                    inputContainer: '.field',
+                    errorClass: 'LabelError', errorListClass: 'ListaError'
+                },
+                callback: {
+                    onBeforeSubmit: function (node) {
+                    },
+                    onSubmit: function (node, formData) {
+                        //var files = $("#txtRutaArchivo").get(0).files;
+                        var fileData = new FormData();
+                        for (var control in formData) {
+                            var valor = $("#" + control).val();
+                            fileData.append(control, valor);
+                            valor = "";
+                        }
+                        //fileData.append('Archivo', files[0]);
+
+
+                        $.ajax({
+                            url: "@Url.Action("GuardarRegistroCatalogo", "CatalogoSancion")",
+                            method: 'POST',
+                            data: fileData,
+                            contentType: false,
+                            processData: false,
+                            success: function (catalogo) {
+                                if (catalogo.mensaje.CodigoMensaje == 0) {
+                                    toastr.success(catalogo.mensaje.DescripcionMensaje);
+                                    VerEditarCatalogo(0);
+                                    ActualizarTablaCatalogo();
+                                }
+                                else {
+                                    toastr.error(catalogo.mensaje.DescripcionMensaje);
+                                    console.log(catalogo.mensaje.DescripcionMensajeSistema);
+                                }
+                            },
+                            error: function (mensaje) {
+                                console.log(mensaje);
+                                toastr.error('Sucedió un error en la interface [GuardarRegistroCatalogo], verifique consola');
+                            },
+                            complete: function (respuesta) {
+                                ValidarSesionActual(respuesta);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+
+
+
+
+
+
+

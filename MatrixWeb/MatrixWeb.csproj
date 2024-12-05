@@ -1,0 +1,143 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
+  </PropertyGroup>
+ 
+  <ItemGroup>
+    <Compile Remove="Controllers\Institucional\**" />
+    <Compile Remove="Controllers\Reclamaciones\**" />
+    <Compile Remove="Views\EmpleadoEmpleado\**" />
+    <Compile Remove="Views\InstitucionDatosImagenes\**" />
+    <Compile Remove="Views\InstitucionDatos\**" />
+    <Compile Remove="Views\Institucion\**" />
+    <Compile Remove="Views\Shared_old\**" />
+    <Compile Remove="wwwroot\Content\daterangepicker\**" />
+    <Compile Remove="wwwroot\Content\gantt\NuevoGantt\utils\**" />
+    <Content Remove="Controllers\Institucional\**" />
+    <Content Remove="Controllers\Reclamaciones\**" />
+    <Content Remove="Views\EmpleadoEmpleado\**" />
+    <Content Remove="Views\InstitucionDatosImagenes\**" />
+    <Content Remove="Views\InstitucionDatos\**" />
+    <Content Remove="Views\Institucion\**" />
+    <Content Remove="Views\Shared_old\**" />
+    <Content Remove="wwwroot\Content\daterangepicker\**" />
+    <Content Remove="wwwroot\Content\gantt\NuevoGantt\utils\**" />
+    <EmbeddedResource Remove="Controllers\Institucional\**" />
+    <EmbeddedResource Remove="Controllers\Reclamaciones\**" />
+    <EmbeddedResource Remove="Views\EmpleadoEmpleado\**" />
+    <EmbeddedResource Remove="Views\InstitucionDatosImagenes\**" />
+    <EmbeddedResource Remove="Views\InstitucionDatos\**" />
+    <EmbeddedResource Remove="Views\Institucion\**" />
+    <EmbeddedResource Remove="Views\Shared_old\**" />
+    <EmbeddedResource Remove="wwwroot\Content\daterangepicker\**" />
+    <EmbeddedResource Remove="wwwroot\Content\gantt\NuevoGantt\utils\**" />
+    <None Remove="Controllers\Institucional\**" />
+    <None Remove="Controllers\Reclamaciones\**" />
+    <None Remove="Views\EmpleadoEmpleado\**" />
+    <None Remove="Views\InstitucionDatosImagenes\**" />
+    <None Remove="Views\InstitucionDatos\**" />
+    <None Remove="Views\Institucion\**" />
+    <None Remove="Views\Shared_old\**" />
+    <None Remove="wwwroot\Content\daterangepicker\**" />
+    <None Remove="wwwroot\Content\gantt\NuevoGantt\utils\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Controllers\RecursoHumano\EmpleadoEmpleadoController.cs" />
+    <Compile Remove="Controllers\Seguridad\ValidarUsuario.cs" />
+    <Compile Remove="Utilitarios\AdvancedSearchViewModel.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\Content\bootstrap\css\bootstrap.css.map" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DataTables.AspNet.AspNetCore" Version="2.0.2" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="2.20.0" />
+    <PackageReference Include="EPPlus" Version="7.0.0" />
+    <PackageReference Include="itext" Version="8.0.2" />
+    <PackageReference Include="itext.bouncy-castle-adapter" Version="8.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.13" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+    <PackageReference Include="SharpZipLib" Version="1.4.2" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.5" />
+    <PackageReference Include="System.DirectoryServices" Version="7.0.0" />
+    <PackageReference Include="System.DirectoryServices.Protocols" Version="8.0.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="System.ServiceModel.Duplex" Version="6.0.0" />
+    <PackageReference Include="System.ServiceModel.Federation" Version="6.1.0" />
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="6.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MatrixModel\MatrixModel.csproj" />
+    <ProjectReference Include="..\MatrixService\MatrixService.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Views\Area\IndexArea.cshtml" />
+    <None Include="Views\Area\RegistroArea.cshtml" />
+    <None Include="Views\EmpleadoPerfil\DirectorioPerfil.cshtml" />
+    <None Include="Views\EmpleadoPerfil\IndexEmpleadoPerfil.cshtml" />
+    <None Include="Views\EmpleadoPerfil\RegistroEmpleadoPerfil.cshtml" />
+    <None Include="Views\EmpleadoPerfil\Roles.cshtml" />
+    <None Include="Views\Empleado\Directorio.cshtml" />
+    <None Include="Views\Empleado\IndexEmpleado.cshtml" />
+    <None Include="Views\Empleado\RegistroEmpleado.cshtml" />
+    <None Include="Views\Empleado\ReporteEmpleado.cshtml" />
+    <None Include="Views\MovimientoPersonal\IndexMovimientoDeRecursoHumano.cshtml" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\16112023184111.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\21019112023123638.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\21419112023123633.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\21519112023125105.xlsx" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\21619112023123637.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\22219112023123418.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\22419112023123433.xlsx" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\22419112023123631.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\22419112023134418.xlsx" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\22819112023125515.xlsx" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\23119112023123638.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\23218112023232559.xlsx" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\23919112023010259.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\24219112023121652.xlsx" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\2519112023123433.xlsx" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\25419112023123432.xlsx" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\25818112023232617.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\26019112023220541.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\26619112023121214.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\27019112023123422.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\27118112023205241.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\27518112023232543.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\27618112023115216.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\27818112023204543.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\28418112023205525.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\28419112023123638.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\28618112023234326.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\28918112023115702.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\2916112023191453.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\2919112023123600.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\2919112023123634.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\29519112023123634.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\29719112023123431.xlsx" />
+    <None Include="wwwroot\Content\Contenedor\Archivos\29819112023123634.pdf" />
+    <None Include="wwwroot\Content\Contenedor\Contenedor.rar" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\assets\libs\firmaperu\" />
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
+
+</Project>

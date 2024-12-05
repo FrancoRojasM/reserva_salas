@@ -1,0 +1,202 @@
+﻿@model Sanciones.Sancion
+@{
+    ViewBag.Title = "Registro Sanción";
+    Layout = null;
+}
+<form id="frmRegistroSancion" name="frmRegistroSancion" method="POST">
+    <input type="hidden" id="txtRegId" name="txtRegId" value="@Model.Id" />
+    <div class="row">
+        <div class="col-12">
+            <div class="card-header"><h4 class="my-0">Registro de Sancion</h4></div>
+            <div class="card" style="box-shadow:none">
+                <div class="card-body">
+                    <div class="row mb-1">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtCMP">CMP</label>
+                                <div class="input-group">
+                                    <div class="input-group input-group-merge">
+                                        <input type="text" class="form-control" id="txtCMP" name="txtCMP" value="@Model.CMP" data-validation="[L>=1]" data-validation-message="Ingrese el CMP" autocomplete="off">
+                                        <div title="Buscar Código de Barra" onclick="SearchCode()" class="input-group-text btn btn-success" id="SearchCode">
+                                            <span id="iBtnCMPBuscar" class="fas fa-search"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtNombreApellidos">Nombre y Apellidos</label>
+                                <input type="text" class="form-control" id="txtNombreApellidos" name="txtNombreApellidos" value="@Model.NombreCompleto" data-validation="[L>=1]" data-validation-message="Ingrese el nombre y apellidos" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtTipoSancion">Tipo de Sanción</label>
+                                <input type="text" class="form-control" id="txtTipoSancion" name="txtTipoSancion" value="@Model.TipoSancion" data-validation="[L>=1]" data-validation-message="Ingrese el tipo de sanción" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtConsejoRegional">Consejo Regional</label>
+                                <input type="text" class="form-control" id="txtConsejoRegional" name="txtConsejoRegional" value="@Model.ConsejoRegional" data-validation="[L>=1]" data-validation-message="Ingrese el consejo regional" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtNumeroResolucion">Número de Resolución</label>
+                                <input type="text" class="form-control" id="txtNumeroResolucion" name="txtNumeroResolucion" value="@Model.NumeroResolucion" data-validation="[L>=1]" data-validation-message="Ingrese el número de resolución" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="dtFechaResolucion">Fecha de Resolución</label>
+                                <input type="date" class="form-control" id="dtFechaResolucion" name="dtFechaResolucion" value="@Model.FechaResolucion?.ToString("yyyy-MM-dd")">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="dtFechaNotificacionMedico">Fecha de Notificación al Médico</label>
+                                <input type="date" class="form-control" id="dtFechaNotificacionMedico" name="dtFechaNotificacionMedico" value="@Model.FechaNotificacionMedico?.ToString("yyyy-MM-dd")">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="dtFechaVencimientoSancion">Fecha de Vencimiento de la Sanción</label>
+                                <input type="date" class="form-control" id="dtFechaVencimientoSancion" name="dtFechaVencimientoSancion" value="@Model.FechaVencimientoSancion?.ToString("yyyy-MM-dd")">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="dtFechaCumplimientoMulta">Fecha de Cumplimiento de Multa</label>
+                                <input type="date" class="form-control" id="dtFechaCumplimientoMulta" name="dtFechaCumplimientoMulta" value="@Model.FechaCumplimientoMulta?.ToString("yyyy-MM-dd")">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="dtFechaRegistroInscripcion">Fecha de Registro de Inscripción</label>
+                                <input type="date" class="form-control" id="dtFechaRegistroInscripcion" name="dtFechaRegistroInscripcion" value="@Model.FechaRegistroInscripcion?.ToString("yyyy-MM-dd")">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtEstadoSancion">Estado de la Sanción</label>
+                                <input type="text" class="form-control" id="txtEstadoSancion" name="txtEstadoSancion" value="@Model.EstadoSancion" data-validation="[L>=1]" data-validation-message="Ingrese el estado de la sanción" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtSancionImpuesta">Sanción Impuesta</label>
+                                <input type="text" class="form-control" id="txtSancionImpuesta" name="txtSancionImpuesta" value="@Model.SancionImpuesta" data-validation="[L>=1]" data-validation-message="Ingrese la sanción impuesta" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label" for="txtIndicacionNormaVulnerada">Indicación Norma Vulnerada</label>
+                                <input type="text" class="form-control" id="txtIndicacionNormaVulnerada" name="txtIndicacionNormaVulnerada" value="@Model.IndicacionNormaVulnerada" data-validation="[L>=1]" data-validation-message="Ingrese la norma vulnerada" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="card-footer" style="text-align:right;">
+                    <button type="button" data-toggle="tooltip" class="btn btn-warning waves-effect waves-light" title="Actualizar tabla de registros" onclick="ActualizarTablaSancion()"> Refrescar &nbsp;<i class="fas fa-sync"></i></button>
+                    <button type="button" data-toggle="tooltip" class="btn btn-success waves-effect waves-light" title="Nuevo registro" onclick="NuevoRegistro()"> Nuevo &nbsp;<i id="iBtnNuevoSancion" class="ti-file"></i></button>
+                    <button type="submit" data-toggle="tooltip" class="btn btn-primary waves-effect waves-light" title="Grabar registro"> Guardar &nbsp;<i class="ti-save"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+
+    function CerrarModalSancion() {
+        $("#ModalSancion").modal("hide");
+        $("#divEditarSancion").empty();
+        ActualizarTablaSancion();
+    }
+
+    function NuevoRegistro() {
+        VerEditarSancion(0);
+    }
+
+    function SearchCode() {
+        let Id = $("#txtCMP").val();
+        if (Id) {
+            $.ajax({
+                beforeSend: function () {
+                    $('#iBtnCMPBuscar').removeClass("ti-file").addClass("fa fa-spinner fa-spin fa-fw");
+                },
+                url: "@Url.Action("BuscarCodigo", "Sancion")",
+                type: "POST",
+                async: true,
+                data: { Id: Id },
+                success: function (vistaParcial) {
+                    $("#divEditarSancion").html(vistaParcial);
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la llamada, verifique consola');
+                },
+                complete: function (respuesta) {
+                    $('#iBtnCMPBuscar').removeClass("fa fa-spinner fa-spin fa-fw").addClass("ti-file");
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+    }
+
+
+    $(function () {
+        $("#frmRegistroSancion").validate({
+            submit: {
+                settings: {
+                    inputContainer: '.field',
+                    errorClass: 'LabelError', errorListClass: 'ListaError'
+                },
+                callback: {
+                    onBeforeSubmit: function (node) {
+                    },
+                    onSubmit: function (node, formData) {
+                        $.ajax({
+                            url: "@Url.Action("GuardarRegistroSancion")",
+                            method: 'POST',
+                            data: formData,
+                            success: function (articulo) {
+                                if (articulo.mensaje.CodigoMensaje == 0) {
+                                    toastr.success(articulo.mensaje.DescripcionMensaje);
+                                    $("#txtRegId").val(articulo.Id);
+                                    ActualizarTablaSancion();
+                                }
+                                else {
+                                    toastr.error(articulo.mensaje.DescripcionMensaje);
+                                    console.log(articulo.mensaje.DescripcionMensajeSistema);
+                                }
+                            },
+                            error: function (mensaje) {
+                                console.log(mensaje);
+                                toastr.error('Sucedió un error en la interface [GuardarRegistroSancion], verifique consola');
+                            },
+                            complete: function (respuesta) {
+                                ValidarSesionActual(respuesta);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    });
+
+</script>

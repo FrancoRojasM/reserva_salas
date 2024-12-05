@@ -1,0 +1,167 @@
+﻿@{
+    ViewBag.Title = "ListaCatalogo";
+    Layout = null;
+
+}
+<div class="card border-success border mb-3">
+    <div class="card-body px-1 py-1">
+        <div id="divEditarCatalogo">
+        </div>
+    </div>
+</div>
+<div class="card" style="box-shadow:none">
+    <div class="card-body px-1 py-1">
+        <div class="row">
+            <div class="col-12">
+                <table id="dtbCatalogo" class="table table-striped table-hover table-bordered" cellspacing="0" style="width:100%"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalEliminarCatalogo" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+    <input type="hidden" class="form-control" name="txtIdCatalogoEliminar" id="txtIdCatalogoEliminar" value="">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Eliminar</h5>
+                <a class="close" onclick="CerrarEliminarCatalogo()"><i class="fas fa-times"></i></a>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro de eliminar el registro seleccionado?
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Eliminar registro seleccionado" onclick="EliminarCatalogo()"> Eliminar <i class="ti-trash"></i></button>
+                <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Regresar al formulario anterior" onclick="CerrarEliminarCatalogo()"> Regresar<i class="ti-back-left"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function CerrarEliminarCatalogo() {
+        $("#ModalEliminarCatalogo").modal("hide");
+    }
+    function EliminarCatalogo() {
+        var IdCatalogo = $("#txtIdCatalogoEliminar").val();
+        $.ajax({
+            url: "@Url.Action("EliminarCatalogo", "CatalogoCasilla")",
+            method: 'POST',
+            data: { IdCatalogo: IdCatalogo },
+            success: function (mensaje) {
+                $("#modalEliminarCatalogo").modal('hide');
+                if (mensaje.CodigoMensaje == 0) {
+                    toastr.success(mensaje.DescripcionMensaje);
+                    ActualizarTablaCatalogo();
+                    VerEditarCatalogo(0);
+                    CerrarEliminarCatalogo();
+                }
+                else {
+                    toastr.error(mensaje.DescripcionMensaje);
+                    console.log(mensaje.DescripcionMensajeSistema);
+                }
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la interface [EliminarCatalogo], verifique consola');
+            }
+        });
+    }
+    function VerModalEliminarCatalogo(IdCatalogo) {
+
+        $("#txtIdCatalogoEliminar").val(IdCatalogo);
+        $("#ModalEliminarCatalogo").modal("show");
+    }
+
+    function VerEditarCatalogo(tipo) {
+        var IdCatalogo = 0;
+        if (tipo == 1) {
+            var data = ListaCatalogo.dtCatalogo.rows('.selected').data();
+            if (data.length == 1) {
+                IdCatalogo = data[0].IdCatalogo;
+            }
+        }
+        $.ajax({
+            url: "@Url.Action("RegistroCatalogo", "CatalogoCasilla")",
+            type: "POST",
+            async: true,
+            data: { IdCatalogo: IdCatalogo, IdCatalogoPadre: '@ViewBag.IdCatalogoPadre' },
+            success: function (vistaParcial) {
+                $("#divEditarCatalogo").html(vistaParcial);
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la llamada, verifique consola');
+            }
+        });
+    }
+
+    function ActualizarTablaCatalogo() {
+        ListaCatalogo.refresh();
+    }
+    $(function () {
+        VerEditarCatalogo(0);
+        ListaCatalogo = {
+            dtCatalogo: null,
+            init: function () {
+                this.dtCatalogo = $('#dtbCatalogo').DataTable({
+                    responsive: true,
+                    rowId: 'IdCatalogo',
+                    language: {
+                        url: '/assets/libs/datatables.net/js/es-ES.json',
+                    },
+                    "ordering": false,
+                    "lengthMenu": [[10, 25, 50, 100, 100000], [10, 25, 50, 100, 'Todo']],
+                    select: {
+                        style: 'single',
+                        info: false
+                    },
+                    "serverSide": true,
+                    "ajax": {
+                        "url": "@Url.Action("ListarCatalogo", "CatalogoCasilla")",
+                        "error": function (respuesta, error, thrown) {
+                            ValidarSesionActual(respuesta);
+                        },
+                        "type": "POST",
+                        "data": function (d) {
+                            d.IdCatalogoPadre = '@ViewBag.IdCatalogoPadre';
+                        }
+                    },
+                    "columns": [
+                        { "title": "Orden", "data": "OrdenItem", "className": "dt-head-center dt-body-left", "width": "10%" },
+                        { "title": "Descripcion", "data": "Descripcion", "className": "dt-head-center dt-body-left", "width": "50%" },
+                        { "title": "Detalle", "data": "Detalle", "className": "dt-head-center dt-body-left", "width": "30%" },
+                        { "title": "Activo", "data": "Activo", "className": "dt-head-center dt-body-left", "width": "10%" },
+                        {
+                            "title": "Eliminar",
+                            "data": function (row, type, val, meta) {
+                                return '<button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Opciones" onclick="VerModalEliminarCatalogo(' + row.IdCatalogo + ')"><i class="fa fa-trash"></i></button>';
+                            }, "className": "dt-head-center dt-body-center", "width": "5%"
+                        }
+                    ]
+                });
+            },
+            refresh: function () {
+                this.dtCatalogo.ajax.reload(null, false);
+            }
+        }
+        ListaCatalogo.init();
+        ListaCatalogo.dtCatalogo.on('select', function (e, dt, type, indexes) {
+            var count = ListaCatalogo.dtCatalogo.rows({ selected: true }).count();
+            if (count > 0) {
+                VerEditarCatalogo(1);
+            }
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+
+

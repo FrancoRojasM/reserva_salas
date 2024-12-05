@@ -1,0 +1,212 @@
+﻿@model General.Empresa
+@{
+    ViewBag.Title = "Registro Empresa";
+    Layout = null;
+}
+@if (Model.mensaje.CodigoMensaje > 0)
+{
+    <span>ERROR</span>
+    <span>@Model.mensaje.DescripcionMensaje</span>
+    <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Regresar al formulario anterior" onclick="NombreFuncionCerrarModal()"><i class="ti-back-left"></i></button>
+}
+else
+{
+    <form id="frmRegistroEmpresa" name="frmRegistroEmpresa" method="POST">
+        <input type="hidden" id="txtRegIdEmpresa" name="txtRegIdEmpresa" value="@Model.IdEmpresa" />
+        <div class="card card-block">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="form-group">
+                        <label class="form-label" for="txtPersona">Persona jurídica</label>
+                        <input type="hidden" id="txtIdPersona" name="txtIdPersona" value="@Model.persona.IdPersona" />
+                        <input autocomplete="off" type="text" class="form-control" name="txtPersona" id="txtPersona" value="@Model.persona.NombreCompleto" data-validation="[NOTEMPTY]" data-validation-message="Seleccione una persona">
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="form-group">
+                        <label class="form-label" for="txtNombreEmpresa">Nombre de la empresa</label>
+                        <input type="text" class="form-control" name="txtNombreEmpresa" id="txtNombreEmpresa" value="@Model.NombreEmpresa" data-validation="[L>=1]" data-validation-message="Ingrese la NombreEmpresa">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label class="form-label" for="optActivo">Activo</label>
+                        <select class="form-control form-select" id="optActivo" name="optActivo">
+                            @if (Model.Activo == true)
+                            {
+                                <option value="1" selected="">Si</option>
+                                <option value="0">No</option>
+                            }
+                            else
+                            {
+                                <option value="1">Si</option>
+                                <option value="0" selected="">No</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card card-block">
+            <div class="pull-xs-right">
+                @{string disabled = "";
+                    if (Model.IdEmpresa == 0) { disabled = "disabled"; }
+                }
+                <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Actualizar tabla de registros" onclick="ActualizarTablaEmpresa()"> Refrescar<i class="mdi mdi-refresh-circle"></i></button>
+                <button type="button" data-toggle="tooltip" class="btn btn-primary label" title="Nuevo registro" onclick="VerEditarEmpresa(0)"> Nuevo<i id="iBtnNuevoEmpresa" class="ti-file"></i></button>
+                <button type="submit" data-toggle="tooltip" class="btn btn-blue label" title="Grabar registro"> Guardar<i class="ti-save"></i></button>
+                <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Eliminar registro seleccionado" @disabled id="btnVerModalEliminarEmpresa" onclick="VerModalEliminarEmpresa()"> Eliminar<i class="ti-trash"></i></button>
+            </div>
+        </div>
+    </form>
+    <div class="modal fade" id="ModalEliminarEmpresa">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <a href="#" class="close" onclick="CerrarEliminarEmpresa()"><i class="fas fa-times"></i></a>
+                    <h4 class="modal-title">Eliminar</h4>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro de eliminar el registro seleccionado?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Eliminar registro seleccionado" onclick="EliminarEmpresa()"><i class="ti-trash"></i></button>
+                    <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Regresar al formulario anterior" onclick="CerrarEliminarEmpresa()"><i class="ti-back-left"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        function CerrarModalEmpresa() {
+            $("#ModalEmpresa").modal("hide");
+            $("#divEditarEmpresa").empty();
+            ActualizarTablaEmpresa();
+        }
+        function CerrarEliminarEmpresa() {
+            $("#ModalEliminarEmpresa").modal("hide");
+        }
+        function EliminarEmpresa() {
+            $.ajax({
+                beforeSend: function () {
+                    $('#btnNuevoEmpresa').prop('disabled', true);
+                    $('#btnGrabarEmpresa').prop('disabled', true);
+                    $('#btnVerModalEliminarEmpresa').prop('disabled', true);
+                },
+                url: "@Url.Action("EliminarEmpresa")",
+                method: 'POST',
+                data: { IdEmpresa: '@Model.IdEmpresa' },
+                success: function (mensaje) {
+                    $("#modalEliminarEmpresa").modal('hide');
+                    if (mensaje.CodigoMensaje == 0) {
+                        $('#btnVerEditarEmpresa').prop('disabled', true);
+                        $('#btnVerModalEliminarEmpresa').prop('disabled', true);
+                        toastr.success(mensaje.DescripcionMensaje);
+                        ActualizarTablaEmpresa();
+                        VerEditarEmpresa(0);
+                        CerrarEliminarEmpresa();
+                    }
+                    else {
+                        toastr.error(mensaje.DescripcionMensaje);
+                        console.log(mensaje.DescripcionMensajeSistema);
+                    }
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la interface [EliminarEmpresa], verifique consola');
+                },
+                complete: function (respuesta) {
+                    $('#btnNuevoEmpresa').prop('disabled', false);
+                    $('#btnGrabarEmpresa').prop('disabled', false);
+                    $('#btnVerModalEliminarEmpresa').prop('disabled', false);
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+        function VerModalEliminarEmpresa() {
+            $("#ModalEliminarEmpresa").modal("show");
+        }
+        function ListarPersonaJuridicaPorAutoComplete() {
+            $("#txtPersona").jqxInput({
+                placeHolder: "Escriba y seleccione una persona", height: 30,
+                source: function (query, response) {
+                    var dataAdapter = new $.jqx.dataAdapter
+                    ({  datatype: "json",
+                        datafields: [{ name: 'IdPersona' }, { name: 'NombreCompleto' }],
+                        url: "@Url.Action("ListarPersonaJuridicaPorAutoComplete", "Persona")",
+                        data: { NombreCompleto: query }
+                    },
+                     {   autoBind: true,
+                         formatData: function (data) {
+                             data.name_startsWith = query;
+                             return data;
+                         },
+                         loadComplete: function (data) {
+                             response($.map(data, function (item) {
+                                 return {
+                                     label: item.NombreCompleto,
+                                     value: item.IdPersona
+                                 }
+                             }));
+                         }
+                     });
+                }, displayMember: "NombreCompleto", valueMember: "IdPersona", height: 30
+            });
+            $("#txtPersona").on('select', function (event) {
+                $("#txtIdPersona").val(0);
+                if (event.args) {
+                    var item = event.args.item;
+                    if (item) {
+                        $("#txtIdPersona").val(item.value);
+                    }
+                    else {
+                        $("#txtIdPersona").val(0);
+                    }
+                }
+                else {
+                    $("#txtIdPersona").val(0);
+                }
+            });
+        }
+        $(function () {
+            ListarPersonaJuridicaPorAutoComplete();          
+            $("#frmRegistroEmpresa").validate({
+                submit: {
+                    settings: {
+                        inputContainer: '.field',
+                        errorClass: 'LabelError', errorListClass: 'ListaError'
+                    },
+                    callback: {
+                        onBeforeSubmit: function (node) {
+                        },
+                        onSubmit: function (node, formData) {
+                            $.ajax({
+                                url: "@Url.Action("GuardarRegistroEmpresaPrincipal", "Empresa")",
+                                method: 'POST',
+                                data: formData,
+                                success: function (empresa) {
+                                    if (empresa.mensaje.CodigoMensaje == 0) {
+                                        toastr.success(empresa.mensaje.DescripcionMensaje);
+                                        VerEditarEmpresa(0);
+                                        ActualizarTablaEmpresa();
+                                    }
+                                    else {
+                                        toastr.error(empresa.mensaje.DescripcionMensaje);
+                                        console.log(empresa.mensaje.DescripcionMensajeSistema);
+                                    }
+                                },
+                                error: function (mensaje) {
+                                    console.log(mensaje);
+                                    toastr.error('Sucedió un error en la interface [GuardarRegistroEmpresa], verifique consola');
+                                },
+                                complete: function (respuesta) {
+                                    ValidarSesionActual(respuesta);
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

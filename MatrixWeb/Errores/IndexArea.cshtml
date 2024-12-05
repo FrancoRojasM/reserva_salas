@@ -1,0 +1,204 @@
+﻿@{
+    ViewBag.Title = "ListaArea";
+    Layout = null;
+
+
+}
+
+<div id="divEditarArea">
+</div>
+
+<div class="card card-block">
+    <table id="dtbArea" class="table table-striped table-hover table-bordered" cellspacing="0" style="width:100%"></table>
+</div>
+
+<div class="modal fade" id="ModalAreaDocumento" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+    <input type="hidden" class="form-control" name="txtIdPersonaEliminar" id="txtIdPersonaEliminar" value="">
+    <div class="modal-dialog modal-sme modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Documentos por Area</h5>
+                <span type="button" class="close" onclick="CerrarModalAreaDocumento()"><i class="fas fa-times"></i></span>
+            </div>
+            <div class="modal-body">
+                <div id="divModalAreaDocumento">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ModalEliminarArea" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+    <input type="hidden" class="form-control" name="txtIdAreaEliminar" id="txtIdAreaEliminar" value="">
+    <input type="hidden" class="form-control" name="txtIdPersonaEliminar" id="txtIdPersonaEliminar" value="">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Eliminar</h5>
+                <span type="button" class="close" onclick="CerrarEliminarArea()"><i class="fas fa-times"></i></span>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro de eliminar el registro seleccionado?
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Eliminar registro seleccionado" onclick="EliminarArea()"> Eliminar <i class="ti-trash"></i></button>
+                <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Regresar al formulario anterior" onclick="CerrarEliminarArea()"> Cerrar <i class="ti-back-left"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function CerrarEliminarArea() {
+        $("#txtIdAreaEliminar").val(0);
+        $("#ModalEliminarArea").modal("hide");
+    }
+        function EliminarArea() {
+            var IdAreaEliminar = $('#txtIdAreaEliminar').val();
+            $.ajax({
+                url: "@Url.Action("EliminarArea")",
+                method: 'POST',
+                data: { IdArea: IdAreaEliminar },
+                success: function (mensaje) {
+                    $("#modalEliminarArea").modal('hide');
+                    if (mensaje.CodigoMensaje == 0) {
+                        toastr.success(mensaje.DescripcionMensaje);
+                        VerEditarArea(0);
+                        CerrarEliminarArea();
+                        ActualizarTablaArea();
+                    }
+                    else {
+                        toastr.error(mensaje.DescripcionMensaje);
+                        console.log(mensaje.DescripcionMensajeSistema);
+                    }
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la interface [EliminarArea], verifique consola');
+                },
+                complete: function (respuesta) {
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+    function VerModalEliminarArea(IdArea) {
+                $("#txtIdAreaEliminar").val(IdArea);
+                $("#ModalEliminarArea").modal("show");
+        }
+        function VerEditarArea(tipo) {
+            var IdArea = 0;
+            if (tipo == 1) {
+                var data = ListaArea.dtArea.rows('.selected').data();
+                if (data.length == 1) {
+                    IdArea = data[0].IdArea;
+                }
+            }
+            $.ajax({
+                url: "@Url.Action("RegistroArea", "Area")",
+                type: "POST",
+                async: true,
+                data: { IdArea: IdArea, IdEmpresa:'@ViewBag.IdEmpresa' },
+                success: function (vistaParcial) {
+                    $("#divEditarArea").html(vistaParcial);
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la llamada, verifique consola');
+                }
+            });
+        }
+        function CerrarModalAreaDocumento() {
+            $("#ModalAreaDocumento").modal("hide");
+			$("#divModalAreaDocumento").empty();
+			ActualizarTablaAreaDocumento();
+        }
+		 function VerModalAreaDocumento(IdArea) {
+            if (IdArea == 0) {
+                toastr.error('Seleccione correctamente un AreaDocumento');
+                return;
+            }
+
+            $.ajax({
+                url: "@Url.Action("IndexAreaDocumento", "AreaDocumento")",
+                type: "POST",
+                async: true,
+                data: { IdArea: IdArea },
+                success: function (vistaParcial) {
+                    $("#divModalAreaDocumento").html(vistaParcial);
+                    $("#ModalAreaDocumento").modal("show");
+                },
+                error: function (mensaje) {
+                    console.log(mensaje.responseText);
+                    toastr.error('Sucedió un error en la llamada, verifique consola');
+                },
+                complete: function (respuesta) {
+                    $('#iBtnVerModalAreaDocumento').removeClass("fa fa-spinner fa-spin fa-fw").addClass("icon-menu");
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+        function ActualizarTablaArea() {
+            ListaArea.refresh();
+        }
+        $(function () {
+            VerEditarArea(0);
+            ListaArea = {
+                dtArea: null,
+                init: function () {
+                    this.dtArea = $('#dtbArea').DataTable({
+                        responsive: true,
+                        rowId: 'IdArea',
+                        language: {
+                            url: '/assets/libs/datatables.net/js/es-ES.json',
+                        },
+                        "ordering": false,
+                        "lengthMenu": [[10, 25, 50, 100, 100000], [10, 25, 50, 100, 'Todo']],
+                        select: {
+                            style: 'single',
+info: false
+                        },
+                        "serverSide": true,
+                        "ajax": {
+                            "url": "@Url.Action("ListarArea", "Area")",
+                            "error": function (respuesta, error, thrown) {
+                                ValidarSesionActual(respuesta);
+                            },
+                            "type": "POST",
+                            "data": function (d) {
+                                d.IdEmpresa = '@ViewBag.IdEmpresa';
+                            }
+                        },
+                        "columns": [
+                            { "title": "Dependencia", "data": "NombreAreaPadre", "className": "dt-head-center dt-body-left", "width": "15%" },
+                            { "title": "Tipo", "data": "CatalogoTipoArea", "className": "dt-head-center dt-body-left", "width": "15%" },
+                            { "title": "Area", "data": "NombreArea", "className": "dt-head-center dt-body-left", "width": "25%" },
+                            { "title": "Abreviatura", "data": "Abreviatura", "className": "dt-head-center dt-body-left", "width": "15%" },
+                            { "title": "Sigla", "data": "Sigla", "className": "dt-head-center dt-body-left", "width": "15%" },
+                            { "title": "Activo", "data": "Activo", "className": "dt-head-center dt-body-center", "width": "5%" },
+                            { "title": "Documentos",
+                                "data": function (row, type, val, meta) {
+                                    var CantidadAreaDocumento = '';
+                                    if (row.CantidadAreaDocumento > 0) { CantidadAreaDocumento = '<span class="badge headerBadgeColor2">' + row.CantidadAreaDocumento + '</span>'; }
+                                    return '<button type="button" data-toggle="tooltip" class="btn btn-warning label" title="ver AreaDocumento" onclick="VerModalAreaDocumento(' + row.IdArea + ')" ><i id="iBtnAreaDocumento' + row.IdArea + '" class="fas fa-bars"></i></button>' + CantidadAreaDocumento;
+                                },"className": "dt-head-center dt-body-center", "width": "5%"
+                            },
+                            { "title": "Eliminar",
+                                "data": function (row, type, val, meta) {
+                                    return '<button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Opciones" onclick="VerModalEliminarArea(' + row.IdArea + ')"><i id="btnArea' + row.IdArea + '" class="fa fa-trash"></i></button>';
+                                },"className": "dt-head-center dt-body-center", "width": "5%"
+                            }
+                        ]
+                    });
+                },
+                refresh: function () {
+                    this.dtArea.ajax.reload(null, false);
+                }
+            }
+            ListaArea.init();
+            ListaArea.dtArea.on('select', function (e, dt, type, indexes) {
+                var count = ListaArea.dtArea.rows({ selected: true }).count();
+                if (count > 0) {
+                    VerEditarArea(1);
+                }
+            });            
+        });
+</script>
+

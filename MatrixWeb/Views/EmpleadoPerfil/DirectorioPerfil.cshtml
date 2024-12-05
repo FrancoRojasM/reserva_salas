@@ -1,0 +1,65 @@
+﻿@{
+    ViewBag.Title = "ListaEmpleadoPerfil";
+    Layout = null;
+
+}
+
+<div class="card card-block">
+    <table id="dtbEmpleadoPerfil" class="table table-striped table-hover table-bordered" cellspacing="0" style="width:100%"></table>
+</div>
+
+<script>
+
+    $(function () {
+
+        ListaEmpleadoPerfil = {
+            dtEmpleadoPerfil: null,
+            init: function () {
+                this.dtEmpleadoPerfil = $('#dtbEmpleadoPerfil').DataTable({
+                    responsive: true,
+                    rowId: 'IdEmpleadoPerfil',
+                    language: {
+                            url: '/assets/libs/datatables.net/js/es-ES.json',
+                        },
+                        "ordering": false,
+                    "lengthMenu": [[10, 25, 50, 100, 100000], [10, 25, 50, 100, 'Todo']],
+                    select: {
+                        style: 'single',
+info: false
+                    },
+                    "serverSide": true,
+                    "ajax": {
+                        "url": "@Url.Action("ListarEmpleadoPerfil", "EmpleadoPerfil")",
+                        "error": function (respuesta, error, thrown) {
+                            ValidarSesionActual(respuesta);
+                        },
+                        "type": "POST",
+                        "data": function (d) {
+                            d.IdEmpleado = @ViewBag.IdEmpleado;
+                        }
+                    },
+                    "columns": [
+
+                        { "title": "Empresa/Sede", "data": "EmpresaSede", "className": "dt-head-center dt-body-left", "width": "30%" },
+                        { "title": "Area", "data": "Area", "className": "dt-head-center dt-body-left", "width": "35%" },
+                        { "title": "Cargo", "data": "Cargo", "className": "dt-head-center dt-body-left", "width": "30%" },
+                        { "title": "Activo", "data": "Activo", "className": "dt-head-center dt-body-center", "width": "5%" }
+                    ]
+                });
+            },
+            refresh: function () {
+                this.dtEmpleadoPerfil.ajax.reload(null, false);
+            }
+        }
+        ListaEmpleadoPerfil.init();
+    });
+</script>
+
+
+
+
+
+
+
+
+

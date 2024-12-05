@@ -1,0 +1,284 @@
+﻿@model Seguridad.Usuario
+@{
+    ViewBag.Title = "Registro Usuario";
+    Layout = null;
+}
+<form id="frmRegistroUsuario" name="frmRegistroUsuario" method="POST">
+    <input type="hidden" id="txtRegIdUsuario" name="txtRegIdUsuario" value="@Model.IdUsuario" />
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Datos del Usuario</h5>
+            <div class="row">
+                <div class="col-md-4 mb-1">
+                    <div class="form-group">
+                        <label class="form-label" for="cmbCatalogoTipoUsuario">Tipo de Usuarios</label>
+                        <select class="form-control form-select" id="cmbCatalogoTipoUsuario" name="cmbCatalogoTipoUsuario" data-validation="[V>0]" data-validation-message="Seleccione el CatalogoTipoUsuario"></select>
+                    </div>
+                </div>
+
+                @*<div class="col-md-4">
+                <div class="form-group">
+                <label class="form-label" for="cmbPersona">Nombre completo del usuario</label>
+                <input type="hidden" id="txtIdPersona" name="txtIdPersona" value="@Model.persona.IdPersona" />
+                <input autocomplete="off" type="text" class="form-control" name="txtPersona" id="txtPersona" value="@Model.persona.NombreCompleto">
+
+                </div>
+                </div>*@
+
+                <div class="col-md-4 mb-1">
+                    <div class="form-group">
+                        <label class="form-label" for="cmbPersona">Persona</label>
+                        <select class="form-control form-select" id="cmbPersona" name="cmbPersona" data-validation="[V>0]" data-validation-message="Seleccione una persona">
+                            @if (Model.persona.IdPersona > 0)
+                            {
+                                <option value="@Model.persona.IdPersona" selected="selected">@Model.persona.NombreCompleto</option>
+                            }
+                            else
+                            {
+                                <option></option>
+                            }
+                            
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-1">
+                    <div class="form-group">
+                        <label class="form-label" for="txtEmail">Email</label>
+                        <input type="email" class="form-control" name="txtEmail" id="txtEmail" value="@Model.Email" data-validation="[L>=1]" data-validation-message="Ingrese la Email" autocomplete="off">
+                    </div>
+                </div>
+                <div class="col-md-4 mb-1">
+                    <div class="form-group">
+                        <label class="form-label" for="txtLogueo">Login</label>
+                        <input type="text" class="form-control" name="txtLogueo" id="txtLogueo" value="@Model.Logueo" data-validation="[L>=1]" data-validation-message="Ingrese la Logueo" autocomplete="off">
+                    </div>
+                </div>
+
+                <!--<div hidden class="col-md-4 mb-1">-->
+                <div class="col-md-4 mb-1">
+                    <div class="form-group">
+                        <label class="form-label" for="txtClave">Clave</label>
+                        <!--<input type="hidden" id="txtPassword" name="txtPassword" value="" />-->
+                        <input type="password" autocomplete="off" class="form-control" name="txtClave" id="txtClave" value="@Model.Clave">
+                    </div>
+                </div>
+                <div class="col-md-4 mb-1">
+                    <div class="form-group mb-1">
+                        <label class="form-label" for="optBloqueado">Bloqueado</label>
+                        <select id="optBloqueado" name="optBloqueado" class="form-select">
+                            @if (Model.Bloqueado == true)
+                            {
+                                <option value="1" selected="">Si</option>
+                                <option value="0">No</option>
+                            }
+                            else
+                            {
+                                <option value="1">Si</option>
+                                <option value="0" selected="">No</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-1">
+                    <div class="form-group">
+                        <label class="form-label" for="optEsInstitucion">Es Institución</label>                     
+                        <select id="optEsInstitucion" name="optEsInstitucion" class="form-select">
+                            @if (Model.EsInstitucion == true)
+                            {
+                                <option value="1" selected="">Si</option>
+                                <option value="0">No</option>
+                            }
+                            else
+                            {
+                                <option value="1">Si</option>
+                                <option value="0" selected="">No</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-1">
+                    <div class="form-group">
+                        <input type="hidden" id="txtNombreRutaArchivoFoto" name="txtNombreRutaArchivoFoto" value="@Model.RutaArchivoFoto" />
+                        <label class="form-label" for="txtRutaArchivoFoto">Foto</label>
+                        <input type="file" data-allowed-file-extensions="jpg png jpeg" Data-Height="70" name="txtRutaArchivoFoto" id="txtRutaArchivoFoto" data-default-file="@(System.Configuration.ConfigurationManager.AppSettings["HostImagenes"] + Model.RutaArchivoFoto )" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer" style="text-align:end;">
+            <button type="button" data-toggle="tooltip" class="btn btn-warning waves-effect waves-light" title="Actualizar tabla de registros" onclick="ActualizarTablaUsuario()"> Refrescar &nbsp;<i class="fas fa-sync"></i></button>
+            <button type="button" data-toggle="tooltip" class="btn btn-success waves-effect waves-light" title="Nuevo registro" onclick="VerEditarUsuario(0)"> Nuevo &nbsp;<i id="iBtnNuevoUsuario" class="ti-file"></i></button>
+            <button type="submit" data-toggle="tooltip" class="btn btn-primary waves-effect waves-light" title="Grabar registro"> Guardar &nbsp;<i class="ti-save"></i></button>
+        </div>
+    </div>
+</form>
+
+<script>
+    /*
+     function ListarPersonaPorAutoComplete() {
+            $("#txtPersona").jqxInput({
+                placeHolder: " Escriba y seleccione una persona",
+                height: 30,
+                source: function (query, response) {
+                    var dataAdapter = new $.jqx.dataAdapter
+                        ({
+                            datatype: "json",
+                            datafields: [{ name: 'IdPersona' }, { name: 'NombreCompleto' }],
+                            url: "@Url.Action("ListarPersonaPorAutoComplete", "Persona")",
+                            data: { NombreCompleto: query }
+                        },
+                            {
+                                autoBind: true,
+                                formatData: function (data) {
+                                    data.name_startsWith = query;
+                                    return data;
+                                },
+                                loadComplete: function (data) {
+                                    response($.map(data, function (item) {
+                                        return {
+                                            label: item.NombreCompleto,
+                                            value: item.IdPersona
+                                        }
+                                    }));
+                                }
+                            });
+                }, displayMember: "NombreCompleto", valueMember: "IdPersona", height: 30
+            });
+            $("#txtPersona").on('select', function (event) {
+                $("#txtIdPersona").val(0);
+                if (event.args) {
+                    var item = event.args.item;
+                    if (item) {
+                        $("#txtIdPersona").val(item.value);
+                    }
+                    else {
+                        $("#txtIdPersona").val(0);
+                    }
+                }
+                else {
+                    $("#txtIdPersona").val(0);
+                }
+            });
+        }
+        */
+    function ListarPersonaNaturalPorAutoComplete() {
+        $('#cmbPersona').select2({
+            placeholder: 'Seleccione una persona',
+            allowClear: true,
+            
+            ajax: {
+                delay: 250,
+                method: 'POST',
+                url: "@Url.Action("ListarPersonaNaturalAutoComplete", "Persona")",
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        type: 'public'
+                    }
+                    return query;
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.items
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1
+        }).on("select2:select", function (e) {
+
+            $("#frmRegistroUsuario").removeError("cmbPersona")
+        });;;
+        // $('#cmbPersonaEmpresa').val(null).trigger('change');
+    }
+    function CerrarModalUsuario() {
+        $("#ModalUsuario").modal("hide");
+        $("#divEditarUsuario").empty();
+        ActualizarTablaUsuario();
+    }
+    function ListarCatalogoTipoUsuario() {
+        $.ajax({
+            url: "@Url.Action("ListarCatalogoTipoUsuario", "CatalogoSeguridad")",
+            method: 'POST',
+            success: function (data) {
+                $("#cmbCatalogoTipoUsuario").empty();
+                $.each(data, function (i, item) {
+                    if (item.IdCatalogo == "@Model.catalogotipousuario.IdCatalogo") {
+                        $("#cmbCatalogoTipoUsuario").append("<option value=" + item.IdCatalogo + " selected='selected'>" + item.Descripcion + "</option>");
+                    }
+                    else {
+                        $("#cmbCatalogoTipoUsuario").append("<option value=" + item.IdCatalogo + ">" + item.Descripcion + "</option>");
+                    }
+                });
+            },
+            error: function (mensaje) {
+                console.log(mensaje);
+                toastr.error('Sucedió un error en la interface [ListarCatalogoTipoUsuario], verifique consola');
+            },
+            complete: function (respuesta) {
+                ValidarSesionActual(respuesta);
+            }
+        });
+    }
+
+    $(function () {
+        ListarPersonaNaturalPorAutoComplete();
+        ListarCatalogoTipoUsuario();
+        // $("#cmbCatalogoTipoUsuario").select2({ theme: 'bootstrap' });
+        $('#txtRutaArchivoFoto').dropify();
+        var drEventRutaArchivoFoto = $('.dropify').dropify();
+        drEventRutaArchivoFoto.on('dropify.afterClear', function (event, element) {
+            $('#txtNombreRutaArchivoFoto').val('');
+        });
+
+        $("#frmRegistroUsuario").validate({
+            submit: {
+                settings: {
+                    inputContainer: '.field',
+                    errorClass: 'LabelError', errorListClass: 'ListaError'
+                },
+                callback: {
+                    onBeforeSubmit: function (node) {
+                    },
+                    onSubmit: function (node, formData) {
+
+                        var files = $("#txtRutaArchivoFoto").get(0).files;
+                        var fileData = new FormData();
+                        for (var key in formData) {
+                            fileData.append(key, formData[key]);
+                        }
+                        fileData.append('Archivo', files[0]);
+
+
+                        $.ajax({
+                            url: "@Url.Action("GuardarRegistroUsuario","Usuario")",
+                            method: 'POST',
+                            data: fileData,
+                            contentType: false,
+                            processData: false,
+                            success: function (usuario) {
+                                if (usuario.mensaje.CodigoMensaje == 0) {
+                                    toastr.success(usuario.mensaje.DescripcionMensaje);
+                                    $("#txtRegIdUsuario").val(usuario.IdUsuario);
+                                    ActualizarTablaUsuario();
+                                }
+                                else {
+                                    toastr.error(usuario.mensaje.DescripcionMensaje);
+                                    console.log(usuario.mensaje.DescripcionMensajeSistema);
+                                }
+                            },
+                            error: function (mensaje) {
+                                console.log(mensaje);
+                                toastr.error('Sucedió un error en la interface [GuardarRegistroUsuario], verifique consola');
+                            },
+                            complete: function (respuesta) {
+                                ValidarSesionActual(respuesta);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    });
+</script>

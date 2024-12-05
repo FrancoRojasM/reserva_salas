@@ -1,0 +1,247 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    Layout = "~/Views/Shared/Inicial.cshtml";
+    Context.Session.SetString("ModuloActual", "Sistema");
+    Context.Session.SetString("PaginaActual", "Opciones");
+    Context.Session.SetString("SubPaginaActual", "");
+
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item">@Context.Session.GetString("ModuloActual")</li>
+                        <li class="breadcrumb-item active">@Context.Session.GetString("PaginaActual")</li>
+                    </ol>
+                </div>
+                <h4 class="page-title">@Context.Session.GetString("PaginaActual")</h4>
+            </div>
+        </div>
+    </div>
+</div>
+@if (ViewBag.conpermiso == 0)
+{
+    <div style="font-weight:bold;color:red;">Usted no tiene permiso para ver este recurso</div>
+}
+else
+{
+    <div class="card border-info border mb-3">
+        <div class="card-body  px-1 py-1">
+            <div id="divEditarOpcion">
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12">
+                    <table id="dtbOpcion" class="table table-striped table-hover table-bordered" cellspacing="0" style="width:100%"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="ModalOpcionFormulario" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-sde modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Formulario</h5>
+                    <a class="close" onclick="CerrarModalOpcionFormulario()"><i class="fas fa-times"></i></a>
+                </div>
+                <div class="modal-body">
+                    <div id="divModalOpcionFormulario"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="ModalEliminarOpcion" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <input type="hidden" class="form-control" name="txtIdOpcionEliminar" id="txtIdOpcionEliminar" value="">
+                    <h5 class="modal-title">Eliminar Opción</h5>
+                    <a class="close" onclick="CerrarEliminarOpcion()"><i class="fas fa-times"></i></a>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro de eliminar el registro seleccionado?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Eliminar registro seleccionado" onclick="EliminarOpcion()"> Eliminar <i class="ti-trash"></i></button>
+                    <button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Regresar al formulario anterior" onclick="CerrarEliminarOpcion()"> Cerrar <i class="ti-back-left"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section scripts {
+    <script>
+
+        function CerrarModalOpcion() {
+            $("#ModalOpcion").modal("hide");
+            $("#divEditarOpcion").empty();
+            ActualizarTablaOpcion();
+        }
+        function CerrarEliminarOpcion() {
+            $("#txtIdOpcionEliminar").val(0);
+            $("#ModalEliminarOpcion").modal("hide");
+        }
+        function EliminarOpcion() {
+            var IdOpcionEliminar = $('#txtIdOpcionEliminar').val();
+            $.ajax({
+                beforeSend: function () {
+                    $('#btnNuevoOpcion').prop('disabled', true);
+                    $('#btnGrabarOpcion').prop('disabled', true);
+                },
+                url: "@Url.Action("EliminarOpcion")",
+                method: 'POST',
+                async: true,
+                data: { IdOpcion: IdOpcionEliminar },
+                success: function (mensaje) {
+                    $("#modalEliminarOpcion").modal('hide');
+                    if (mensaje.CodigoMensaje == 0) {
+                        $("#" + IdOpcionEliminar).remove();
+                        toastr.success(mensaje.DescripcionMensaje);
+                        VerEditarOpcion(0);
+                        CerrarEliminarOpcion();
+                    }
+                    else {
+                        toastr.error(mensaje.DescripcionMensaje);
+                    }
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la llamada EliminarOpcion, verifique consola');
+                },
+                complete: function (respuesta) {
+                    $('#btnNuevoOpcion').prop('disabled', false);
+                    $('#btnGrabarOpcion').prop('disabled', false);
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+        function VerModalEliminarOpcion(IdOpcion) {
+            if (IdOpcion > 0) {
+                $("#txtIdOpcionEliminar").val(IdOpcion);
+                $("#ModalEliminarOpcion").modal("show");
+            }
+        }
+        function VerModalOpcionFormulario(IdOpcion) {
+            $.ajax({
+                url: "@Url.Action("RegistroOpcionFormulario", "OpcionFormulario")",
+                type: "POST",
+                async: true,
+                data: { IdOpcion: IdOpcion },
+                success: function (vistaParcial) {
+                    $("#divModalOpcionFormulario").html(vistaParcial);
+                    $("#ModalOpcionFormulario").modal("show");
+                },
+                error: function (mensaje) {
+                    console.log(mensaje.responseText);
+                    toastr.error('Sucedió un error en la llamada, verifique consola');
+                },
+                complete: function (respuesta) {
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+        function VerEditarOpcion(tipo) {
+            var IdOpcion = 0;
+            if (tipo == 1) {
+                var data = ListaOpcion.dtOpcion.rows('.selected').data();
+                if (data.length == 1) {
+                    IdOpcion = data[0].IdOpcion;
+                }
+            }
+            $.ajax({
+                beforeSend: function () {
+                    $('#iBtnNuevoIdOpcion').removeClass("ti-file").addClass("fa fa-spinner fa-spin fa-fw");
+                },
+                url: "@Url.Action("RegistroOpcion", "Opcion")",
+                type: "POST",
+                async: true,
+                data: { IdOpcion: IdOpcion },
+                success: function (vistaParcial) {
+                    $("#divEditarOpcion").html(vistaParcial);
+                },
+                error: function (mensaje) {
+                    console.log(mensaje);
+                    toastr.error('Sucedió un error en la llamada, verifique consola');
+                },
+                complete: function (respuesta) {
+                    $('#iBtnNuevoIdOpcion').removeClass("fa fa-spinner fa-spin fa-fw").addClass("ti-file");
+                    ValidarSesionActual(respuesta);
+                }
+            });
+        }
+
+        function ActualizarTablaOpcion() {
+            ListaOpcion.refresh();
+        }
+        $(function () {
+            ListaOpcion = {
+                dtOpcion: null,
+                init: function () {
+                    this.dtOpcion = $('#dtbOpcion').DataTable({
+                        responsive: true,
+                        rowId: 'IdOpcion',
+                        language: {
+                            url: '/assets/libs/datatables.net/js/es-ES.json',
+                        },
+                        "ordering": false,
+                        "lengthMenu": [[10, 25, 50, 100, 100000], [10, 25, 50, 100, 'Todo']],
+                        select: {
+                            style: 'single',
+                            info: false
+                        },
+                        "serverSide": true,
+                        "ajax": {
+                            "url": "@Url.Action("ListarOpcion", "Opcion")",
+                            "error": function (respuesta, error, thrown) {
+                                ValidarSesionActual(respuesta);
+                            },
+                            "type": "POST"
+                        },
+                        "columns": [
+                            { "title": "Modulo", "data": "Modulo", "className": "dt-head-left dt-body-left", "width": "15%" },
+                            { "title": "Tipo", "data": "CatalogoTipoOpcion", "className": "dt-head-left dt-body-left", "width": "10%" },
+                            { "title": "Opción padre", "data": "NombreOpcionPadre", "className": "dt-head-left dt-body-left", "width": "15%" },
+                            { "title": "Nombre", "data": "NombreOpcion", "className": "dt-head-left dt-body-left", "width": "15%" },
+                            { "title": "Detalle", "data": "DetalleOpcion", "className": "dt-head-left dt-body-left", "width": "15%" },
+                            { "title": "Orden", "data": "OrdenOpcion", "className": "dt-head-center dt-body-center", "width": "5%" },
+                            { "title": "Icono", "data": "RutaImagenOpcion", "className": "dt-head-left dt-body-left", "width": "5%" },
+                            { "title": "Activo", "data": "Activo", "className": "dt-head-center dt-body-center", "width": "5%" },
+                            {
+                                "title": "Formulario",
+                                "data": function (row, type, val, meta) {
+                                    return '<button type="button" data-toggle="tooltip" class="btn btn-warning label" title="Formulario" onclick="VerModalOpcionFormulario(' + row.IdOpcion + ')"><i id="btnOpcionFormulario' + row.IdOpcion + '" class="icon-menu"></i></button>';
+                                }, "className": "dt-head-center dt-body-center", "width": "5%"
+                            },
+                            {
+                                "title": "Eliminar",
+                                "data": function (row, type, val, meta) {
+                                    return '<button type="button" data-toggle="tooltip" class="btn btn-danger label" title="Opciones" onclick="VerModalEliminarOpcion(' + row.IdOpcion + ')"><i id="btnOpcion' + row.IdOpcion + '" class="fa fa-trash"></i></button>';
+                                },
+                                "className": "dt-head-center dt-body-center", "width": "5%"
+                            }
+                        ]
+                    });
+                },
+                refresh: function () {
+                    this.dtOpcion.ajax.reload(null, false);
+                }
+            }
+            ListaOpcion.init();
+            ListaOpcion.dtOpcion.on('select', function (e, dt, type, indexes) {
+                var count = ListaOpcion.dtOpcion.rows({ selected: true }).count();
+                if (count > 0) {
+                    VerEditarOpcion(1);
+                }
+            });
+            VerEditarOpcion(0);
+        });
+    </script>
+    }
+}

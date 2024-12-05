@@ -1,0 +1,155 @@
+﻿@{
+    ViewBag.Title = "ListaSancion";
+    Layout = null;
+}
+<div class="card card-topline-aqua">
+    <div class="card-head">
+        <header style="text-transform: uppercase;"><span><i class="fa fa-tasks"></i></span> Sancion </header>
+        <div class="tools">
+            <a class="t-collapse btn-color fa fa-chevron-down" href="javascript:;"></a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="divEditarSancion">
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-block">
+        <table id="dtbSancion" class="table table-striped table-hover table-bordered" cellspacing="0" style="width:100%"></table>
+    </div>
+</div>
+
+
+    <script>
+
+		function VerEditarSancion(tipo) {
+			var Id = 0;
+			else if(tipo==1)
+			{
+			    var data = ListaSancion.dtSancion.rows('.selected').data();
+			    if (data.length == 1) {
+				    Id = data[0].Id;
+			    }
+			}
+			 $.ajax({
+                beforeSend: function () {
+                    $('#iBtnNuevoId').removeClass("ti-file").addClass("fa fa-spinner fa-spin fa-fw");
+                },
+                url: "@Url.Action("RegistroSancion", "Sancion")",
+                type: "POST",
+				async: true,
+                data: { Id: Id},
+                success: function (vistaParcial) {
+                    $("#divEditarSancion").html(vistaParcial);
+                },
+				error: function (mensaje) {
+					console.log(mensaje);
+                    toastr.error('Sucedió un error en la llamada, verifique consola');
+                },
+                complete: function (respuesta) {
+                    $('#iBtnNuevoId').removeClass("fa fa-spinner fa-spin fa-fw").addClass("ti-file");
+					ValidarSesionActual(respuesta);
+                }
+            });
+        }
+
+		 function ActualizarTablaSancion() {
+            ListaSancion.refresh();
+        }
+
+        $(function () {
+		 VerEditarSancion(0);
+		     ListaSancion = {
+                dtSancion: null,
+                init: function () {
+                    this.dtSancion = $('#dtbSancion').DataTable({
+                        responsive: true,
+						rowId: 'Id',
+						language: {
+                            url: '/assets/libs/datatables.net/js/es-ES.json',
+                        },
+                        "ordering": false,
+						"lengthMenu": [[10, 25, 50, 100, 100000], [10, 25, 50, 100, 'Todo']],
+                        select: {
+                            style: 'single',
+                            info: false
+                        },
+                        "serverSide": true,
+                        "ajax": {
+                            "url": "@Url.Action("ListarSancion", "Sancion")",
+							"error": function (respuesta, error, thrown) {
+                                ValidarSesionActual(respuesta);
+                            },
+							"type": "POST"
+							//"data": function (d) {
+                            //    d.extra_search = $('#extra').val();
+                            //}
+                        },
+                        "columns": [
+                            { "title": "Id", "data": "Id", "className": "dt-head-center dt-body-left", "width": "5%" },
+                            { "title": "Tipo de Documento", "data": "TipoDocumento", "className": "dt-head-center dt-body-left", "width": "10%" },
+                            { "title": "Número de Documento", "data": "NroDocumento", "className": "dt-head-center dt-body-left", "width": "10%" },
+                            { "title": "Nombre Completo", "data": "NombreCompleto", "className": "dt-head-center dt-body-left", "width": "10%" },
+                            { "title": "Tipo Sancion", "data": "TipoSancion", "className": "dt-head-center dt-body-left", "width": "10%" },
+                            { "title": "Consejo Regional", "data": "ConsejoRegional", "className": "dt-head-center dt-body-left", "width": "10%" },
+                            { "title": "CMP", "data": "CMP", "className": "dt-head-center dt-body-left", "width": "10%" },
+                            { "title": "Numero Resolucion", "data": "NumeroResolucion", "className": "dt-head-center dt-body-left", "width": "10%" },
+                            {
+                                "title": "Fecha Resolucion", "data": "FechaResolucion", "className": "dt-head-center dt-body-left", "width": "15%", "render": function (data, type, row) {
+                                    return data ? moment(data).format('DD/MM/YYYY') : '';
+                                }
+                            },
+                            {
+                                "title": "Fecha Notificacion Medico", "data": "FechaNotificacionMedico", "className": "dt-head-center dt-body-left", "width": "10%", "render": function (data, type, row) {
+                                    return data ? moment(data).format('DD/MM/YYYY') : '';
+                                }
+                            },
+                            {
+                                "title": "Fecha Vencimiento Sancion", "data": "FechaVencimientoSancion", "className": "dt-head-center dt-body-left", "width": "10%", "render": function (data, type, row) {
+                                    return data ? moment(data).format('DD/MM/YYYY') : '';
+                                }
+                            },
+                            {
+                                "title": "Fecha Cumplimiento Multa", "data": "FechaCumplimientoMulta", "className": "dt-head-center dt-body-left", "width": "10%", "render": function (data, type, row) {
+                                    return data ? moment(data).format('DD/MM/YYYY') : '';
+                                }
+                            },
+                            {
+                                "title": "Fecha Registro Inscripcion", "data": "FechaRegistroInscripcion", "className": "dt-head-center dt-body-left", "width": "10%", "render": function (data, type, row) {
+                                    return data ? moment(data).format('DD/MM/YYYY') : '';
+                                }
+                            },
+                            { "title": "Estado Sancion", "data": "EstadoSancion", "className": "dt-head-center dt-body-left", "width": "10%" },
+                            { "title": "Sancion Impuesta", "data": "SancionImpuesta", "className": "dt-head-center dt-body-left", "width": "10%" },
+                            { "title": "Norma Vulnerada", "data": "IndicacionNormaVulnerada", "className": "dt-head-center dt-body-left", "width": "10%" },
+                        ]
+                    });
+                },
+                refresh: function () {
+                    this.dtSancion.ajax.reload( null, false );
+                }
+            }
+            ListaSancion.init();
+            ListaSancion.dtSancion.on('select', function (e, dt, type, indexes) {
+                var count = ListaSancion.dtSancion.rows({ selected: true }).count();
+                if (count > 0) {
+					VerEditarSancion(1);
+                }
+            });
+            ListaSancion.dtSancion.on('deselect', function (e, dt, type, indexes) {
+                var count = ListaSancion.dtSancion.rows({ selected: true }).count();
+                if (count == 0) {
+                    $('#btnVerModalEliminarSancion').prop('disabled', true);
+                }
+            });
+        });
+    </script>
+
+
+
+
+
+
+
+

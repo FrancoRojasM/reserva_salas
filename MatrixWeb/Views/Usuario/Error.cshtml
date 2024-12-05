@@ -1,0 +1,73 @@
+﻿@using System.Configuration
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="auth-fluid">
+    <!--Auth fluid left content -->
+    <div class="auth-fluid-form-box">
+        <div class="align-items-center d-flex h-100">
+            <div class="p-3">
+
+                <!-- Logo -->
+                <div class="auth-brand text-center text-lg-start">
+                    <div class="auth-brand">
+                        <a href="index.html" class="logo logo-dark text-center">
+                            <span class="logo-lg">
+                                <img src="@ConfigurationManager.AppSettings["HostImagenes"]LogoInstitucion.png" alt="" height="55">
+                            </span>
+                        </a>
+
+                        <a href="index.html" class="logo logo-light text-center">
+                            <span class="logo-lg">
+                                <img src="@ConfigurationManager.AppSettings["HostImagenes"]LogoInstitucion.png" alt="" height="55">
+                            </span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-12">
+                        <div class="error-text-box">
+                            <svg viewBox="0 0 600 200">
+                                <!-- Symbol-->
+                                <symbol id="s-text">
+                                    <text text-anchor="middle" x="50%" y="50%" dy=".35em">404!</text>
+                                </symbol>
+                                <!-- Duplicate symbols-->
+                                <use class="text" xlink:href="#s-text"></use>
+                                <use class="text" xlink:href="#s-text"></use>
+                                <use class="text" xlink:href="#s-text"></use>
+                                <use class="text" xlink:href="#s-text"></use>
+                                <use class="text" xlink:href="#s-text"></use>
+                            </svg>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="mt-0 mb-2">Ops! Pagina no encontrada </h3>
+                            <p class="text-muted mb-3">
+                               No te preocupes, estamos trabajando en ello.
+                            </p>
+
+                            <a href="@Url.Action("Login", "Usuario")" class="btn btn-success waves-effect waves-light">Regresar</a>
+                        </div>
+                        <!-- end row -->
+
+                    </div> <!-- end col -->
+                </div>
+                <!-- end row -->
+                <!-- Footer-->
+                <footer class="footer footer-alt">
+                    <p class="text-muted">@DateTime.Now.Year ® @MatrixUtilitarios.DatosGlobales.NombreSoftware - @MatrixUtilitarios.DatosGlobales.NombreInstitucionLargo ® </p>
+                </footer>
+
+            </div> <!-- end .card-body -->
+        </div> <!-- end .align-items-center.d-flex.h-100-->
+    </div>
+    <!-- end auth-fluid-form-box-->
+    <!-- Auth fluid right content -->
+    <div class="auth-fluid-right text-center">
+    </div>
+    <!-- end Auth fluid right content -->
+</div>
+<!-- end auth-fluid-->
